@@ -1,4 +1,4 @@
-# Tangled on 2025-08-12T18:59:50
+# Tangled on 2025-08-18T10:12:08
 
 # Minimal STAC-like dataset (Week 1)
 # Tangles to `geogfm/data/datasets/stac_dataset.py`
