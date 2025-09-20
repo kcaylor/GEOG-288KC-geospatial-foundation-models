@@ -2,12 +2,18 @@
 example_course/
 LLMS-from-scratch/
 
+# Agents and Tools:
+.cursor/
+.claude/
+
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .cursor/
+.claude/
 .Python
 build/
 develop-eggs/
