@@ -1,0 +1,112 @@
+---
+title: "HuggingFace Cache on Shared Servers"
+subtitle: "Managing HuggingFace cache directories on UCSB AI Sandbox"
+---
+
+## The Problem
+
+When working on shared computational environments like the UCSB AI Sandbox, HuggingFace libraries default to storing datasets and models in the shared conda environment installation directory. Since users don't have write permissions to this location, attempts to download datasets or models will fail with permission errors.
+
+## The Solution
+
+Redirect HuggingFace's cache directories to your personal user directory by setting environment variables before importing HuggingFace libraries.
+
+## Step-by-Step Setup
+
+### 1. Configure Environment Variables
+
+Set up your custom cache directories at the beginning of your notebook or script:
+
+```python
+import os
+import pathlib
+
+# Specify the full path to where you want your data to be located
+# Replace with your preferred location
+BASE = "/home/caylor/hf_cache"
+
+# Setup environment variables that are used by the HF library
+os.environ["HF_HOME"]            = os.path.join(BASE, "hfhome")
+os.environ["HF_HUB_CACHE"]       = os.path.join(BASE, "hub")
+os.environ["HF_DATASETS_CACHE"]  = os.path.join(BASE, "datasets")
+os.environ["TRANSFORMERS_CACHE"] = os.path.join(BASE, "transformers")
+
+# Ensure all the necessary folders are created
+for p in [os.environ["HF_HOME"], os.environ["HF_HUB_CACHE"],
+          os.environ["HF_DATASETS_CACHE"], os.environ["TRANSFORMERS_CACHE"]]:
+    pathlib.Path(p).mkdir(parents=True, exist_ok=True)
+```
+
+### 2. Import HuggingFace Libraries
+
+After setting environment variables, import the libraries you need:
+
+```python
+from datasets import load_dataset
+from datasets import DownloadConfig
+```
+
+### 3. Use Download Config When Loading Data
+
+When loading datasets, pass your cache directory configuration:
+
+```python
+# The download config needs your local HF_HUB_CACHE location
+dc = DownloadConfig(cache_dir=os.environ["HF_HUB_CACHE"])
+
+# Load dataset with custom cache location
+ds = load_dataset("glue", "mrpc",
+                  cache_dir=os.environ["HF_DATASETS_CACHE"])
+```
+
+### 4. Verify Data Loaded Successfully
+
+```python
+# Check the dataset structure
+ds
+```
+
+Expected output:
+```
+DatasetDict({
+    train: Dataset({
+        features: ['sentence1', 'sentence2', 'label', 'idx'],
+        num_rows: 3668
+    })
+    validation: Dataset({
+        features: ['sentence1', 'sentence2', 'label', 'idx'],
+        num_rows: 408
+    })
+    test: Dataset({
+        features: ['sentence1', 'sentence2', 'label', 'idx'],
+        num_rows: 1725
+    })
+})
+```
+
+## Key Points
+
+**Set environment variables BEFORE importing HuggingFace libraries** - Once imported, the libraries have already determined their cache locations.
+
+**Choose a base directory with sufficient storage** - Models and datasets can be large (several GB).
+
+**The same setup works for all HuggingFace libraries** - This approach works for `datasets`, `transformers`, `diffusers`, and other HuggingFace libraries.
+
+**Share cache between projects** - By using the same `BASE` directory across notebooks, you can reuse downloaded models and datasets.
+
+## Environment Variables Explained
+
+- **`HF_HOME`**: Main directory for all HuggingFace data
+- **`HF_HUB_CACHE`**: Storage for downloaded model files
+- **`HF_DATASETS_CACHE`**: Storage for downloaded datasets
+- **`TRANSFORMERS_CACHE`**: Legacy cache location for transformers library
+
+## Recommended Directory Structure
+
+```
+/home/{your_username}/hf_cache/
+├── hfhome/
+├── hub/              # Models stored here
+├── datasets/         # Datasets stored here
+└── transformers/     # Legacy cache
+```

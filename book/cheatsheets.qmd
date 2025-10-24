@@ -40,6 +40,7 @@ format:
 - [Loading Pre-trained Models](extras/cheatsheets/loading_models.qmd)
 - [Model Inference & Feature Extraction](extras/cheatsheets/model_inference.qmd)
 - [Fine-tuning Strategies](extras/cheatsheets/finetuning_basics.qmd)
+- [HuggingFace Cache on Shared Servers](extras/cheatsheets/huggingface_cache_server.qmd)
 
 ## 📊 Visualization & Analysis
 

@@ -122,7 +122,7 @@
   </url>
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/cheatsheets.html</loc>
-    <lastmod>2025-10-10T16:51:28.827Z</lastmod>
+    <lastmod>2025-10-24T18:26:38.036Z</lastmod>
   </url>
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/cheatsheets/cloud_scalable_computing.html</loc>
@@ -231,5 +231,9 @@
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/chapters/c01-geospatial-data-foundations-OLD.html</loc>
     <lastmod>2025-10-09T17:41:47.790Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/cheatsheets/huggingface_cache_server.html</loc>
+    <lastmod>2025-10-24T18:26:20.087Z</lastmod>
   </url>
 </urlset>
