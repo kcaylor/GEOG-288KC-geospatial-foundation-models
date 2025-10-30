@@ -1,0 +1,1182 @@
+---
+title: "Segmentation Fine-Tuning with TerraTorch"
+subtitle: "Fine-tuning pretrained models for pixel-wise classification"
+jupyter: geoai
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+---
+
+## Overview
+
+This example demonstrates fine-tuning a pretrained geospatial foundation model for semantic segmentation. We'll load a pretrained Prithvi model, adapt it for pixel-wise classification, and train it on **real Sentinel-2 imagery from STAC catalogs**.
+
+**This is a complete, project-ready workflow** - from raw satellite data to trained model. You can use this as a template for your own projects.
+
+:::{.callout-tip}
+## What You'll Learn
+- Search and load real Sentinel-2 scenes from STAC catalogs
+- Extract training patches from large satellite imagery
+- Create pixel-wise segmentation targets from satellite imagery
+- Load pretrained foundation models for segmentation tasks
+- Fine-tune models using transfer learning
+- Evaluate segmentation performance with per-class metrics
+- Visualize prediction results
+:::
+
+## Background
+
+**Segmentation vs Classification:**
+- **Classification**: Assigns a single label to an entire image patch
+- **Segmentation**: Assigns a label to each pixel independently
+
+**Why Real Data in This Example:**
+
+Unlike the classification example that uses benchmark datasets (EuroSAT), this example works with **real Sentinel-2 scenes from STAC catalogs**. This mirrors what you'll do in your projects:
+- Query STAC catalogs for imagery
+- Extract patches from large scenes
+- Handle cloud masking and data quality
+- Create custom training datasets
+
+**Fine-tuning approach:**
+We use a pretrained encoder (Prithvi) that learned representations from large-scale satellite data, and attach a decoder head trained for our specific segmentation task. The encoder weights can be frozen (feature extraction) or unfrozen (full fine-tuning).
+
+## Setup
+
+### Imports
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.ndimage import zoom
+import logging
+
+from geogfm.c01 import setup_planetary_computer_auth, search_sentinel2_scenes, load_sentinel2_bands
+
+logger = logging.getLogger(__name__)
+
+setup_planetary_computer_auth()
+
+# Select device - prefer CUDA, then MPS (Apple Silicon), then CPU
+if torch.cuda.is_available():
+    device = torch.device('cuda')
+    logger.info(f"Using CUDA GPU: {torch.cuda.get_device_name(0)}")
+elif torch.backends.mps.is_available():
+    device = torch.device('mps')
+    logger.info("Using Apple Silicon MPS")
+else:
+    device = torch.device('cpu')
+    logger.info("Using CPU (no GPU acceleration available)")
+```
+
+## Data Preparation
+
+### Load Satellite Imagery
+
+We'll use a coastal area that naturally provides good class balance between water, vegetation, and other land cover types.
+
+:::{.callout-tip}
+## Choosing Study Areas for Balanced Training
+
+For segmentation tasks, choose regions with diverse land cover:
+- **Coastal areas**: Mix of water, urban, and vegetation
+- **Agricultural zones**: Multiple crop types and land uses
+- **Urban-rural transitions**: Built environment + natural areas
+- **River corridors**: Water, riparian vegetation, and developed land
+
+**Why San Francisco Bay Area?**
+- **Water**: Bay, ocean, rivers (excellent representation)
+- **Vegetation**: Parks, hills, agricultural areas
+- **Other**: Urban development, bare ground, beaches
+
+This region naturally provides better class balance than purely coastal or inland areas.
+
+**Other good regions for balanced segmentation training:**
+
+```python
+# Sacramento Delta (rivers + agriculture + wetlands)
+aoi = [-121.6, 38.0, -121.4, 38.2]
+
+# Florida Everglades (water + wetland vegetation)
+aoi = [-80.5, 25.5, -80.3, 25.7]
+
+# Minnesota lake region (many small water bodies + forest)
+aoi = [-94.5, 47.0, -94.3, 47.2]
+
+# Chesapeake Bay (water + coastal vegetation + urban)
+aoi = [-76.5, 38.5, -76.3, 38.7]
+```
+:::
+
+```{python}
+# Define area of interest - San Francisco Bay Area
+# This region has excellent class balance: water (bay), vegetation (parks/hills), urban
+aoi = [-122.5, 37.7, -122.3, 37.9]
+
+# Alternative: Sacramento Delta (rivers + agriculture)
+# aoi = [-121.6, 38.0, -121.4, 38.2]
+
+# Alternative: Florida Everglades (water + wetland vegetation)
+# aoi = [-80.5, 25.5, -80.3, 25.7]
+
+# Search for clear Sentinel-2 scenes
+scenes = search_sentinel2_scenes(
+    bbox=aoi,
+    date_range="2023-06-01/2023-08-31",
+    cloud_cover_max=10,
+    limit=1
+)
+
+scene = scenes[0]
+logger.info(f"Using scene: {scene.id}")
+logger.info(f"Date: {scene.properties['datetime'][:10]}")
+logger.info(f"Cloud cover: {scene.properties.get('eo:cloud_cover', 'N/A')}%")
+```
+
+### Extract Image Patches
+
+We need a function to extract random patches from our satellite scene. This is a core workflow for any project using large satellite imagery.
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+#| mode: append
+
+def extract_patches(scene, bbox, patch_size=64, n_patches=100):
+    """
+    Extract square patches from Sentinel-2 scene for segmentation tasks.
+
+    Loads six Sentinel-2 bands (Blue, Green, Red, NIR, SWIR1, SWIR2),
+    resamples 20m bands to 10m resolution, and extracts random patches
+    with at least 80% valid (unmasked) pixels.
+
+    Parameters
+    ----------
+    scene : pystac.Item
+        STAC item representing the Sentinel-2 scene
+    bbox : list[float]
+        Bounding box [min_lon, min_lat, max_lon, max_lat]
+    patch_size : int, optional
+        Size of square patches in pixels (default: 64)
+    n_patches : int, optional
+        Number of patches to extract (default: 100)
+
+    Returns
+    -------
+    patches : torch.Tensor
+        Tensor of shape (N, 6, patch_size, patch_size) with normalized patches
+
+    Notes
+    -----
+    - Bands are normalized per-patch using 2nd-98th percentile scaling
+    - Only patches with >=80% valid pixels are retained
+    - 20m bands (SWIR1, SWIR2) are resampled to 10m resolution
+
+    Examples
+    --------
+    >>> from geogfm.c01 import search_sentinel2_scenes
+    >>> scenes = search_sentinel2_scenes(bbox=[-120, 34, -119, 35], limit=1)
+    >>> patches = extract_patches(scenes[0], bbox=[-120, 34, -119, 35], patch_size=64, n_patches=50)
+    >>> patches.shape
+    torch.Size([50, 6, 64, 64])
+    """
+    # Load 6 bands matching Prithvi's input
+    band_data = load_sentinel2_bands(
+        scene,
+        bands=['B02', 'B03', 'B04', 'B08', 'B11', 'B12'],
+        subset_bbox=bbox,
+        max_retries=3
+    )
+
+    logger.info(f"Loaded {len([k for k in band_data.keys() if k.startswith('B')])} bands")
+
+    # Get target shape from 10m bands
+    target_shape = band_data['B02'].shape
+
+    # Resample 20m bands to 10m resolution
+    bands_list = []
+    for band_name in ['B02', 'B03', 'B04', 'B08', 'B11', 'B12']:
+        band = band_data[band_name]
+        if band.shape != target_shape:
+            zoom_factors = (
+                target_shape[0] / band.shape[0],
+                target_shape[1] / band.shape[1]
+            )
+            band = zoom(band, zoom_factors, order=1)
+        bands_list.append(band)
+
+    # Stack bands into (C, H, W)
+    bands = np.stack(bands_list)
+
+    # Create validity mask
+    mask = ~np.isnan(bands[0])
+
+    # Extract random patches
+    _, H, W = bands.shape
+    patches = []
+
+    for _ in range(n_patches * 2):  # Try more to ensure enough valid
+        y = np.random.randint(0, H - patch_size)
+        x = np.random.randint(0, W - patch_size)
+
+        patch = bands[:, y:y+patch_size, x:x+patch_size]
+        patch_mask = mask[y:y+patch_size, x:x+patch_size]
+
+        if np.mean(patch_mask) > 0.8:  # 80% valid pixels
+            # Normalize per-patch using percentile scaling
+            patch_norm = np.zeros_like(patch)
+            for c in range(patch.shape[0]):
+                valid = patch[c][~np.isnan(patch[c])]
+                if len(valid) > 0:
+                    p2, p98 = np.percentile(valid, [2, 98])
+                    patch_norm[c] = np.clip(
+                        (patch[c] - p2) / (p98 - p2 + 1e-8), 0, 1
+                    )
+                    patch_norm[c] = np.nan_to_num(patch_norm[c], 0)
+
+            patches.append(patch_norm)
+
+        if len(patches) >= n_patches:
+            break
+
+    return torch.from_numpy(np.stack(patches)).float()
+```
+
+Now extract patches from our scene:
+
+```{python}
+# Extract patches
+# Start with more patches so stratified sampling has options if needed
+patches = extract_patches(scene, aoi, patch_size=64, n_patches=300)
+logger.info(f"Extracted {len(patches)} patches of shape {patches[0].shape}")
+```
+
+### Create Segmentation Masks
+
+For segmentation, we need pixel-wise labels. This function uses **percentile-based classification** to guarantee better class balance.
+
+**Why Percentiles Instead of Fixed Thresholds?**
+
+Fixed thresholds (e.g., NDVI > 0.5 for vegetation) often fail because:
+- Different scenes have different spectral distributions
+- Urban scenes may have very little high-NDVI vegetation
+- Result: 95%+ "Other" class, model can't learn
+
+**Direct percentile assignment:**
+- Rank ALL pixels by NDVI and NDWI
+- Assign top 30% of NDVI → vegetation
+- Assign bottom 30% of NDWI → water
+- Remaining 40% → other
+- **GUARANTEES** exactly these proportions
+
+**Spectral Indices:**
+- **NDVI** (Normalized Difference Vegetation Index): `(NIR - Red) / (NIR + Red)`
+  - Higher values = more vegetation-like
+- **NDWI** (Normalized Difference Water Index): `(Green - NIR) / (Green + NIR)`
+  - Lower values (more negative) = more water-like
+
+**Classification Logic:**
+1. Compute NDVI/NDWI for all pixels across all patches
+2. Find 70th percentile of NDVI, 30th percentile of NDWI
+3. Assign pixels:
+   - **Water (Class 1)**: NDWI below 30th percentile
+   - **Vegetation (Class 0)**: NDVI above 70th percentile (excluding water)
+   - **Other (Class 2)**: Everything else - urban, bare soil, roads
+
+**Trade-offs:**
+- ✅ Guarantees balanced training data
+- ✅ Adapts to any scene
+- ⚠️ "Vegetation" in urban scenes may just be greenest pixels (still urban)
+- ⚠️ In production, use real ground-truth labels
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+#| mode: append
+
+def create_segmentation_masks(patches, veg_pct=30, water_pct=30):
+    """
+    Create pixel-wise segmentation masks using direct percentile assignment.
+
+    Assigns pixels to classes based on their rank in NDVI/NDWI distributions,
+    guaranteeing specified class representation regardless of scene content.
+
+    Classification strategy:
+        - 0: Vegetation (top veg_pct% of NDVI)
+        - 1: Water (bottom water_pct% of NDWI)
+        - 2: Other (remaining pixels)
+
+    Parameters
+    ----------
+    patches : torch.Tensor
+        Tensor of shape (N, C, H, W) with C=6 bands:
+        [Blue, Green, Red, NIR, SWIR1, SWIR2]
+    veg_pct : int, optional
+        Percentage of pixels to classify as vegetation (default: 30)
+    water_pct : int, optional
+        Percentage of pixels to classify as water (default: 30)
+
+    Returns
+    -------
+    masks : torch.Tensor
+        Tensor of shape (N, H, W) with class indices for each pixel
+
+    Notes
+    -----
+    NDVI = (NIR - Red) / (NIR + Red) - vegetation index
+    NDWI = (Green - NIR) / (Green + NIR) - water index
+
+    This approach GUARANTEES the specified class distribution by ranking
+    pixels and assigning top/bottom percentiles. The labels are pseudo-labels
+    for demonstration - in production, use real ground truth data.
+
+    Examples
+    --------
+    >>> patches = torch.rand(10, 6, 64, 64)
+    >>> masks = create_segmentation_masks(patches, veg_pct=30, water_pct=30)
+    >>> # Should have ~30% vegetation, ~30% water, ~40% other
+    >>> torch.bincount(masks.flatten()) / masks.numel()
+    """
+    # Collect all NDVI and NDWI values across all patches
+    all_ndvi_list = []
+    all_ndwi_list = []
+    all_positions = []  # Track which patch and pixel each value came from
+
+    for patch_idx, patch in enumerate(patches):
+        green = patch[1]
+        red = patch[2]
+        nir = patch[3]
+
+        ndvi = (nir - red) / (nir + red + 1e-8)
+        ndwi = (green - nir) / (green + nir + 1e-8)
+
+        # Flatten and store
+        H, W = ndvi.shape
+        for i in range(H):
+            for j in range(W):
+                all_ndvi_list.append(ndvi[i, j].item())
+                all_ndwi_list.append(ndwi[i, j].item())
+                all_positions.append((patch_idx, i, j))
+
+    # Convert to numpy for faster sorting
+    import numpy as np
+    all_ndvi = np.array(all_ndvi_list)
+    all_ndwi = np.array(all_ndwi_list)
+
+    # Compute percentile thresholds
+    ndvi_threshold = np.percentile(all_ndvi, 100 - veg_pct)
+    ndwi_threshold = np.percentile(all_ndwi, water_pct)
+
+    # Create masks
+    masks = []
+    for patch in patches:
+        mask = torch.full((patch.shape[1], patch.shape[2]), 2, dtype=torch.long)
+        masks.append(mask)
+
+    # Assign classes based on thresholds
+    for idx, (patch_idx, i, j) in enumerate(all_positions):
+        ndvi_val = all_ndvi[idx]
+        ndwi_val = all_ndwi[idx]
+
+        # Priority: water first, then vegetation, then other
+        if ndwi_val <= ndwi_threshold:
+            masks[patch_idx][i, j] = 1  # Water
+        elif ndvi_val >= ndvi_threshold:
+            masks[patch_idx][i, j] = 0  # Vegetation
+        # else: stays as 2 (Other)
+
+    return torch.stack(masks)
+```
+
+```{python}
+# Create masks for all patches using direct percentile assignment
+# This GUARANTEES the specified class distribution:
+#   veg_pct=30 → exactly 30% of pixels will be vegetation
+#   water_pct=30 → exactly 30% of pixels will be water
+#   Remaining ~40% will be "other"
+#
+# Adjust these percentages to change class balance:
+#   - veg_pct=40, water_pct=30 → more vegetation, less other
+#   - veg_pct=25, water_pct=25 → more balanced three-way split
+masks = create_segmentation_masks(patches, veg_pct=30, water_pct=30)
+logger.info(f"Created masks with shape {masks.shape}")
+logger.info(f"Using direct percentile assignment: {30}% vegetation, {30}% water, ~{40}% other")
+
+# Check class distribution
+unique, counts = torch.unique(masks, return_counts=True)
+class_weights = []
+logger.info("\nClass distribution:")
+for cls, count in zip(unique, counts):
+    pct = 100 * count / masks.numel()
+    # Compute inverse frequency weights for balanced training
+    weight = masks.numel() / (len(unique) * count)
+    class_weights.append(weight)
+    logger.info(f"  Class {cls}: {pct:.1f}% of pixels (weight: {weight:.2f})")
+
+# Convert to tensor for loss function
+class_weights = torch.tensor(class_weights, dtype=torch.float32).to(device)
+logger.info(f"\nClass weights for balanced training: {class_weights}")
+
+# Check for severe imbalance
+min_pct = 100 * counts.min().item() / masks.numel()
+max_pct = 100 * counts.max().item() / masks.numel()
+imbalance_ratio = max_pct / min_pct
+
+logger.info(f"\nImbalance analysis:")
+logger.info(f"  Rarest class: {min_pct:.1f}%")
+logger.info(f"  Most common class: {max_pct:.1f}%")
+logger.info(f"  Imbalance ratio: {imbalance_ratio:.1f}x")
+
+if imbalance_ratio > 50:
+    logger.warning(f"  ⚠️  Severe imbalance detected! Applying stratified sampling...")
+elif imbalance_ratio > 10:
+    logger.info(f"  ℹ️  Moderate imbalance - class weights will help balance training")
+else:
+    logger.info(f"  ✓ Reasonably balanced dataset")
+```
+
+### Stratified Patch Sampling (Optional but Recommended)
+
+When dealing with severe imbalance, we can filter patches to ensure minimum representation of rare classes. This is especially useful when you have many patches to choose from.
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+#| mode: append
+
+def stratified_sample_patches(patches, masks, min_pixels_per_class=50, target_patches=200):
+    """
+    Sample patches to ensure each class has minimum representation.
+
+    Prioritizes patches that contain rare classes while maintaining
+    diversity across all classes.
+
+    Parameters
+    ----------
+    patches : torch.Tensor
+        Tensor of image patches (N, C, H, W)
+    masks : torch.Tensor
+        Tensor of segmentation masks (N, H, W)
+    min_pixels_per_class : int, optional
+        Minimum number of pixels per class in each patch (default: 50)
+    target_patches : int, optional
+        Target number of patches to return (default: 200)
+
+    Returns
+    -------
+    selected_patches : torch.Tensor
+        Filtered patches with better class balance
+    selected_masks : torch.Tensor
+        Corresponding masks
+
+    Notes
+    -----
+    This function helps with severe class imbalance by:
+    - Filtering out patches with only majority class
+    - Ensuring rare classes are represented
+    - Maintaining some diversity in patch selection
+    """
+    # Compute class counts per patch
+    patch_class_counts = []
+    for i in range(len(masks)):
+        mask = masks[i]
+        counts = torch.bincount(mask.flatten(), minlength=3)
+        patch_class_counts.append(counts)
+
+    patch_class_counts = torch.stack(patch_class_counts)
+
+    # Score patches based on rare class representation
+    # Higher score = more rare class pixels
+    scores = []
+    for i in range(len(patches)):
+        counts = patch_class_counts[i]
+        # Score based on minimum class representation
+        # Patches with all classes present get highest scores
+        min_count = counts.min().item()
+        has_all_classes = (counts > min_pixels_per_class).all().item()
+
+        if has_all_classes:
+            score = 100 + min_count  # Bonus for having all classes
+        else:
+            score = min_count  # Just the minimum count
+
+        scores.append(score)
+
+    scores = torch.tensor(scores)
+
+    # Select top patches by score, up to target_patches
+    n_select = min(target_patches, len(patches))
+    top_indices = torch.argsort(scores, descending=True)[:n_select]
+
+    selected_patches = patches[top_indices]
+    selected_masks = masks[top_indices]
+
+    return selected_patches, selected_masks
+```
+
+```{python}
+# Apply stratified sampling if imbalance is severe
+if imbalance_ratio > 50:
+    logger.info("\nApplying stratified sampling to improve class balance...")
+    original_count = len(patches)
+
+    patches, masks = stratified_sample_patches(
+        patches, masks,
+        min_pixels_per_class=50,
+        target_patches=200
+    )
+
+    logger.info(f"  Filtered from {original_count} to {len(patches)} patches")
+
+    # Recompute class distribution after filtering
+    unique, counts = torch.unique(masks, return_counts=True)
+    class_weights = []
+    logger.info("\nClass distribution after stratified sampling:")
+    for cls, count in zip(unique, counts):
+        pct = 100 * count / masks.numel()
+        weight = masks.numel() / (len(unique) * count)
+        class_weights.append(weight)
+        logger.info(f"  Class {cls}: {pct:.1f}% of pixels (weight: {weight:.2f})")
+
+    # Update class weights
+    class_weights = torch.tensor(class_weights, dtype=torch.float32).to(device)
+
+    # Recompute imbalance metrics
+    min_pct = 100 * counts.min().item() / masks.numel()
+    max_pct = 100 * counts.max().item() / masks.numel()
+    new_imbalance_ratio = max_pct / min_pct
+
+    logger.info(f"\nImproved imbalance ratio: {imbalance_ratio:.1f}x → {new_imbalance_ratio:.1f}x")
+```
+
+:::{.callout-note}
+## Stratified Sampling Strategy
+
+**How it works:**
+1. Score each patch based on rare class representation
+2. Prioritize patches that contain all classes
+3. Select patches with highest diversity
+
+**When to use:**
+- Severe imbalance (>50x ratio)
+- When you have many patches to choose from (>2x target)
+- For initial exploration before collecting more data
+
+**Trade-offs:**
+- Reduces total number of patches
+- May introduce spatial bias (selecting specific areas)
+- Better than training on pure imbalance but not as good as naturally balanced data
+:::
+
+### Create Dataset Class
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+#| mode: append
+
+class SegmentationDataset(Dataset):
+    """
+    Dataset for segmentation tasks with image patches and pixel-wise masks.
+
+    Parameters
+    ----------
+    patches : torch.Tensor
+        Image patches of shape (N, C, H, W)
+    masks : torch.Tensor
+        Segmentation masks of shape (N, H, W)
+    """
+    def __init__(self, patches, masks):
+        self.patches = patches
+        self.masks = masks
+
+    def __len__(self):
+        return len(self.patches)
+
+    def __getitem__(self, idx):
+        return self.patches[idx], self.masks[idx]
+```
+
+### Split Data
+
+We split into training (70%), validation (15%), and test (15%) sets.
+
+```{python}
+n_train = int(0.7 * len(patches))
+n_val = int(0.15 * len(patches))
+
+train_dataset = SegmentationDataset(
+    patches[:n_train],
+    masks[:n_train]
+)
+val_dataset = SegmentationDataset(
+    patches[n_train:n_train+n_val],
+    masks[n_train:n_train+n_val]
+)
+test_dataset = SegmentationDataset(
+    patches[n_train+n_val:],
+    masks[n_train+n_val:]
+)
+
+logger.info(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
+
+# Create data loaders
+train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=16)
+test_loader = DataLoader(test_dataset, batch_size=16)
+```
+
+## Model Construction
+
+### Load Pretrained Model
+
+We use TerraTorch's `EncoderDecoderFactory` to build a segmentation model with a pretrained Prithvi backbone.
+
+**Architecture choices:**
+- **Backbone**: `prithvi_eo_v1_100` - 100M parameter foundation model pretrained on global satellite imagery
+- **Decoder**: `UperNetDecoder` - Unified perceptual parsing network, good for multi-scale segmentation
+- **Alternative decoders**: `FCNDecoder` (simpler), `UNetDecoder` (U-Net style), `SegFormerDecoder` (transformer-based)
+
+```{python}
+try:
+    from terratorch.models import EncoderDecoderFactory
+
+    model_factory = EncoderDecoderFactory()
+
+    model = model_factory.build_model(
+        task="segmentation",
+        backbone="prithvi_eo_v1_100",
+        decoder="UperNetDecoder",
+        num_classes=3
+    )
+
+    n_params = sum(p.numel() for p in model.parameters())
+    logger.info(f"Loaded Prithvi segmentation model with {n_params:,} parameters")
+
+except ImportError:
+    logger.warning("TerraTorch not installed - using demo model")
+
+    # Fallback demo model for testing
+    class DemoSegModel(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.conv1 = nn.Conv2d(6, 64, 3, padding=1)
+            self.conv2 = nn.Conv2d(64, 128, 3, padding=1)
+            self.conv3 = nn.Conv2d(128, 3, 1)
+
+        def forward(self, x):
+            x = torch.relu(self.conv1(x))
+            x = torch.relu(self.conv2(x))
+            return self.conv3(x)
+
+    model = DemoSegModel()
+
+model = model.to(device)
+```
+
+## Fine-Tuning
+
+### Training Loop
+
+This function implements the fine-tuning loop with training and validation phases.
+
+**Key components:**
+- **Loss function**: CrossEntropyLoss with class weights for handling imbalanced classes
+- **Optimizer**: Adam with configurable learning rate
+- **Validation**: Evaluated after each epoch to monitor overfitting
+- **Metrics**: Track both loss and pixel-wise accuracy
+
+**Design decisions:**
+- All model parameters are trainable (full fine-tuning)
+- For faster training, could freeze encoder with `encoder.requires_grad_(False)`
+- **Class weighting**: Critical for imbalanced segmentation - without weights, model ignores rare classes
+- No data augmentation (keep example simple)
+- No learning rate scheduling (could add for better convergence)
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+#| mode: append
+
+def finetune_segmentation(model, train_loader, val_loader, epochs=10, lr=1e-4, class_weights=None):
+    """
+    Fine-tune a segmentation model on a training dataset.
+
+    Performs standard supervised learning with weighted cross-entropy loss,
+    evaluating on validation set after each epoch. Class weights are used
+    to handle imbalanced datasets where some classes are rare.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        Segmentation model to train
+    train_loader : DataLoader
+        Training data loader
+    val_loader : DataLoader
+        Validation data loader
+    epochs : int, optional
+        Number of training epochs (default: 10)
+    lr : float, optional
+        Learning rate for Adam optimizer (default: 1e-4)
+    class_weights : torch.Tensor, optional
+        Weights for each class to handle imbalance (default: None for equal weights)
+
+    Returns
+    -------
+    history : dict
+        Dictionary with keys 'train_loss', 'train_acc', 'val_loss', 'val_acc'
+        containing lists of values for each epoch
+
+    Notes
+    -----
+    Class weights are computed as: weight[c] = N / (n_classes * count[c])
+    where N is total pixels and count[c] is pixels of class c.
+    This gives higher weight to rare classes.
+
+    Examples
+    --------
+    >>> # Compute class weights from training data
+    >>> class_counts = torch.bincount(train_masks.flatten())
+    >>> class_weights = len(train_masks.flatten()) / (len(class_counts) * class_counts)
+    >>> class_weights = class_weights.to(device)
+    >>> history = finetune_segmentation(model, train_loader, val_loader,
+    ...                                  epochs=5, class_weights=class_weights)
+    >>> plt.plot(history['val_acc'])
+    """
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
+
+    history = {
+        'train_loss': [],
+        'train_acc': [],
+        'val_loss': [],
+        'val_acc': []
+    }
+
+    for epoch in range(epochs):
+        # Training phase
+        model.train()
+        train_loss = 0
+        train_correct = 0
+        train_total = 0
+
+        for images, masks in train_loader:
+            images, masks = images.to(device), masks.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(images)
+
+            # Handle TerraTorch ModelOutput wrapper
+            if hasattr(outputs, 'output'):
+                outputs = outputs.output
+
+            loss = criterion(outputs, masks)
+            loss.backward()
+            optimizer.step()
+
+            train_loss += loss.item()
+
+            # Calculate pixel-wise accuracy
+            preds = torch.argmax(outputs, dim=1)
+            train_correct += (preds == masks).sum().item()
+            train_total += masks.numel()
+
+        train_loss /= len(train_loader)
+        train_acc = train_correct / train_total
+
+        # Validation phase
+        model.eval()
+        val_loss = 0
+        val_correct = 0
+        val_total = 0
+
+        with torch.no_grad():
+            for images, masks in val_loader:
+                images, masks = images.to(device), masks.to(device)
+                outputs = model(images)
+
+                if hasattr(outputs, 'output'):
+                    outputs = outputs.output
+
+                loss = criterion(outputs, masks)
+                val_loss += loss.item()
+
+                preds = torch.argmax(outputs, dim=1)
+                val_correct += (preds == masks).sum().item()
+                val_total += masks.numel()
+
+        val_loss /= len(val_loader)
+        val_acc = val_correct / val_total
+
+        history['train_loss'].append(train_loss)
+        history['train_acc'].append(train_acc)
+        history['val_loss'].append(val_loss)
+        history['val_acc'].append(val_acc)
+
+        logger.info(
+            f"Epoch {epoch+1}/{epochs}: "
+            f"Train Loss={train_loss:.4f}, Train Acc={train_acc:.3f}, "
+            f"Val Loss={val_loss:.4f}, Val Acc={val_acc:.3f}"
+        )
+
+    return history
+```
+
+### Run Fine-Tuning
+
+```{python}
+logger.info("Starting fine-tuning with class-weighted loss...")
+history = finetune_segmentation(
+    model,
+    train_loader,
+    val_loader,
+    epochs=15,
+    lr=1e-4,
+    class_weights=class_weights
+)
+```
+
+### Visualize Training Progress
+
+```{python}
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+epochs_range = range(1, len(history['train_loss']) + 1)
+
+# Loss curves
+ax1.plot(epochs_range, history['train_loss'], label='Train', marker='o')
+ax1.plot(epochs_range, history['val_loss'], label='Val', marker='s')
+ax1.set_xlabel('Epoch')
+ax1.set_ylabel('Loss')
+ax1.set_title('Training and Validation Loss')
+ax1.legend()
+ax1.grid(alpha=0.3)
+
+# Accuracy curves
+ax2.plot(epochs_range, history['train_acc'], label='Train', marker='o')
+ax2.plot(epochs_range, history['val_acc'], label='Val', marker='s')
+ax2.set_xlabel('Epoch')
+ax2.set_ylabel('Pixel Accuracy')
+ax2.set_title('Training and Validation Accuracy')
+ax2.legend()
+ax2.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+## Evaluation
+
+### Test Set Performance
+
+```{python}
+model.eval()
+test_correct = 0
+test_total = 0
+
+with torch.no_grad():
+    for images, masks in test_loader:
+        images, masks = images.to(device), masks.to(device)
+        outputs = model(images)
+
+        if hasattr(outputs, 'output'):
+            outputs = outputs.output
+
+        preds = torch.argmax(outputs, dim=1)
+        test_correct += (preds == masks).sum().item()
+        test_total += masks.numel()
+
+test_acc = test_correct / test_total
+logger.info(f"Test pixel accuracy: {test_acc:.3f}")
+```
+
+### Visualize Predictions
+
+Compare model predictions against ground truth masks.
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+#| mode: append
+
+def visualize_segmentation_results(model, data_loader, n_samples=3, class_names=None):
+    """
+    Visualize model predictions alongside ground truth masks.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        Trained segmentation model
+    data_loader : DataLoader
+        DataLoader containing test samples
+    n_samples : int, optional
+        Number of samples to visualize (default: 3)
+    class_names : list, optional
+        List of class names for legend (default: None)
+    """
+    if class_names is None:
+        class_names = ['Vegetation', 'Water', 'Other']
+
+    model.eval()
+    images, masks = next(iter(data_loader))
+    images, masks = images.to(device), masks.to(device)
+
+    with torch.no_grad():
+        outputs = model(images)
+        if hasattr(outputs, 'output'):
+            outputs = outputs.output
+        preds = torch.argmax(outputs, dim=1)
+
+    n_show = min(n_samples, images.shape[0])
+
+    for i in range(n_show):
+        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+        # Input RGB composite (assuming bands: Blue, Green, Red, NIR, SWIR1, SWIR2)
+        img_np = images[i].cpu()
+        rgb = torch.stack([img_np[2], img_np[1], img_np[0]], dim=0)  # R, G, B
+        rgb = rgb.permute(1, 2, 0)
+        rgb = (rgb - rgb.min()) / (rgb.max() - rgb.min() + 1e-8)  # Normalize for display
+
+        axes[0].imshow(rgb)
+        axes[0].set_title('Input Image (RGB)')
+        axes[0].axis('off')
+
+        # Ground truth mask
+        im1 = axes[1].imshow(masks[i].cpu(), cmap='tab10', vmin=0, vmax=2)
+        axes[1].set_title('Ground Truth')
+        axes[1].axis('off')
+
+        # Predicted mask
+        im2 = axes[2].imshow(preds[i].cpu(), cmap='tab10', vmin=0, vmax=2)
+        axes[2].set_title('Prediction')
+        axes[2].axis('off')
+
+        # Add colorbar with class labels
+        cbar = plt.colorbar(im2, ax=axes[2], ticks=[0, 1, 2], fraction=0.046)
+        cbar.set_ticklabels(class_names)
+
+        plt.tight_layout()
+        plt.show()
+```
+
+```{python}
+visualize_segmentation_results(model, test_loader, n_samples=3)
+```
+
+### Per-Class Metrics
+
+Calculate precision, recall, and F1 score for each class.
+
+```{python}
+#| tangle: geogfm/examples/segmentation_finetuning.py
+#| mode: append
+
+def compute_class_metrics(model, data_loader, n_classes=3):
+    """
+    Compute per-class precision, recall, and F1 score.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        Trained segmentation model
+    data_loader : DataLoader
+        DataLoader for evaluation
+    n_classes : int, optional
+        Number of classes (default: 3)
+
+    Returns
+    -------
+    metrics : dict
+        Dictionary with precision, recall, and f1 arrays for each class
+    """
+    model.eval()
+
+    # Initialize confusion matrix components
+    true_positives = torch.zeros(n_classes)
+    false_positives = torch.zeros(n_classes)
+    false_negatives = torch.zeros(n_classes)
+
+    with torch.no_grad():
+        for images, masks in data_loader:
+            images, masks = images.to(device), masks.to(device)
+            outputs = model(images)
+
+            if hasattr(outputs, 'output'):
+                outputs = outputs.output
+
+            preds = torch.argmax(outputs, dim=1)
+
+            for cls in range(n_classes):
+                pred_cls = (preds == cls)
+                true_cls = (masks == cls)
+
+                true_positives[cls] += (pred_cls & true_cls).sum().item()
+                false_positives[cls] += (pred_cls & ~true_cls).sum().item()
+                false_negatives[cls] += (~pred_cls & true_cls).sum().item()
+
+    # Calculate metrics
+    precision = true_positives / (true_positives + false_positives + 1e-8)
+    recall = true_positives / (true_positives + false_negatives + 1e-8)
+    f1 = 2 * (precision * recall) / (precision + recall + 1e-8)
+
+    return {
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
+```
+
+```{python}
+metrics = compute_class_metrics(model, test_loader)
+
+class_names = ['Vegetation', 'Water', 'Other']
+logger.info("\nPer-class metrics:")
+for i, name in enumerate(class_names):
+    logger.info(
+        f"{name}: "
+        f"Precision={metrics['precision'][i]:.3f}, "
+        f"Recall={metrics['recall'][i]:.3f}, "
+        f"F1={metrics['f1'][i]:.3f}"
+    )
+```
+
+## Key Takeaways
+
+1. **Transfer learning works**: Pretrained encoders provide strong features for downstream tasks
+2. **Segmentation requires pixel-wise labels**: More annotation effort than classification
+3. **Class imbalance is critical**: Real-world segmentation datasets are almost always imbalanced
+   - Use **class weights** in loss function to focus on rare classes
+   - Choose study areas with diverse land cover when possible
+   - Monitor per-class metrics, not just overall accuracy
+4. **Pixel accuracy can be misleading**: A model predicting only the majority class can have high accuracy but be useless
+5. **Fine-tuning strategies**:
+   - Full fine-tuning: Update all parameters (what we did here)
+   - Feature extraction: Freeze encoder, train only decoder
+   - Gradual unfreezing: Start with frozen encoder, progressively unfreeze layers
+
+### Handling Class Imbalance (Critical!)
+
+Without class weights, the model learns to predict only the majority class ("Other") because:
+- Minimizing loss on the majority class gives good average loss
+- Rare classes (water, vegetation) don't affect the loss enough to matter
+- Result: 90% accuracy but 0% on rare classes = useless model
+
+**With class weights:**
+- Rare class errors are penalized more heavily
+- Model forced to learn all classes
+- Result: Lower overall accuracy but actually useful predictions
+
+## Adapting for Your Project
+
+This workflow provides a template for real-world projects. Here's how to customize it:
+
+### 1. Change the Study Area
+
+```python
+# Replace with your area of interest
+# Choose regions with diverse land cover for balanced training data
+
+# Example: San Francisco Bay Area (water + urban + vegetation)
+my_aoi = [-122.5, 37.5, -122.0, 38.0]
+
+# Example: Agricultural region with multiple crop types
+# my_aoi = [-120.5, 36.5, -120.0, 37.0]  # Central Valley, CA
+
+# Example: Coastal wetlands (water + vegetation + urban)
+# my_aoi = [-90.5, 29.0, -90.0, 29.5]  # Louisiana coast
+
+# Adjust date range and cloud cover for your needs
+scenes = search_sentinel2_scenes(
+    bbox=my_aoi,
+    date_range="2023-01-01/2023-12-31",
+    cloud_cover_max=10,
+    limit=5  # Use multiple scenes for larger datasets
+)
+```
+
+### 2. Define Your Segmentation Classes
+
+Replace the simple NDVI-based classification with your own labeling logic:
+
+```python
+def create_custom_masks(patches):
+    """
+    Replace this with your labeling strategy:
+    - Use existing labeled data
+    - Apply domain-specific spectral indices
+    - Use unsupervised clustering
+    - Combine multiple data sources
+    """
+    # Your custom logic here
+    pass
+```
+
+### 3. Tune Hyperparameters
+
+Experiment with:
+- **Patch size**: Larger patches (128, 256) capture more context
+- **Number of patches**: More data generally improves results
+- **Learning rate**: Try 1e-3, 1e-4, 1e-5
+- **Epochs**: Train longer for better convergence
+- **Batch size**: Adjust based on GPU memory
+- **Class weights**: Adjust the weighting formula for your class distribution
+  ```python
+  # More aggressive weighting for very imbalanced data
+  class_weights = (masks.numel() / (len(unique) * counts)) ** 0.5
+  ```
+
+### 4. Add Data Augmentation
+
+```python
+from torchvision import transforms
+
+# Add random transformations
+augmentation = transforms.Compose([
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.RandomVerticalFlip(p=0.5),
+    transforms.RandomRotation(90)
+])
+```
+
+### 5. Save and Deploy Your Model
+
+```python
+# Save trained model
+torch.save(model.state_dict(), 'my_segmentation_model.pth')
+
+# Load for inference
+model.load_state_dict(torch.load('my_segmentation_model.pth'))
+model.eval()
+```
+
+## Next Steps
+
+**Improve Model Performance:**
+- Try different backbones (ResNet, Prithvi V2, SatMAE)
+- Experiment with decoder architectures (UNet, SegFormer, DeepLabV3)
+- Add learning rate scheduling (ReduceLROnPlateau, CosineAnnealing)
+- Implement class weighting for imbalanced datasets
+- Use cross-validation for robust evaluation
+
+**Scale to Production:**
+- Use real ground-truth labels from annotated datasets
+- Implement sliding window inference for large scenes
+- Add proper data augmentation pipeline
+- Track experiments with MLflow or Weights & Biases
+- Deploy with TorchServe or FastAPI
+
+**Compare Approaches:**
+- Benchmark against traditional methods (Random Forest, SVM)
+- Compare zero-shot vs few-shot vs full fine-tuning
+- Evaluate transfer learning across different regions
+- Test model generalization on held-out areas
+
+## Resources
+
+- [TerraTorch Documentation](https://terra-torch.readthedocs.io/)
+- [Prithvi Models](https://huggingface.co/ibm-nasa-geospatial)
+- [UperNet Paper](https://arxiv.org/abs/1807.10221)
+- [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com/)
+- [STAC Specification](https://stacspec.org/)

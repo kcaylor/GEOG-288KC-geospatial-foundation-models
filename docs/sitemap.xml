@@ -9,16 +9,12 @@
     <lastmod>2025-08-08T19:29:31.724Z</lastmod>
   </url>
   <url>
-    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/chapters/c02-spatial-temporal-attention-mechanisms.html</loc>
-    <lastmod>2025-10-10T00:56:02.217Z</lastmod>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/chapters/c03a-terratorch-foundations.html</loc>
+    <lastmod>2025-10-17T17:27:06.944Z</lastmod>
   </url>
   <url>
-    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/neural_networks_explainer.html</loc>
-    <lastmod>2025-10-03T20:40:17.665Z</lastmod>
-  </url>
-  <url>
-    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/segmentation_finetuning.html</loc>
-    <lastmod>2025-10-30T22:20:35.264Z</lastmod>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/normalization_comparison.html</loc>
+    <lastmod>2025-08-13T19:09:23.027Z</lastmod>
   </url>
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/segmentation_tutorial.html</loc>
@@ -119,6 +115,10 @@
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/cheatsheets.html</loc>
     <lastmod>2025-10-24T18:26:38.036Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/segmentation_finetuning.html</loc>
+    <lastmod>2025-10-30T23:10:59.008Z</lastmod>
   </url>
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/Syllabus.html</loc>
@@ -229,16 +229,12 @@
     <lastmod>2025-08-10T18:33:57.866Z</lastmod>
   </url>
   <url>
-    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/normalization_comparison.html</loc>
-    <lastmod>2025-08-13T19:09:23.027Z</lastmod>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/neural_networks_explainer.html</loc>
+    <lastmod>2025-10-03T20:40:17.665Z</lastmod>
   </url>
   <url>
-    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/chapters/c03a-terratorch-foundations.html</loc>
-    <lastmod>2025-10-17T17:27:06.944Z</lastmod>
-  </url>
-  <url>
-    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/c03b-terratorch-foundations.html</loc>
-    <lastmod>2025-10-15T00:17:20.046Z</lastmod>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/chapters/c02-spatial-temporal-attention-mechanisms.html</loc>
+    <lastmod>2025-10-10T00:56:02.217Z</lastmod>
   </url>
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/chapters/c01-geospatial-data-foundations-OLD.html</loc>

@@ -1,5 +1,5 @@
 # geogfm.inference.tiling — Naive tiled apply and stitch-back (Week 9).
-# Tangled on 2025-10-30T16:08:03
+# Tangled on 2025-10-30T16:29:24
 
 from __future__ import annotations
 import numpy as np

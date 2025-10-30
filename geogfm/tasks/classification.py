@@ -1,5 +1,5 @@
 # geogfm.tasks.classification — Simple classification head (Week 8).
-# Tangled on 2025-10-30T16:08:04
+# Tangled on 2025-10-30T16:29:25
 
 from __future__ import annotations
 import torch

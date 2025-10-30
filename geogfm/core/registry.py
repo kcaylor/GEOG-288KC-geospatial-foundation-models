@@ -1,5 +1,5 @@
 # geogfm.core.registry — Minimal name→builder registry for models/heads (Week 7).
-# Tangled on 2025-10-30T16:08:05
+# Tangled on 2025-10-30T16:29:26
 
 from __future__ import annotations
 from typing import Callable, Dict, Any

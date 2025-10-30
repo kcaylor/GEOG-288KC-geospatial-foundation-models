@@ -69,7 +69,7 @@ website:
           - text: ResNet Implementation
             href: extras/examples/resnet.qmd
           - text: Segmentation Fine-Tuning
-            href: extras/examples/segmentation_finetuning.qmd
+            href: extras/examples/segmentation_finetuning.ipynb
           - text: Text Encoder
             href: extras/examples/text_encoder.qmd
           - text: Tiling and Patches
