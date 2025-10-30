@@ -1,4 +1,11 @@
-# Troubleshooting Guide for GEOG 288KC
+# Troubleshooting Guide
+
+## Quick Links to Common Issues
+
+- **[PROJ Database Version Mismatch](PROJ_DATABASE_FIX.md)** - "CRSError: DATABASE.LAYOUT.VERSION.MINOR = 2 whereas >= 6 is expected"
+- **GDAL/Rasterio Issues** - See sections below
+- **GPU/MPS Issues** - See sections below
+- **Import Errors** - See sections below for GEOG 288KC
 
 This guide provides solutions to common issues encountered when setting up and using the GEOG 288KC environment on the UCSB AI Sandbox.
 

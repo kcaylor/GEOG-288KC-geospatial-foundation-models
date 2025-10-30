@@ -31,15 +31,17 @@ dependencies:
   - safetensors>=0.5
 
   # Geospatial core libraries
-  - gdal>=3.10
-  - rasterio>=1.4
-  - fiona>=1.10
-  - geopandas>=1.1
-  - shapely>=2.1
-  - pyproj>=3.7
-  - xarray>=2025.7
-  - netcdf4>=1.6
-  - rioxarray>=0.15
+  # Use conda-forge channel explicitly for compatibility
+  - conda-forge::proj>=9.7
+  - conda-forge::gdal>=3.10
+  - conda-forge::rasterio>=1.4
+  - conda-forge::pyproj>=3.7
+  - conda-forge::fiona>=1.10
+  - conda-forge::geopandas>=1.1
+  - conda-forge::shapely>=2.1
+  - conda-forge::xarray>=2025.7
+  - conda-forge::netcdf4>=1.6
+  - conda-forge::rioxarray>=0.15
 
   # Geospatial visualization
   - folium>=0.20

@@ -231,6 +231,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">ResNet Implementation</span></a>
   </li>  
         <li>
+    <a class="dropdown-item" href="../extras/examples/segmentation_finetuning.html">
+ <span class="dropdown-text">Segmentation Fine-Tuning</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="../extras/examples/text_encoder.html">
  <span class="dropdown-text">Text Encoder</span></a>
   </li>  
@@ -367,13 +371,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <section id="package-inits" class="level3">
 <h3 class="anchored" data-anchor-id="package-inits">Package inits</h3>
-<div id="1fec5389" class="cell" data-header="geogfm.inference — package init (Week 9). Inference utilities: tiling and sliding-window." data-tangle="geogfm/inference/__init__.py" data-execution_count="1">
+<div id="6eef378f" class="cell" data-tangle="geogfm/inference/__init__.py" data-header="geogfm.inference — package init (Week 9). Inference utilities: tiling and sliding-window.">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># geogfm.inference</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sliding-window-helpers" class="level3">
 <h3 class="anchored" data-anchor-id="sliding-window-helpers">1) Sliding-window helpers</h3>
-<div id="983da490" class="cell" data-header="geogfm.inference.sliding_window — Window generator for patch traversal (Week 9)." data-tangle="geogfm/inference/sliding_window.py" data-execution_count="2">
+<div id="9a470bcc" class="cell" data-tangle="geogfm/inference/sliding_window.py" data-header="geogfm.inference.sliding_window — Window generator for patch traversal (Week 9).">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Iterator, Tuple</span>
@@ -388,7 +392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="tiling-inference-naive" class="level3">
 <h3 class="anchored" data-anchor-id="tiling-inference-naive">2) Tiling inference (naive)</h3>
-<div id="c49a92d7" class="cell" data-header="geogfm.inference.tiling — Naive tiled apply and stitch-back (Week 9)." data-tangle="geogfm/inference/tiling.py" data-execution_count="3">
+<div id="1164d77d" class="cell" data-tangle="geogfm/inference/tiling.py" data-header="geogfm.inference.tiling — Naive tiled apply and stitch-back (Week 9).">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Callable</span>

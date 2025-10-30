@@ -1,5 +1,5 @@
 # geogfm.inference.sliding_window — Window generator for patch traversal (Week 9).
-# Tangled on 2025-10-10T09:56:04
+# Tangled on 2025-10-30T16:01:27
 
 from __future__ import annotations
 import numpy as np

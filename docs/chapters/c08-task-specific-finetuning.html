@@ -231,6 +231,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">ResNet Implementation</span></a>
   </li>  
         <li>
+    <a class="dropdown-item" href="../extras/examples/segmentation_finetuning.html">
+ <span class="dropdown-text">Segmentation Fine-Tuning</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="../extras/examples/text_encoder.html">
  <span class="dropdown-text">Text Encoder</span></a>
   </li>  
@@ -369,13 +373,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <section id="package-inits" class="level3">
 <h3 class="anchored" data-anchor-id="package-inits">Package inits</h3>
-<div id="4d573dd1" class="cell" data-header="geogfm.tasks — package init (Week 8). Heads for task-specific fine-tuning." data-tangle="geogfm/tasks/__init__.py" data-execution_count="1">
+<div id="ac53a6c0" class="cell" data-tangle="geogfm/tasks/__init__.py" data-header="geogfm.tasks — package init (Week 8). Heads for task-specific fine-tuning.">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># geogfm.tasks</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="classification-head" class="level3">
 <h3 class="anchored" data-anchor-id="classification-head">1) Classification Head</h3>
-<div id="d6d85058" class="cell" data-header="geogfm.tasks.classification — Simple classification head (Week 8)." data-tangle="geogfm/tasks/classification.py" data-execution_count="2">
+<div id="53de7e8a" class="cell" data-tangle="geogfm/tasks/classification.py" data-header="geogfm.tasks.classification — Simple classification head (Week 8).">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
@@ -393,7 +397,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="segmentation-head-token-wise-classifier" class="level3">
 <h3 class="anchored" data-anchor-id="segmentation-head-token-wise-classifier">2) Segmentation Head (token-wise classifier)</h3>
-<div id="a5637613" class="cell" data-header="geogfm.tasks.segmentation — Token-wise segmentation head (Week 8)." data-tangle="geogfm/tasks/segmentation.py" data-execution_count="3">
+<div id="6c5f66a4" class="cell" data-tangle="geogfm/tasks/segmentation.py" data-header="geogfm.tasks.segmentation — Token-wise segmentation head (Week 8).">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
@@ -410,7 +414,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage-snippet-non-tangled" class="level3">
 <h3 class="anchored" data-anchor-id="usage-snippet-non-tangled">Usage snippet (non-tangled)</h3>
-<div id="7a9aaa0e" class="cell" data-execution_count="4">
+<div id="dc19cd04" class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of freezing encoder and training a head:</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># encoder = GeoViTBackbone(cfg)</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># for p in encoder.parameters():</span></span>

@@ -231,6 +231,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">ResNet Implementation</span></a>
   </li>  
         <li>
+    <a class="dropdown-item" href="../extras/examples/segmentation_finetuning.html">
+ <span class="dropdown-text">Segmentation Fine-Tuning</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="../extras/examples/text_encoder.html">
  <span class="dropdown-text">Text Encoder</span></a>
   </li>  
@@ -368,16 +372,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <section id="package-inits" class="level3">
 <h3 class="anchored" data-anchor-id="package-inits">Package inits</h3>
-<div id="3e3abd03" class="cell" data-header="geogfm.interoperability — package init (Week 7). HF Hub glue and external model hooks." data-tangle="geogfm/interoperability/__init__.py" data-execution_count="1">
+<div id="57cc2a90" class="cell" data-tangle="geogfm/interoperability/__init__.py" data-header="geogfm.interoperability — package init (Week 7). HF Hub glue and external model hooks.">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># geogfm.interoperability</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="c90ff2b7" class="cell" data-header="geogfm.core — registry additions (Week 7)." data-mode="append" data-tangle="geogfm/core/__init__.py" data-execution_count="2">
+<div id="177ee82e" class="cell" data-tangle="geogfm/core/__init__.py" data-header="geogfm.core — registry additions (Week 7)." data-mode="append">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># registry will be added here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="lightweight-registry" class="level3">
 <h3 class="anchored" data-anchor-id="lightweight-registry">1) Lightweight Registry</h3>
-<div id="a468abb0" class="cell" data-header="geogfm.core.registry — Minimal name→builder registry for models/heads (Week 7)." data-tangle="geogfm/core/registry.py" data-execution_count="3">
+<div id="afbcf967" class="cell" data-tangle="geogfm/core/registry.py" data-header="geogfm.core.registry — Minimal name→builder registry for models/heads (Week 7).">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Callable, Dict, Any</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -407,7 +411,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="huggingface-interoperability-stubs" class="level3">
 <h3 class="anchored" data-anchor-id="huggingface-interoperability-stubs">2) HuggingFace Interoperability Stubs</h3>
-<div id="b2393087" class="cell" data-header="geogfm.interoperability.huggingface — Lightweight HF Hub helpers (Week 7)." data-tangle="geogfm/interoperability/huggingface.py" data-execution_count="4">
+<div id="6629ec3c" class="cell" data-tangle="geogfm/interoperability/huggingface.py" data-header="geogfm.interoperability.huggingface — Lightweight HF Hub helpers (Week 7).">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Any, Dict</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>

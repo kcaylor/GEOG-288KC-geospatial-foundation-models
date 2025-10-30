@@ -68,6 +68,8 @@ website:
             href: extras/examples/normalization_comparison.qmd
           - text: ResNet Implementation
             href: extras/examples/resnet.qmd
+          - text: Segmentation Fine-Tuning
+            href: extras/examples/segmentation_finetuning.qmd
           - text: Text Encoder
             href: extras/examples/text_encoder.qmd
           - text: Tiling and Patches
@@ -108,6 +110,6 @@ filters:
 tangle-root: ..
 
 execute:
-  freeze: auto
+  freeze: true
 
 editor: source
