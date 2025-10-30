@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Hierarchy of Geospatial Prediction Tasks</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/quarto-contrib/fontawesome6-1.2.0/all.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/fontawesome6-1.2.0/latex-fontsize.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">GEOG 288KC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">🏠 home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../Syllabus.html"> 
+<span class="menu-text">📋 syllabus</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-weekly-sessions" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">💻 weekly sessions</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-weekly-sessions">    
+        <li>
+    <a class="dropdown-item" href="../chapters/c01-geospatial-data-foundations.html">
+ <span class="dropdown-text">Week 1 - 🚀 Core Tools and Data Access</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c02-spatial-temporal-attention-mechanisms.html">
+ <span class="dropdown-text">Week 2 - ⚡ Rapid Remote Sensing Preprocessing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c03a-terratorch-foundations.html">
+ <span class="dropdown-text">Week 3a - 🌍 TerraTorch Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c03-complete-gfm-architecture.html">
+ <span class="dropdown-text">Week 3b - 🤖 Machine Learning on Remote Sensing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c04-pretraining-implementation.html">
+ <span class="dropdown-text">Week 4 - 🏗️ Foundation Models in Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c05-training-loop-optimization.html">
+ <span class="dropdown-text">Week 5 - 🔧 Fine-Tuning &amp; Transfer Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c06-model-evaluation-analysis.html">
+ <span class="dropdown-text">Week 6 - ⏰ Spatiotemporal Modeling &amp; Projects</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-cheatsheets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">👀 cheatsheets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-cheatsheets">    
+        <li>
+    <a class="dropdown-item" href="../cheatsheets.html">
+ <span class="dropdown-text">📋 All Cheatsheets</span></a>
+  </li>  
+        <li><hr class="dropdown-divider"></li>
+        <li class="dropdown-header">⚡ Quick Starts</li>
+        <li>
+    <a class="dropdown-item" href="../extras/cheatsheets/week01_imports.html">
+ <span class="dropdown-text">Week 01: Import Guide</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-explainers" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">🧩 explainers</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-explainers">    
+        <li class="dropdown-header">1️⃣ Week 1</li>
+        <li>
+    <a class="dropdown-item" href="../extras/ai-ml-dl-fm-hierarchy.html">
+ <span class="dropdown-text">🤖 AI/ML/DL/FM Hierarchy</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/geospatial-foundation-model-predictions-standalone.html">
+ <span class="dropdown-text">🎯 GFM Predictions (Standalone)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/geospatial-prediction-hierarchy.html">
+ <span class="dropdown-text">✅ Geospatial Task/Prediction Types</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/neural_networks_explainer.html">
+ <span class="dropdown-text">🧠 Neural Networks: Neurons to Transformers</span></a>
+  </li>  
+        <li class="dropdown-header">2️⃣ Week 2</li>
+        <li>
+    <a class="dropdown-item" href="../chapters/c00a-foundation_model_architectures.html">
+ <span class="dropdown-text">🏗️ Foundation Model Architectures</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c00b-introduction-to-deeplearning-architecture.html">
+ <span class="dropdown-text">🎓 Introduction to Deep Learning Architecture</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-extras" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">📖 extras</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-extras">    
+        <li class="dropdown-header">🎯 Practical Examples</li>
+        <li>
+    <a class="dropdown-item" href="../extras/examples/normalization_comparison.html">
+ <span class="dropdown-text">Normalization Comparison</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/resnet.html">
+ <span class="dropdown-text">ResNet Implementation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/segmentation_finetuning.html">
+ <span class="dropdown-text">Segmentation Fine-Tuning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/text_encoder.html">
+ <span class="dropdown-text">Text Encoder</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/tiling-and-patches.html">
+ <span class="dropdown-text">Tiling and Patches</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/terratorch_workflows.html">
+ <span class="dropdown-text">TerraTorch Workflows</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/resources/course_resources.html">
+ <span class="dropdown-text">📚 Reference Materials</span></a>
+  </li>  
+        <li class="dropdown-header">📁 Project Templates</li>
+        <li>
+    <a class="dropdown-item" href="../extras/projects/project-proposal-template.html">
+ <span class="dropdown-text">Project Proposal Template</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/projects/mvp-template.html">
+ <span class="dropdown-text">Project Results Template</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/gfms-from-scratch/gfms-from-scratch.github.io" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-page-left">
+      <div class="quarto-title-block"><div><h1 class="title">Hierarchy of Geospatial Prediction Tasks</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+            <p class="subtitle lead">From Pixels to Objects: Understanding ML/DL/FM Applications in Remote Sensing</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta column-page-left">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#the-fundamental-dichotomy-pixel-values-vs.-labels" id="toc-the-fundamental-dichotomy-pixel-values-vs.-labels" class="nav-link" data-scroll-target="#the-fundamental-dichotomy-pixel-values-vs.-labels">The Fundamental Dichotomy: Pixel Values vs.&nbsp;Labels</a>
+  <ul class="collapse">
+  <li><a href="#pixel-values-continuous-data" id="toc-pixel-values-continuous-data" class="nav-link" data-scroll-target="#pixel-values-continuous-data">1. <strong>Pixel Values</strong> (Continuous Data)</a></li>
+  <li><a href="#labels-categoricaldiscrete-data" id="toc-labels-categoricaldiscrete-data" class="nav-link" data-scroll-target="#labels-categoricaldiscrete-data">2. <strong>Labels</strong> (Categorical/Discrete Data)</a></li>
+  </ul></li>
+  <li><a href="#pixel-value-prediction-tasks" id="toc-pixel-value-prediction-tasks" class="nav-link" data-scroll-target="#pixel-value-prediction-tasks">Pixel Value Prediction Tasks</a>
+  <ul class="collapse">
+  <li><a href="#temporal-prediction-next-value" id="toc-temporal-prediction-next-value" class="nav-link" data-scroll-target="#temporal-prediction-next-value">Temporal Prediction (Next Value)</a></li>
+  <li><a href="#spatial-prediction-missing-values" id="toc-spatial-prediction-missing-values" class="nav-link" data-scroll-target="#spatial-prediction-missing-values">Spatial Prediction (Missing Values)</a></li>
+  </ul></li>
+  <li><a href="#label-based-prediction-tasks" id="toc-label-based-prediction-tasks" class="nav-link" data-scroll-target="#label-based-prediction-tasks">Label-Based Prediction Tasks</a>
+  <ul class="collapse">
+  <li><a href="#image-classification" id="toc-image-classification" class="nav-link" data-scroll-target="#image-classification">1. Image Classification</a></li>
+  <li><a href="#pixel-wise-classification" id="toc-pixel-wise-classification" class="nav-link" data-scroll-target="#pixel-wise-classification">2. Pixel-wise Classification</a></li>
+  <li><a href="#object-detection" id="toc-object-detection" class="nav-link" data-scroll-target="#object-detection">3. Object Detection</a></li>
+  <li><a href="#object-segmentation" id="toc-object-segmentation" class="nav-link" data-scroll-target="#object-segmentation">4. Object Segmentation</a></li>
+  </ul></li>
+  <li><a href="#regression-for-novel-variable-prediction" id="toc-regression-for-novel-variable-prediction" class="nav-link" data-scroll-target="#regression-for-novel-variable-prediction">Regression for Novel Variable Prediction</a>
+  <ul class="collapse">
+  <li><a href="#pixel-wise-regression-applications" id="toc-pixel-wise-regression-applications" class="nav-link" data-scroll-target="#pixel-wise-regression-applications">Pixel-wise Regression Applications</a></li>
+  <li><a href="#input-output-relationships-for-regression" id="toc-input-output-relationships-for-regression" class="nav-link" data-scroll-target="#input-output-relationships-for-regression">Input-Output Relationships for Regression</a></li>
+  </ul></li>
+  <li><a href="#mldlfm-tool-suitability-matrix" id="toc-mldlfm-tool-suitability-matrix" class="nav-link" data-scroll-target="#mldlfm-tool-suitability-matrix">ML/DL/FM Tool Suitability Matrix</a></li>
+  <li><a href="#choosing-the-right-approach" id="toc-choosing-the-right-approach" class="nav-link" data-scroll-target="#choosing-the-right-approach">Choosing the Right Approach</a>
+  <ul class="collapse">
+  <li><a href="#use-traditional-ml-when" id="toc-use-traditional-ml-when" class="nav-link" data-scroll-target="#use-traditional-ml-when">Use Traditional ML When:</a></li>
+  <li><a href="#use-deep-learning-when" id="toc-use-deep-learning-when" class="nav-link" data-scroll-target="#use-deep-learning-when">Use Deep Learning When:</a></li>
+  <li><a href="#use-foundation-models-when" id="toc-use-foundation-models-when" class="nav-link" data-scroll-target="#use-foundation-models-when">Use Foundation Models When:</a></li>
+  </ul></li>
+  <li><a href="#practical-implementation-considerations" id="toc-practical-implementation-considerations" class="nav-link" data-scroll-target="#practical-implementation-considerations">Practical Implementation Considerations</a>
+  <ul class="collapse">
+  <li><a href="#data-preparation-pipeline" id="toc-data-preparation-pipeline" class="nav-link" data-scroll-target="#data-preparation-pipeline">Data Preparation Pipeline</a></li>
+  <li><a href="#multi-task-learning-opportunities" id="toc-multi-task-learning-opportunities" class="nav-link" data-scroll-target="#multi-task-learning-opportunities">Multi-Task Learning Opportunities</a></li>
+  </ul></li>
+  <li><a href="#best-practices-and-recommendations" id="toc-best-practices-and-recommendations" class="nav-link" data-scroll-target="#best-practices-and-recommendations">Best Practices and Recommendations</a>
+  <ul class="collapse">
+  <li><a href="#start-simple-scale-up" id="toc-start-simple-scale-up" class="nav-link" data-scroll-target="#start-simple-scale-up">1. Start Simple, Scale Up</a></li>
+  <li><a href="#leverage-pretrained-models" id="toc-leverage-pretrained-models" class="nav-link" data-scroll-target="#leverage-pretrained-models">2. Leverage Pretrained Models</a></li>
+  <li><a href="#handle-geospatial-specifics" id="toc-handle-geospatial-specifics" class="nav-link" data-scroll-target="#handle-geospatial-specifics">3. Handle Geospatial Specifics</a></li>
+  <li><a href="#validate-appropriately" id="toc-validate-appropriately" class="nav-link" data-scroll-target="#validate-appropriately">4. Validate Appropriately</a></li>
+  </ul></li>
+  <li><a href="#code-example-unified-prediction-framework" id="toc-code-example-unified-prediction-framework" class="nav-link" data-scroll-target="#code-example-unified-prediction-framework">Code Example: Unified Prediction Framework</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+
+
+
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>In geospatial data science and remote sensing, prediction tasks form a natural hierarchy from pixel-level analysis to complex object understanding. This document explores the relationships between different prediction tasks, their input-output structures, and the suitability of various machine learning approaches.</p>
+</section>
+<section id="the-fundamental-dichotomy-pixel-values-vs.-labels" class="level2">
+<h2 class="anchored" data-anchor-id="the-fundamental-dichotomy-pixel-values-vs.-labels">The Fundamental Dichotomy: Pixel Values vs.&nbsp;Labels</h2>
+<p>At the core of geospatial analysis, we work with two fundamental types of data:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/prediction_hierarchy_overview.png" class="img-fluid figure-img"></p>
+<figcaption>Overview of prediction task hierarchy in geospatial analysis</figcaption>
+</figure>
+</div>
+<section id="pixel-values-continuous-data" class="level3">
+<h3 class="anchored" data-anchor-id="pixel-values-continuous-data">1. <strong>Pixel Values</strong> (Continuous Data)</h3>
+<ul>
+<li>Raw spectral measurements from sensors</li>
+<li>Physical quantities (temperature, reflectance, radiance)</li>
+<li>Derived indices (NDVI, EVI, moisture indices)</li>
+<li>Can be predicted, interpolated, or forecasted</li>
+</ul>
+</section>
+<section id="labels-categoricaldiscrete-data" class="level3">
+<h3 class="anchored" data-anchor-id="labels-categoricaldiscrete-data">2. <strong>Labels</strong> (Categorical/Discrete Data)</h3>
+<ul>
+<li>Human-assigned categories</li>
+<li>Land cover classes</li>
+<li>Object boundaries and types</li>
+<li>Binary masks (water/no water, cloud/clear)</li>
+</ul>
+</section>
+</section>
+<section id="pixel-value-prediction-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="pixel-value-prediction-tasks">Pixel Value Prediction Tasks</h2>
+<p>When working with continuous pixel values, we encounter two primary prediction paradigms:</p>
+<section id="temporal-prediction-next-value" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-prediction-next-value">Temporal Prediction (Next Value)</h3>
+<ul>
+<li><p><strong>Task</strong>: Predict future pixel values based on historical time series</p></li>
+<li><p><strong>Approach</strong>: Autoregressive models (GPT-like architectures)</p></li>
+<li><p><strong>Example Applications</strong>:</p></li>
+<li><p>Vegetation phenology forecasting</p></li>
+<li><p>Surface temperature prediction</p></li>
+<li><p>Crop yield estimation</p></li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Conceptual example</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TemporalPixelPredictor(nn.Module):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""GPT-style temporal prediction for pixel time series"""</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_bands, hidden_dim<span class="op">=</span><span class="dv">256</span>):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.embedding <span class="op">=</span> nn.Linear(num_bands, hidden_dim)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transformer <span class="op">=</span> nn.TransformerEncoder(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>            nn.TransformerEncoderLayer(hidden_dim, nhead<span class="op">=</span><span class="dv">8</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            num_layers<span class="op">=</span><span class="dv">6</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.predictor <span class="op">=</span> nn.Linear(hidden_dim, num_bands)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x shape: (batch, time, bands)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        embedded <span class="op">=</span> <span class="va">self</span>.embedding(x)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Causal mask for autoregressive prediction</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.transformer(embedded)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.predictor(features)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="spatial-prediction-missing-values" class="level3">
+<h3 class="anchored" data-anchor-id="spatial-prediction-missing-values">Spatial Prediction (Missing Values)</h3>
+<ul>
+<li><p><strong>Task</strong>: Fill in missing pixel values based on spatial context</p></li>
+<li><p><strong>Approach</strong>: Masked modeling (BERT-like architectures)</p></li>
+<li><p><strong>Example Applications</strong>:</p></li>
+<li><p>Cloud gap filling</p></li>
+<li><p>Sensor failure recovery</p></li>
+<li><p>Super-resolution</p></li>
+<li><p>Data fusion across sensors</p></li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SpatialPixelPredictor(nn.Module):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""BERT-style spatial prediction for missing pixels"""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_bands, patch_size<span class="op">=</span><span class="dv">16</span>, hidden_dim<span class="op">=</span><span class="dv">256</span>):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.patch_embed <span class="op">=</span> nn.Linear(num_bands <span class="op">*</span> patch_size<span class="op">**</span><span class="dv">2</span>, hidden_dim)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transformer <span class="op">=</span> nn.TransformerEncoder(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            nn.TransformerEncoderLayer(hidden_dim, nhead<span class="op">=</span><span class="dv">8</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            num_layers<span class="op">=</span><span class="dv">6</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.decoder <span class="op">=</span> nn.Linear(hidden_dim, num_bands <span class="op">*</span> patch_size<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x, mask):</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x shape: (batch, height, width, bands)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># mask indicates missing pixels</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        patches <span class="op">=</span> <span class="va">self</span>.patchify(x)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        embedded <span class="op">=</span> <span class="va">self</span>.patch_embed(patches)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># No causal mask - bidirectional attention</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.transformer(embedded)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.unpatchify(<span class="va">self</span>.decoder(features))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="label-based-prediction-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="label-based-prediction-tasks">Label-Based Prediction Tasks</h2>
+<p>Working with labels introduces a hierarchy of complexity from image-level to pixel-level granularity:</p>
+<section id="image-classification" class="level3">
+<h3 class="anchored" data-anchor-id="image-classification">1. Image Classification</h3>
+<ul>
+<li><strong>Granularity</strong>: Entire image/scene</li>
+<li><strong>Input</strong>: Full image (H × W × Bands)</li>
+<li><strong>Output</strong>: Single label per image</li>
+<li><strong>Example</strong>: “This Sentinel-2 tile contains urban area”</li>
+</ul>
+</section>
+<section id="pixel-wise-classification" class="level3">
+<h3 class="anchored" data-anchor-id="pixel-wise-classification">2. Pixel-wise Classification</h3>
+<ul>
+<li><strong>Granularity</strong>: Individual pixels</li>
+<li><strong>Input</strong>: Image patches or full image</li>
+<li><strong>Output</strong>: Label map (H × W × Classes)</li>
+<li><strong>Example</strong>: Land cover mapping where each pixel gets a class</li>
+</ul>
+</section>
+<section id="object-detection" class="level3">
+<h3 class="anchored" data-anchor-id="object-detection">3. Object Detection</h3>
+<ul>
+<li><strong>Granularity</strong>: Bounding boxes</li>
+<li><strong>Input</strong>: Full image</li>
+<li><strong>Output</strong>: List of [bbox, class, confidence]</li>
+<li><strong>Example</strong>: Detecting buildings, vehicles, or agricultural fields</li>
+</ul>
+</section>
+<section id="object-segmentation" class="level3">
+<h3 class="anchored" data-anchor-id="object-segmentation">4. Object Segmentation</h3>
+<ul>
+<li><strong>Granularity</strong>: Precise object boundaries</li>
+<li><strong>Input</strong>: Full image</li>
+<li><strong>Output</strong>: Instance masks + classes</li>
+<li><strong>Example</strong>: Delineating individual tree crowns or building footprints</li>
+</ul>
+</section>
+</section>
+<section id="regression-for-novel-variable-prediction" class="level2">
+<h2 class="anchored" data-anchor-id="regression-for-novel-variable-prediction">Regression for Novel Variable Prediction</h2>
+<p>Beyond classification, regression tasks predict continuous variables that may not be directly observable:</p>
+<section id="pixel-wise-regression-applications" class="level3">
+<h3 class="anchored" data-anchor-id="pixel-wise-regression-applications">Pixel-wise Regression Applications</h3>
+<ol type="1">
+<li><p><strong>Biophysical Parameter Estimation</strong></p>
+<ul>
+<li>Leaf Area Index (LAI)</li>
+<li>Chlorophyll content</li>
+<li>Soil moisture</li>
+<li>Biomass</li>
+</ul></li>
+<li><p><strong>Environmental Variable Prediction</strong></p>
+<ul>
+<li>Air quality indices</li>
+<li>Surface temperature</li>
+<li>Precipitation estimates</li>
+<li>Carbon flux</li>
+</ul></li>
+<li><p><strong>Socioeconomic Indicators</strong></p>
+<ul>
+<li>Population density</li>
+<li>Economic activity</li>
+<li>Energy consumption</li>
+</ul></li>
+</ol>
+</section>
+<section id="input-output-relationships-for-regression" class="level3">
+<h3 class="anchored" data-anchor-id="input-output-relationships-for-regression">Input-Output Relationships for Regression</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/input_output_relationships.png" class="img-fluid figure-img"></p>
+<figcaption>Input-output relationships for different geospatial tasks</figcaption>
+</figure>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GeospatialRegressor(nn.Module):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""General framework for pixel-wise regression"""</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_bands, output_variables):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.encoder <span class="op">=</span> nn.Sequential(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(input_bands, <span class="dv">64</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            <span class="co"># ... more layers</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.decoder <span class="op">=</span> nn.Conv2d(<span class="dv">128</span>, output_variables, <span class="dv">1</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x: (batch, bands, height, width)</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.encoder(x)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Output: (batch, variables, height, width)</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.decoder(features)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="mldlfm-tool-suitability-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="mldlfm-tool-suitability-matrix">ML/DL/FM Tool Suitability Matrix</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/ml_suitability_matrix.png" class="img-fluid figure-img"></p>
+<figcaption>ML/DL/FM suitability matrix for geospatial tasks</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task Type</th>
+<th>Traditional ML</th>
+<th>Deep Learning</th>
+<th>Foundation Models</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Image Classification</strong></td>
+<td>Random Forest, SVM on hand-crafted features</td>
+<td>CNNs (ResNet, EfficientNet)</td>
+<td>CLIP, RemoteCLIP</td>
+</tr>
+<tr class="even">
+<td><strong>Pixel Classification</strong></td>
+<td>Random Forest per pixel</td>
+<td>U-Net, DeepLab</td>
+<td>Segment Anything + prompting</td>
+</tr>
+<tr class="odd">
+<td><strong>Object Detection</strong></td>
+<td>Limited (HOG+SVM)</td>
+<td>YOLO, Faster R-CNN</td>
+<td>DINO, OWL-ViT</td>
+</tr>
+<tr class="even">
+<td><strong>Instance Segmentation</strong></td>
+<td>Very limited</td>
+<td>Mask R-CNN</td>
+<td>SAM, OneFormer</td>
+</tr>
+<tr class="odd">
+<td><strong>Temporal Prediction</strong></td>
+<td>ARIMA, Random Forest</td>
+<td>LSTM, Temporal CNN</td>
+<td>TimesFM, Prithvi</td>
+</tr>
+<tr class="even">
+<td><strong>Spatial Interpolation</strong></td>
+<td>Kriging, IDW</td>
+<td>CNN autoencoders</td>
+<td>MAE-based models</td>
+</tr>
+<tr class="odd">
+<td><strong>Biophysical Regression</strong></td>
+<td>Random Forest, SVR</td>
+<td>CNN, Vision Transformer</td>
+<td>Fine-tuned Prithvi, SatMAE</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="choosing-the-right-approach" class="level2">
+<h2 class="anchored" data-anchor-id="choosing-the-right-approach">Choosing the Right Approach</h2>
+<section id="use-traditional-ml-when" class="level3">
+<h3 class="anchored" data-anchor-id="use-traditional-ml-when">Use Traditional ML When:</h3>
+<ul>
+<li>Limited training data available</li>
+<li>Interpretability is crucial</li>
+<li>Computational resources are constrained</li>
+<li>Working with tabular features</li>
+</ul>
+</section>
+<section id="use-deep-learning-when" class="level3">
+<h3 class="anchored" data-anchor-id="use-deep-learning-when">Use Deep Learning When:</h3>
+<ul>
+<li>Large labeled datasets available</li>
+<li>Complex spatial patterns exist</li>
+<li>High accuracy is priority</li>
+<li>GPU resources available</li>
+</ul>
+</section>
+<section id="use-foundation-models-when" class="level3">
+<h3 class="anchored" data-anchor-id="use-foundation-models-when">Use Foundation Models When:</h3>
+<ul>
+<li>Limited task-specific labels</li>
+<li>Need zero/few-shot capabilities</li>
+<li>Working across multiple sensors/resolutions</li>
+<li>Require general feature representations</li>
+</ul>
+</section>
+</section>
+<section id="practical-implementation-considerations" class="level2">
+<h2 class="anchored" data-anchor-id="practical-implementation-considerations">Practical Implementation Considerations</h2>
+<section id="data-preparation-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="data-preparation-pipeline">Data Preparation Pipeline</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GeospatialDataPipeline:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, task_type):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.task_type <span class="op">=</span> task_type</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> prepare_data(<span class="va">self</span>, imagery, labels<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Prepare data based on task requirements"""</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"temporal_prediction"</span>:</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Stack time series</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_time_series_sequences(imagery)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"spatial_interpolation"</span>:</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Create masked inputs</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_masked_inputs(imagery)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"pixel_classification"</span>:</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Create patch-label pairs</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_training_patches(imagery, labels)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"object_detection"</span>:</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Format as COCO-style annotations</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_detection_dataset(imagery, labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="multi-task-learning-opportunities" class="level3">
+<h3 class="anchored" data-anchor-id="multi-task-learning-opportunities">Multi-Task Learning Opportunities</h3>
+<p>Many geospatial problems benefit from joint learning:</p>
+<ol type="1">
+<li><strong>Classification + Regression</strong>: Predict land cover type AND vegetation health</li>
+<li><strong>Detection + Segmentation</strong>: Locate AND delineate objects</li>
+<li><strong>Temporal + Spatial</strong>: Fill gaps AND forecast future values</li>
+</ol>
+</section>
+</section>
+<section id="best-practices-and-recommendations" class="level2">
+<h2 class="anchored" data-anchor-id="best-practices-and-recommendations">Best Practices and Recommendations</h2>
+<section id="start-simple-scale-up" class="level3">
+<h3 class="anchored" data-anchor-id="start-simple-scale-up">1. Start Simple, Scale Up</h3>
+<ul>
+<li>Begin with traditional ML baselines</li>
+<li>Move to deep learning with sufficient data</li>
+<li>Consider foundation models for generalization</li>
+</ul>
+</section>
+<section id="leverage-pretrained-models" class="level3">
+<h3 class="anchored" data-anchor-id="leverage-pretrained-models">2. Leverage Pretrained Models</h3>
+<ul>
+<li>Use ImageNet pretrained encoders as starting points</li>
+<li>Fine-tune geospatial foundation models (Prithvi, SatMAE)</li>
+<li>Apply transfer learning from similar domains</li>
+</ul>
+</section>
+<section id="handle-geospatial-specifics" class="level3">
+<h3 class="anchored" data-anchor-id="handle-geospatial-specifics">3. Handle Geospatial Specifics</h3>
+<ul>
+<li>Account for coordinate systems and projections</li>
+<li>Preserve spatial autocorrelation in train/test splits</li>
+<li>Consider atmospheric and seasonal effects</li>
+</ul>
+</section>
+<section id="validate-appropriately" class="level3">
+<h3 class="anchored" data-anchor-id="validate-appropriately">4. Validate Appropriately</h3>
+<ul>
+<li>Use spatial and temporal holdouts</li>
+<li>Employ domain-specific metrics</li>
+<li>Validate against ground truth when available</li>
+</ul>
+</section>
+</section>
+<section id="code-example-unified-prediction-framework" class="level2">
+<h2 class="anchored" data-anchor-id="code-example-unified-prediction-framework">Code Example: Unified Prediction Framework</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Dict, Optional, Union</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> UnifiedGeospatialPredictor(nn.Module):</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Flexible architecture for various geospatial tasks"""</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        input_channels: <span class="bu">int</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        task_config: Dict[<span class="bu">str</span>, <span class="bu">any</span>]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.task_type <span class="op">=</span> task_config[<span class="st">'type'</span>]</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.input_channels <span class="op">=</span> input_channels</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Shared encoder</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.encoder <span class="op">=</span> <span class="va">self</span>._build_encoder(input_channels)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Task-specific heads</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'classification'</span>:</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> nn.Conv2d(<span class="dv">256</span>, task_config[<span class="st">'num_classes'</span>], <span class="dv">1</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'regression'</span>:</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> nn.Conv2d(<span class="dv">256</span>, task_config[<span class="st">'num_outputs'</span>], <span class="dv">1</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'detection'</span>:</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> <span class="va">self</span>._build_detection_head(task_config)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'temporal'</span>:</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> <span class="va">self</span>._build_temporal_head(task_config)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _build_encoder(<span class="va">self</span>, channels):</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Build a flexible encoder backbone"""</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(channels, <span class="dv">64</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(<span class="dv">64</span>),</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(<span class="dv">128</span>),</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(<span class="dv">256</span>),</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>, </span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        x: torch.Tensor,</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>        temporal_mask: Optional[torch.Tensor] <span class="op">=</span> <span class="va">None</span>,</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>        spatial_mask: Optional[torch.Tensor] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">-&gt;</span> Union[torch.Tensor, Dict[<span class="bu">str</span>, torch.Tensor]]:</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Forward pass adapts to task type"""</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.encoder(x)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.task_type <span class="kw">in</span> [<span class="st">'classification'</span>, <span class="st">'regression'</span>]:</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Pixel-wise predictions</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.head(features)</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'detection'</span>:</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Return dict with boxes, classes, scores</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.head(features)</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'temporal'</span>:</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Handle sequential data</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.head(features, temporal_mask)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>The hierarchy of geospatial prediction tasks spans from coarse image-level classification to fine-grained pixel-wise regression. Understanding this hierarchy helps in:</p>
+<ol type="1">
+<li><strong>Choosing appropriate architectures</strong>: Matching model complexity to task requirements</li>
+<li><strong>Preparing data correctly</strong>: Structuring inputs and outputs for optimal learning</li>
+<li><strong>Selecting suitable tools</strong>: Leveraging traditional ML, deep learning, or foundation models based on constraints</li>
+<li><strong>Designing evaluation strategies</strong>: Using task-appropriate metrics and validation schemes</li>
+</ol>
+<p>As the field evolves, foundation models increasingly bridge these task types, offering unified architectures that can adapt to multiple prediction scenarios with minimal modification.</p>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://github.com/NASA-IMPACT/Prithvi">Prithvi: NASA-IBM Geospatial Foundation Model</a></li>
+<li><a href="https://github.com/sustainlab-group/SatMAE">SatMAE: Masked Autoencoders for Satellite Imagery</a></li>
+<li><a href="https://github.com/facebookresearch/segment-anything">Segment Anything Model (SAM)</a></li>
+<li><a href="https://github.com/google-research/timesfm">TimesFM: Time Series Foundation Model</a></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/kcaylor\.github\.io\/GEOG-288KC-geospatial-foundation-models");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Hierarchy of Geospatial Prediction Tasks"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "From Pixels to Objects: Understanding ML/DL/FM Applications in Remote Sensing"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">  error: false</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate visualization figures</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if figures exist, if not generate them</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>figure_dir <span class="op">=</span> <span class="st">"images"</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>figures <span class="op">=</span> [</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"prediction_hierarchy_overview.png"</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"input_output_relationships.png"</span>, </span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ml_suitability_matrix.png"</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Create directory if it doesn't exist</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>os.makedirs(figure_dir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all figures exist</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>all_exist <span class="op">=</span> <span class="bu">all</span>(os.path.exists(os.path.join(figure_dir, fig)) <span class="cf">for</span> fig <span class="kw">in</span> figures)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> all_exist:</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Run the visualization script</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>        <span class="bu">exec</span>(<span class="bu">open</span>(<span class="st">'scripts/visualize_prediction_hierarchy.py'</span>).read())</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Note: Could not generate figures automatically. Error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Please run 'python book/extras/scripts/visualize_prediction_hierarchy.py' manually."</span>)</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>In geospatial data science and remote sensing, prediction tasks form a natural hierarchy from pixel-level analysis to complex object understanding. This document explores the relationships between different prediction tasks, their input-output structures, and the suitability of various machine learning approaches.</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="fu">## The Fundamental Dichotomy: Pixel Values vs. Labels</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>At the core of geospatial analysis, we work with two fundamental types of data:</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="al">![Overview of prediction task hierarchy in geospatial analysis](images/prediction_hierarchy_overview.png)</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. **Pixel Values** (Continuous Data)</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Raw spectral measurements from sensors</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Physical quantities (temperature, reflectance, radiance)</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Derived indices (NDVI, EVI, moisture indices)</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Can be predicted, interpolated, or forecasted</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. **Labels** (Categorical/Discrete Data)</span></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Human-assigned categories</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Land cover classes</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Object boundaries and types</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Binary masks (water/no water, cloud/clear)</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a><span class="fu">## Pixel Value Prediction Tasks</span></span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>When working with continuous pixel values, we encounter two primary prediction paradigms:</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="fu">### Temporal Prediction (Next Value)</span></span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Task**: Predict future pixel values based on historical time series</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Approach**: Autoregressive models (GPT-like architectures)</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Example Applications**:</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Vegetation phenology forecasting</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Surface temperature prediction</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Crop yield estimation</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="co"># Conceptual example</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TemporalPixelPredictor(nn.Module):</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""GPT-style temporal prediction for pixel time series"""</span></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_bands, hidden_dim<span class="op">=</span><span class="dv">256</span>):</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.embedding <span class="op">=</span> nn.Linear(num_bands, hidden_dim)</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transformer <span class="op">=</span> nn.TransformerEncoder(</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>            nn.TransformerEncoderLayer(hidden_dim, nhead<span class="op">=</span><span class="dv">8</span>),</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>            num_layers<span class="op">=</span><span class="dv">6</span></span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.predictor <span class="op">=</span> nn.Linear(hidden_dim, num_bands)</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x shape: (batch, time, bands)</span></span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>        embedded <span class="op">=</span> <span class="va">self</span>.embedding(x)</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Causal mask for autoregressive prediction</span></span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.transformer(embedded)</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.predictor(features)</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a><span class="fu">### Spatial Prediction (Missing Values)</span></span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Task**: Fill in missing pixel values based on spatial context</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Approach**: Masked modeling (BERT-like architectures)</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Example Applications**:</span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Cloud gap filling</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sensor failure recovery</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Super-resolution</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Data fusion across sensors</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SpatialPixelPredictor(nn.Module):</span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""BERT-style spatial prediction for missing pixels"""</span></span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_bands, patch_size<span class="op">=</span><span class="dv">16</span>, hidden_dim<span class="op">=</span><span class="dv">256</span>):</span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.patch_embed <span class="op">=</span> nn.Linear(num_bands <span class="op">*</span> patch_size<span class="op">**</span><span class="dv">2</span>, hidden_dim)</span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transformer <span class="op">=</span> nn.TransformerEncoder(</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>            nn.TransformerEncoderLayer(hidden_dim, nhead<span class="op">=</span><span class="dv">8</span>),</span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>            num_layers<span class="op">=</span><span class="dv">6</span></span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.decoder <span class="op">=</span> nn.Linear(hidden_dim, num_bands <span class="op">*</span> patch_size<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x, mask):</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x shape: (batch, height, width, bands)</span></span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>        <span class="co"># mask indicates missing pixels</span></span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>        patches <span class="op">=</span> <span class="va">self</span>.patchify(x)</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a>        embedded <span class="op">=</span> <span class="va">self</span>.patch_embed(patches)</span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>        <span class="co"># No causal mask - bidirectional attention</span></span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.transformer(embedded)</span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.unpatchify(<span class="va">self</span>.decoder(features))</span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a><span class="fu">## Label-Based Prediction Tasks</span></span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>Working with labels introduces a hierarchy of complexity from image-level to pixel-level granularity:</span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Image Classification</span></span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Granularity**: Entire image/scene</span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Input**: Full image (H × W × Bands)</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Output**: Single label per image</span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Example**: "This Sentinel-2 tile contains urban area"</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Pixel-wise Classification</span></span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Granularity**: Individual pixels</span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Input**: Image patches or full image</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Output**: Label map (H × W × Classes)</span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Example**: Land cover mapping where each pixel gets a class</span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. Object Detection</span></span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Granularity**: Bounding boxes</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Input**: Full image</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Output**: List of <span class="co">[</span><span class="ot">bbox, class, confidence</span><span class="co">]</span></span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Example**: Detecting buildings, vehicles, or agricultural fields</span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4. Object Segmentation</span></span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Granularity**: Precise object boundaries</span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Input**: Full image</span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Output**: Instance masks + classes</span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Example**: Delineating individual tree crowns or building footprints</span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regression for Novel Variable Prediction</span></span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a>Beyond classification, regression tasks predict continuous variables that may not be directly observable:</span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pixel-wise Regression Applications</span></span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Biophysical Parameter Estimation**</span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Leaf Area Index (LAI)</span>
+<span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Chlorophyll content</span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Soil moisture</span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Biomass</span>
+<span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Environmental Variable Prediction**</span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Air quality indices</span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Surface temperature</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Precipitation estimates</span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Carbon flux</span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Socioeconomic Indicators**</span>
+<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Population density</span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Economic activity</span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Energy consumption</span>
+<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a><span class="fu">### Input-Output Relationships for Regression</span></span>
+<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-202"><a href="#cb6-202" aria-hidden="true" tabindex="-1"></a><span class="al">![Input-output relationships for different geospatial tasks](images/input_output_relationships.png)</span></span>
+<span id="cb6-203"><a href="#cb6-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-204"><a href="#cb6-204" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb6-205"><a href="#cb6-205" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GeospatialRegressor(nn.Module):</span>
+<span id="cb6-206"><a href="#cb6-206" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""General framework for pixel-wise regression"""</span></span>
+<span id="cb6-207"><a href="#cb6-207" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, input_bands, output_variables):</span>
+<span id="cb6-208"><a href="#cb6-208" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb6-209"><a href="#cb6-209" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.encoder <span class="op">=</span> nn.Sequential(</span>
+<span id="cb6-210"><a href="#cb6-210" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(input_bands, <span class="dv">64</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb6-211"><a href="#cb6-211" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb6-212"><a href="#cb6-212" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb6-213"><a href="#cb6-213" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb6-214"><a href="#cb6-214" aria-hidden="true" tabindex="-1"></a>            <span class="co"># ... more layers</span></span>
+<span id="cb6-215"><a href="#cb6-215" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-216"><a href="#cb6-216" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.decoder <span class="op">=</span> nn.Conv2d(<span class="dv">128</span>, output_variables, <span class="dv">1</span>)</span>
+<span id="cb6-217"><a href="#cb6-217" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-218"><a href="#cb6-218" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb6-219"><a href="#cb6-219" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x: (batch, bands, height, width)</span></span>
+<span id="cb6-220"><a href="#cb6-220" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.encoder(x)</span>
+<span id="cb6-221"><a href="#cb6-221" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Output: (batch, variables, height, width)</span></span>
+<span id="cb6-222"><a href="#cb6-222" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.decoder(features)</span>
+<span id="cb6-223"><a href="#cb6-223" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-224"><a href="#cb6-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-225"><a href="#cb6-225" aria-hidden="true" tabindex="-1"></a><span class="fu">## ML/DL/FM Tool Suitability Matrix</span></span>
+<span id="cb6-226"><a href="#cb6-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-227"><a href="#cb6-227" aria-hidden="true" tabindex="-1"></a><span class="al">![ML/DL/FM suitability matrix for geospatial tasks](images/ml_suitability_matrix.png)</span></span>
+<span id="cb6-228"><a href="#cb6-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-229"><a href="#cb6-229" aria-hidden="true" tabindex="-1"></a>| Task Type | Traditional ML | Deep Learning | Foundation Models |</span>
+<span id="cb6-230"><a href="#cb6-230" aria-hidden="true" tabindex="-1"></a>|-----------|---------------|---------------|-------------------|</span>
+<span id="cb6-231"><a href="#cb6-231" aria-hidden="true" tabindex="-1"></a>| **Image Classification** | Random Forest, SVM on hand-crafted features | CNNs (ResNet, EfficientNet) | CLIP, RemoteCLIP |</span>
+<span id="cb6-232"><a href="#cb6-232" aria-hidden="true" tabindex="-1"></a>| **Pixel Classification** | Random Forest per pixel | U-Net, DeepLab | Segment Anything + prompting |</span>
+<span id="cb6-233"><a href="#cb6-233" aria-hidden="true" tabindex="-1"></a>| **Object Detection** | Limited (HOG+SVM) | YOLO, Faster R-CNN | DINO, OWL-ViT |</span>
+<span id="cb6-234"><a href="#cb6-234" aria-hidden="true" tabindex="-1"></a>| **Instance Segmentation** | Very limited | Mask R-CNN | SAM, OneFormer |</span>
+<span id="cb6-235"><a href="#cb6-235" aria-hidden="true" tabindex="-1"></a>| **Temporal Prediction** | ARIMA, Random Forest | LSTM, Temporal CNN | TimesFM, Prithvi |</span>
+<span id="cb6-236"><a href="#cb6-236" aria-hidden="true" tabindex="-1"></a>| **Spatial Interpolation** | Kriging, IDW | CNN autoencoders | MAE-based models |</span>
+<span id="cb6-237"><a href="#cb6-237" aria-hidden="true" tabindex="-1"></a>| **Biophysical Regression** | Random Forest, SVR | CNN, Vision Transformer | Fine-tuned Prithvi, SatMAE |</span>
+<span id="cb6-238"><a href="#cb6-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-239"><a href="#cb6-239" aria-hidden="true" tabindex="-1"></a><span class="fu">## Choosing the Right Approach</span></span>
+<span id="cb6-240"><a href="#cb6-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-241"><a href="#cb6-241" aria-hidden="true" tabindex="-1"></a><span class="fu">### Use Traditional ML When:</span></span>
+<span id="cb6-242"><a href="#cb6-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-243"><a href="#cb6-243" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Limited training data available</span>
+<span id="cb6-244"><a href="#cb6-244" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Interpretability is crucial</span>
+<span id="cb6-245"><a href="#cb6-245" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Computational resources are constrained</span>
+<span id="cb6-246"><a href="#cb6-246" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Working with tabular features</span>
+<span id="cb6-247"><a href="#cb6-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-248"><a href="#cb6-248" aria-hidden="true" tabindex="-1"></a><span class="fu">### Use Deep Learning When:</span></span>
+<span id="cb6-249"><a href="#cb6-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-250"><a href="#cb6-250" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Large labeled datasets available</span>
+<span id="cb6-251"><a href="#cb6-251" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Complex spatial patterns exist</span>
+<span id="cb6-252"><a href="#cb6-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>High accuracy is priority</span>
+<span id="cb6-253"><a href="#cb6-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>GPU resources available</span>
+<span id="cb6-254"><a href="#cb6-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-255"><a href="#cb6-255" aria-hidden="true" tabindex="-1"></a><span class="fu">### Use Foundation Models When:</span></span>
+<span id="cb6-256"><a href="#cb6-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-257"><a href="#cb6-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Limited task-specific labels</span>
+<span id="cb6-258"><a href="#cb6-258" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Need zero/few-shot capabilities</span>
+<span id="cb6-259"><a href="#cb6-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Working across multiple sensors/resolutions</span>
+<span id="cb6-260"><a href="#cb6-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Require general feature representations</span>
+<span id="cb6-261"><a href="#cb6-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-262"><a href="#cb6-262" aria-hidden="true" tabindex="-1"></a><span class="fu">## Practical Implementation Considerations</span></span>
+<span id="cb6-263"><a href="#cb6-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-264"><a href="#cb6-264" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Preparation Pipeline</span></span>
+<span id="cb6-265"><a href="#cb6-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-266"><a href="#cb6-266" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb6-267"><a href="#cb6-267" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GeospatialDataPipeline:</span>
+<span id="cb6-268"><a href="#cb6-268" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, task_type):</span>
+<span id="cb6-269"><a href="#cb6-269" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.task_type <span class="op">=</span> task_type</span>
+<span id="cb6-270"><a href="#cb6-270" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-271"><a href="#cb6-271" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> prepare_data(<span class="va">self</span>, imagery, labels<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb6-272"><a href="#cb6-272" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Prepare data based on task requirements"""</span></span>
+<span id="cb6-273"><a href="#cb6-273" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"temporal_prediction"</span>:</span>
+<span id="cb6-274"><a href="#cb6-274" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Stack time series</span></span>
+<span id="cb6-275"><a href="#cb6-275" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_time_series_sequences(imagery)</span>
+<span id="cb6-276"><a href="#cb6-276" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-277"><a href="#cb6-277" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"spatial_interpolation"</span>:</span>
+<span id="cb6-278"><a href="#cb6-278" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Create masked inputs</span></span>
+<span id="cb6-279"><a href="#cb6-279" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_masked_inputs(imagery)</span>
+<span id="cb6-280"><a href="#cb6-280" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-281"><a href="#cb6-281" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"pixel_classification"</span>:</span>
+<span id="cb6-282"><a href="#cb6-282" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Create patch-label pairs</span></span>
+<span id="cb6-283"><a href="#cb6-283" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_training_patches(imagery, labels)</span>
+<span id="cb6-284"><a href="#cb6-284" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-285"><a href="#cb6-285" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">"object_detection"</span>:</span>
+<span id="cb6-286"><a href="#cb6-286" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Format as COCO-style annotations</span></span>
+<span id="cb6-287"><a href="#cb6-287" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.create_detection_dataset(imagery, labels)</span>
+<span id="cb6-288"><a href="#cb6-288" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-289"><a href="#cb6-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-290"><a href="#cb6-290" aria-hidden="true" tabindex="-1"></a><span class="fu">### Multi-Task Learning Opportunities</span></span>
+<span id="cb6-291"><a href="#cb6-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-292"><a href="#cb6-292" aria-hidden="true" tabindex="-1"></a>Many geospatial problems benefit from joint learning:</span>
+<span id="cb6-293"><a href="#cb6-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-294"><a href="#cb6-294" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Classification + Regression**: Predict land cover type AND vegetation health</span>
+<span id="cb6-295"><a href="#cb6-295" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Detection + Segmentation**: Locate AND delineate objects</span>
+<span id="cb6-296"><a href="#cb6-296" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Temporal + Spatial**: Fill gaps AND forecast future values</span>
+<span id="cb6-297"><a href="#cb6-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-298"><a href="#cb6-298" aria-hidden="true" tabindex="-1"></a><span class="fu">## Best Practices and Recommendations</span></span>
+<span id="cb6-299"><a href="#cb6-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-300"><a href="#cb6-300" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Start Simple, Scale Up</span></span>
+<span id="cb6-301"><a href="#cb6-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-302"><a href="#cb6-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Begin with traditional ML baselines</span>
+<span id="cb6-303"><a href="#cb6-303" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Move to deep learning with sufficient data</span>
+<span id="cb6-304"><a href="#cb6-304" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Consider foundation models for generalization</span>
+<span id="cb6-305"><a href="#cb6-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-306"><a href="#cb6-306" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Leverage Pretrained Models</span></span>
+<span id="cb6-307"><a href="#cb6-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-308"><a href="#cb6-308" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Use ImageNet pretrained encoders as starting points</span>
+<span id="cb6-309"><a href="#cb6-309" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Fine-tune geospatial foundation models (Prithvi, SatMAE)</span>
+<span id="cb6-310"><a href="#cb6-310" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Apply transfer learning from similar domains</span>
+<span id="cb6-311"><a href="#cb6-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-312"><a href="#cb6-312" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. Handle Geospatial Specifics</span></span>
+<span id="cb6-313"><a href="#cb6-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-314"><a href="#cb6-314" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Account for coordinate systems and projections</span>
+<span id="cb6-315"><a href="#cb6-315" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Preserve spatial autocorrelation in train/test splits</span>
+<span id="cb6-316"><a href="#cb6-316" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Consider atmospheric and seasonal effects</span>
+<span id="cb6-317"><a href="#cb6-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-318"><a href="#cb6-318" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4. Validate Appropriately</span></span>
+<span id="cb6-319"><a href="#cb6-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-320"><a href="#cb6-320" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Use spatial and temporal holdouts</span>
+<span id="cb6-321"><a href="#cb6-321" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Employ domain-specific metrics</span>
+<span id="cb6-322"><a href="#cb6-322" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Validate against ground truth when available</span>
+<span id="cb6-323"><a href="#cb6-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-324"><a href="#cb6-324" aria-hidden="true" tabindex="-1"></a><span class="fu">## Code Example: Unified Prediction Framework</span></span>
+<span id="cb6-325"><a href="#cb6-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-326"><a href="#cb6-326" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb6-327"><a href="#cb6-327" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb6-328"><a href="#cb6-328" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb6-329"><a href="#cb6-329" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Dict, Optional, Union</span>
+<span id="cb6-330"><a href="#cb6-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-331"><a href="#cb6-331" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> UnifiedGeospatialPredictor(nn.Module):</span>
+<span id="cb6-332"><a href="#cb6-332" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Flexible architecture for various geospatial tasks"""</span></span>
+<span id="cb6-333"><a href="#cb6-333" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-334"><a href="#cb6-334" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(</span>
+<span id="cb6-335"><a href="#cb6-335" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>,</span>
+<span id="cb6-336"><a href="#cb6-336" aria-hidden="true" tabindex="-1"></a>        input_channels: <span class="bu">int</span>,</span>
+<span id="cb6-337"><a href="#cb6-337" aria-hidden="true" tabindex="-1"></a>        task_config: Dict[<span class="bu">str</span>, <span class="bu">any</span>]</span>
+<span id="cb6-338"><a href="#cb6-338" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb6-339"><a href="#cb6-339" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb6-340"><a href="#cb6-340" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.task_type <span class="op">=</span> task_config[<span class="st">'type'</span>]</span>
+<span id="cb6-341"><a href="#cb6-341" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.input_channels <span class="op">=</span> input_channels</span>
+<span id="cb6-342"><a href="#cb6-342" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-343"><a href="#cb6-343" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Shared encoder</span></span>
+<span id="cb6-344"><a href="#cb6-344" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.encoder <span class="op">=</span> <span class="va">self</span>._build_encoder(input_channels)</span>
+<span id="cb6-345"><a href="#cb6-345" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-346"><a href="#cb6-346" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Task-specific heads</span></span>
+<span id="cb6-347"><a href="#cb6-347" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'classification'</span>:</span>
+<span id="cb6-348"><a href="#cb6-348" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> nn.Conv2d(<span class="dv">256</span>, task_config[<span class="st">'num_classes'</span>], <span class="dv">1</span>)</span>
+<span id="cb6-349"><a href="#cb6-349" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'regression'</span>:</span>
+<span id="cb6-350"><a href="#cb6-350" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> nn.Conv2d(<span class="dv">256</span>, task_config[<span class="st">'num_outputs'</span>], <span class="dv">1</span>)</span>
+<span id="cb6-351"><a href="#cb6-351" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'detection'</span>:</span>
+<span id="cb6-352"><a href="#cb6-352" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> <span class="va">self</span>._build_detection_head(task_config)</span>
+<span id="cb6-353"><a href="#cb6-353" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'temporal'</span>:</span>
+<span id="cb6-354"><a href="#cb6-354" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.head <span class="op">=</span> <span class="va">self</span>._build_temporal_head(task_config)</span>
+<span id="cb6-355"><a href="#cb6-355" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb6-356"><a href="#cb6-356" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _build_encoder(<span class="va">self</span>, channels):</span>
+<span id="cb6-357"><a href="#cb6-357" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Build a flexible encoder backbone"""</span></span>
+<span id="cb6-358"><a href="#cb6-358" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> nn.Sequential(</span>
+<span id="cb6-359"><a href="#cb6-359" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(channels, <span class="dv">64</span>, <span class="dv">3</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb6-360"><a href="#cb6-360" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(<span class="dv">64</span>),</span>
+<span id="cb6-361"><a href="#cb6-361" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb6-362"><a href="#cb6-362" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">64</span>, <span class="dv">128</span>, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb6-363"><a href="#cb6-363" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(<span class="dv">128</span>),</span>
+<span id="cb6-364"><a href="#cb6-364" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb6-365"><a href="#cb6-365" aria-hidden="true" tabindex="-1"></a>            nn.Conv2d(<span class="dv">128</span>, <span class="dv">256</span>, <span class="dv">3</span>, stride<span class="op">=</span><span class="dv">2</span>, padding<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb6-366"><a href="#cb6-366" aria-hidden="true" tabindex="-1"></a>            nn.BatchNorm2d(<span class="dv">256</span>),</span>
+<span id="cb6-367"><a href="#cb6-367" aria-hidden="true" tabindex="-1"></a>            nn.ReLU(),</span>
+<span id="cb6-368"><a href="#cb6-368" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb6-369"><a href="#cb6-369" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-370"><a href="#cb6-370" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(</span>
+<span id="cb6-371"><a href="#cb6-371" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>, </span>
+<span id="cb6-372"><a href="#cb6-372" aria-hidden="true" tabindex="-1"></a>        x: torch.Tensor,</span>
+<span id="cb6-373"><a href="#cb6-373" aria-hidden="true" tabindex="-1"></a>        temporal_mask: Optional[torch.Tensor] <span class="op">=</span> <span class="va">None</span>,</span>
+<span id="cb6-374"><a href="#cb6-374" aria-hidden="true" tabindex="-1"></a>        spatial_mask: Optional[torch.Tensor] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb6-375"><a href="#cb6-375" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">-&gt;</span> Union[torch.Tensor, Dict[<span class="bu">str</span>, torch.Tensor]]:</span>
+<span id="cb6-376"><a href="#cb6-376" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Forward pass adapts to task type"""</span></span>
+<span id="cb6-377"><a href="#cb6-377" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> <span class="va">self</span>.encoder(x)</span>
+<span id="cb6-378"><a href="#cb6-378" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-379"><a href="#cb6-379" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.task_type <span class="kw">in</span> [<span class="st">'classification'</span>, <span class="st">'regression'</span>]:</span>
+<span id="cb6-380"><a href="#cb6-380" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Pixel-wise predictions</span></span>
+<span id="cb6-381"><a href="#cb6-381" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.head(features)</span>
+<span id="cb6-382"><a href="#cb6-382" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-383"><a href="#cb6-383" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'detection'</span>:</span>
+<span id="cb6-384"><a href="#cb6-384" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Return dict with boxes, classes, scores</span></span>
+<span id="cb6-385"><a href="#cb6-385" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.head(features)</span>
+<span id="cb6-386"><a href="#cb6-386" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-387"><a href="#cb6-387" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.task_type <span class="op">==</span> <span class="st">'temporal'</span>:</span>
+<span id="cb6-388"><a href="#cb6-388" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Handle sequential data</span></span>
+<span id="cb6-389"><a href="#cb6-389" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">self</span>.head(features, temporal_mask)</span>
+<span id="cb6-390"><a href="#cb6-390" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-391"><a href="#cb6-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-392"><a href="#cb6-392" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
+<span id="cb6-393"><a href="#cb6-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-394"><a href="#cb6-394" aria-hidden="true" tabindex="-1"></a>The hierarchy of geospatial prediction tasks spans from coarse image-level classification to fine-grained pixel-wise regression. Understanding this hierarchy helps in:</span>
+<span id="cb6-395"><a href="#cb6-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-396"><a href="#cb6-396" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Choosing appropriate architectures**: Matching model complexity to task requirements</span>
+<span id="cb6-397"><a href="#cb6-397" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Preparing data correctly**: Structuring inputs and outputs for optimal learning</span>
+<span id="cb6-398"><a href="#cb6-398" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Selecting suitable tools**: Leveraging traditional ML, deep learning, or foundation models based on constraints</span>
+<span id="cb6-399"><a href="#cb6-399" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Designing evaluation strategies**: Using task-appropriate metrics and validation schemes</span>
+<span id="cb6-400"><a href="#cb6-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-401"><a href="#cb6-401" aria-hidden="true" tabindex="-1"></a>As the field evolves, foundation models increasingly bridge these task types, offering unified architectures that can adapt to multiple prediction scenarios with minimal modification.</span>
+<span id="cb6-402"><a href="#cb6-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-403"><a href="#cb6-403" aria-hidden="true" tabindex="-1"></a><span class="fu">## Further Reading</span></span>
+<span id="cb6-404"><a href="#cb6-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-405"><a href="#cb6-405" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Prithvi: NASA-IBM Geospatial Foundation Model</span><span class="co">](https://github.com/NASA-IMPACT/Prithvi)</span></span>
+<span id="cb6-406"><a href="#cb6-406" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">SatMAE: Masked Autoencoders for Satellite Imagery</span><span class="co">](https://github.com/sustainlab-group/SatMAE)</span></span>
+<span id="cb6-407"><a href="#cb6-407" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Segment Anything Model (SAM)</span><span class="co">](https://github.com/facebookresearch/segment-anything)</span></span>
+<span id="cb6-408"><a href="#cb6-408" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">TimesFM: Time Series Foundation Model</span><span class="co">](https://github.com/google-research/timesfm)</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../images/geog-logo.png" class="img-fluid figure-img" width="250"></p>
+<figcaption>Department of Geography logo</figcaption>
+</figure>
+</div>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>This website is built with <a href="https://github.com/kcaylor/GEOG-288KC-geospatial-foundation-models"><i class="fa-brands fa-github" title="the github octocat logo" aria-label="github"></i></a> and <a href="https://quarto.org/">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
