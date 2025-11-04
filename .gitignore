@@ -8,6 +8,9 @@ LLMS-from-scratch/
 # Chapter data
 book/chapters/data
 
+data/train
+book/extras/examples/data
+
 # Python
 __pycache__/
 *.py[cod]
