@@ -1,0 +1,674 @@
+---
+title: "Albumentations for GeoAI"
+subtitle: "Data augmentation for satellite and aerial imagery"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+# Albumentations for GeoAI
+
+This cheatsheet demonstrates practical data augmentation techniques using the albumentations library for geospatial imagery, including multi-spectral data and paired image-mask transformations.
+
+## Setup and Imports
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+import cv2
+
+print(f"Albumentations version: {A.__version__}")
+```
+
+## Sample Geospatial Data
+
+```{python}
+def create_sample_multispectral_image(height=256, width=256, num_bands=6):
+    """Create synthetic multi-spectral satellite image"""
+
+    image = np.random.rand(height, width, num_bands).astype(np.float32)
+
+    y, x = np.ogrid[:height, :width]
+    center_y, center_x = height // 2, width // 2
+
+    for b in range(num_bands):
+        gradient = np.sqrt((x - center_x)**2 + (y - center_y)**2)
+        gradient = gradient / gradient.max()
+        image[:, :, b] = gradient * (0.3 + b * 0.1)
+
+    image = np.clip(image, 0, 1)
+
+    return image
+
+def create_sample_mask(height=256, width=256, num_classes=3):
+    """Create synthetic segmentation mask"""
+
+    mask = np.zeros((height, width), dtype=np.uint8)
+
+    center_y, center_x = height // 2, width // 2
+    y, x = np.ogrid[:height, :width]
+
+    dist = np.sqrt((x - center_x)**2 + (y - center_y)**2)
+
+    mask[dist < 50] = 2
+    mask[(dist >= 50) & (dist < 100)] = 1
+    mask[dist >= 100] = 0
+
+    return mask
+
+rgb_image = create_sample_multispectral_image(256, 256, 3)
+multispectral_image = create_sample_multispectral_image(256, 256, 6)
+mask = create_sample_mask(256, 256, 3)
+
+print(f"RGB image: {rgb_image.shape}, range: [{rgb_image.min():.2f}, {rgb_image.max():.2f}]")
+print(f"Multi-spectral: {multispectral_image.shape}")
+print(f"Mask: {mask.shape}, classes: {np.unique(mask)}")
+```
+
+## Visualize Sample Data
+
+```{python}
+def visualize_image_mask(image, mask, title="Sample Data"):
+    """Visualize RGB image and mask side by side"""
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    if image.shape[2] > 3:
+        display_image = image[:, :, :3]
+    else:
+        display_image = image
+
+    axes[0].imshow(display_image)
+    axes[0].set_title('Image (RGB)')
+    axes[0].axis('off')
+
+    axes[1].imshow(mask, cmap='tab10', vmin=0, vmax=9)
+    axes[1].set_title('Segmentation Mask')
+    axes[1].axis('off')
+
+    plt.suptitle(title)
+    plt.tight_layout()
+    plt.show()
+
+visualize_image_mask(rgb_image, mask, "Original Data")
+```
+
+## Basic Spatial Transformations
+
+```{python}
+spatial_transform = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.Rotate(limit=45, p=0.7),
+    A.RandomRotate90(p=0.5)
+])
+
+transformed = spatial_transform(image=rgb_image, mask=mask)
+
+visualize_image_mask(
+    transformed['image'],
+    transformed['mask'],
+    "Spatial Transformations"
+)
+
+print(f"Original shape: {rgb_image.shape}")
+print(f"Transformed shape: {transformed['image'].shape}")
+print(f"Mask preserved: {np.array_equal(mask.shape, transformed['mask'].shape)}")
+```
+
+## Cropping and Scaling
+
+```{python}
+crop_transform = A.Compose([
+    A.RandomCrop(height=128, width=128, p=1.0),
+    A.Resize(height=256, width=256)
+])
+
+cropped = crop_transform(image=rgb_image, mask=mask)
+
+visualize_image_mask(
+    cropped['image'],
+    cropped['mask'],
+    "Random Crop + Resize"
+)
+```
+
+## Color and Spectral Augmentation
+
+```{python}
+color_transform = A.Compose([
+    A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.8),
+    A.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=20, val_shift_limit=10, p=0.7),
+    A.RGBShift(r_shift_limit=15, g_shift_limit=15, b_shift_limit=15, p=0.5),
+    A.RandomGamma(gamma_limit=(80, 120), p=0.5)
+])
+
+color_augmented = color_transform(image=rgb_image)['image']
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+axes[0].imshow(rgb_image)
+axes[0].set_title('Original')
+axes[0].axis('off')
+
+axes[1].imshow(color_augmented)
+axes[1].set_title('Color Augmented')
+axes[1].axis('off')
+
+plt.suptitle('Color Transformations')
+plt.tight_layout()
+plt.show()
+```
+
+## Noise and Blur
+
+```{python}
+noise_transform = A.Compose([
+    A.OneOf([
+        A.GaussNoise(var_limit=(10.0, 50.0), p=1.0),
+        A.ISONoise(color_shift=(0.01, 0.05), intensity=(0.1, 0.5), p=1.0),
+        A.MultiplicativeNoise(multiplier=(0.9, 1.1), p=1.0)
+    ], p=0.8),
+    A.OneOf([
+        A.GaussianBlur(blur_limit=(3, 7), p=1.0),
+        A.MotionBlur(blur_limit=7, p=1.0),
+        A.MedianBlur(blur_limit=7, p=1.0)
+    ], p=0.5)
+])
+
+noisy = noise_transform(image=rgb_image)['image']
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+axes[0].imshow(rgb_image)
+axes[0].set_title('Original')
+axes[0].axis('off')
+
+axes[1].imshow(noisy)
+axes[1].set_title('Noise + Blur')
+axes[1].axis('off')
+
+plt.suptitle('Noise and Blur Augmentations')
+plt.tight_layout()
+plt.show()
+```
+
+## Grid Distortions
+
+```{python}
+distortion_transform = A.Compose([
+    A.OneOf([
+        A.ElasticTransform(alpha=120, sigma=120 * 0.05, p=1.0),
+        A.GridDistortion(num_steps=5, distort_limit=0.3, p=1.0),
+        A.OpticalDistortion(distort_limit=0.5, shift_limit=0.5, p=1.0)
+    ], p=1.0)
+])
+
+distorted = distortion_transform(image=rgb_image, mask=mask)
+
+visualize_image_mask(
+    distorted['image'],
+    distorted['mask'],
+    "Grid Distortions"
+)
+```
+
+## Multi-Spectral Augmentation
+
+```{python}
+def multispectral_augmentation():
+    """Augmentation pipeline for multi-spectral imagery"""
+
+    return A.Compose([
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.5),
+        A.RandomRotate90(p=0.5),
+        A.ShiftScaleRotate(
+            shift_limit=0.1,
+            scale_limit=0.1,
+            rotate_limit=45,
+            border_mode=cv2.BORDER_CONSTANT,
+            value=0,
+            p=0.7
+        ),
+        A.RandomBrightnessContrast(
+            brightness_limit=0.15,
+            contrast_limit=0.15,
+            p=0.6
+        ),
+        A.GaussNoise(var_limit=(5.0, 20.0), p=0.3)
+    ])
+
+multispectral_aug = multispectral_augmentation()
+
+ms_augmented = multispectral_aug(image=multispectral_image)['image']
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+axes[0].imshow(multispectral_image[:, :, :3])
+axes[0].set_title('Original (RGB bands)')
+axes[0].axis('off')
+
+axes[1].imshow(ms_augmented[:, :, :3])
+axes[1].set_title('Augmented (RGB bands)')
+axes[1].axis('off')
+
+plt.suptitle('Multi-Spectral Augmentation')
+plt.tight_layout()
+plt.show()
+
+print(f"Original bands: {multispectral_image.shape[2]}")
+print(f"Augmented bands: {ms_augmented.shape[2]}")
+```
+
+## Classification Training Pipeline
+
+```{python}
+def get_classification_transforms(image_size=224, is_training=True):
+    """Complete augmentation pipeline for classification"""
+
+    if is_training:
+        return A.Compose([
+            A.RandomResizedCrop(height=image_size, width=image_size, scale=(0.8, 1.0)),
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.RandomRotate90(p=0.5),
+            A.ShiftScaleRotate(
+                shift_limit=0.1,
+                scale_limit=0.1,
+                rotate_limit=30,
+                p=0.5
+            ),
+            A.OneOf([
+                A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2),
+                A.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=15, val_shift_limit=10),
+                A.RGBShift(r_shift_limit=10, g_shift_limit=10, b_shift_limit=10)
+            ], p=0.6),
+            A.OneOf([
+                A.GaussNoise(var_limit=(5.0, 30.0)),
+                A.GaussianBlur(blur_limit=(3, 5)),
+                A.MotionBlur(blur_limit=5)
+            ], p=0.3),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2()
+        ])
+    else:
+        return A.Compose([
+            A.Resize(height=image_size, width=image_size),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2()
+        ])
+
+train_transform = get_classification_transforms(224, is_training=True)
+val_transform = get_classification_transforms(224, is_training=False)
+
+train_sample = train_transform(image=rgb_image)
+val_sample = val_transform(image=rgb_image)
+
+print("Training transform:")
+print(f"  Output type: {type(train_sample['image'])}")
+print(f"  Output shape: {train_sample['image'].shape}")
+
+print("\nValidation transform:")
+print(f"  Output type: {type(val_sample['image'])}")
+print(f"  Output shape: {val_sample['image'].shape}")
+```
+
+## Segmentation Training Pipeline
+
+```{python}
+def get_segmentation_transforms(image_size=256, is_training=True):
+    """Complete augmentation pipeline for segmentation"""
+
+    if is_training:
+        return A.Compose([
+            A.RandomCrop(height=image_size, width=image_size),
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.RandomRotate90(p=0.5),
+            A.ShiftScaleRotate(
+                shift_limit=0.1,
+                scale_limit=0.1,
+                rotate_limit=45,
+                border_mode=cv2.BORDER_CONSTANT,
+                p=0.6
+            ),
+            A.OneOf([
+                A.ElasticTransform(alpha=120, sigma=6, p=1.0),
+                A.GridDistortion(num_steps=5, distort_limit=0.2, p=1.0)
+            ], p=0.3),
+            A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
+            A.GaussNoise(var_limit=(5.0, 20.0), p=0.3),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2()
+        ])
+    else:
+        return A.Compose([
+            A.Resize(height=image_size, width=image_size),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2()
+        ])
+
+seg_train_transform = get_segmentation_transforms(256, is_training=True)
+seg_val_transform = get_segmentation_transforms(256, is_training=False)
+
+seg_train_sample = seg_train_transform(image=rgb_image, mask=mask)
+
+print("Segmentation training transform:")
+print(f"  Image shape: {seg_train_sample['image'].shape}")
+print(f"  Mask shape: {seg_train_sample['mask'].shape}")
+print(f"  Mask dtype: {seg_train_sample['mask'].dtype}")
+print(f"  Mask values: {np.unique(seg_train_sample['mask'])}")
+```
+
+## PyTorch Dataset Integration
+
+```{python}
+import torch
+from torch.utils.data import Dataset, DataLoader
+
+class GeoSpatialDataset(Dataset):
+    """Dataset with albumentations transforms"""
+
+    def __init__(self, images, labels, transforms=None):
+        self.images = images
+        self.labels = labels
+        self.transforms = transforms
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, idx):
+        image = self.images[idx]
+        label = self.labels[idx]
+
+        if self.transforms:
+            transformed = self.transforms(image=image)
+            image = transformed['image']
+
+        return image, label
+
+class GeoSpatialSegmentationDataset(Dataset):
+    """Segmentation dataset with paired image-mask transforms"""
+
+    def __init__(self, images, masks, transforms=None):
+        self.images = images
+        self.masks = masks
+        self.transforms = transforms
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, idx):
+        image = self.images[idx]
+        mask = self.masks[idx]
+
+        if self.transforms:
+            transformed = self.transforms(image=image, mask=mask)
+            image = transformed['image']
+            mask = transformed['mask']
+
+        return image, mask
+
+dummy_images = [rgb_image.copy() for _ in range(10)]
+dummy_labels = [np.random.randint(0, 5) for _ in range(10)]
+dummy_masks = [mask.copy() for _ in range(10)]
+
+train_dataset = GeoSpatialDataset(dummy_images, dummy_labels, train_transform)
+seg_dataset = GeoSpatialSegmentationDataset(dummy_images, dummy_masks, seg_train_transform)
+
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+seg_loader = DataLoader(seg_dataset, batch_size=2, shuffle=True)
+
+batch_images, batch_labels = next(iter(train_loader))
+print(f"Classification batch:")
+print(f"  Images: {batch_images.shape}")
+print(f"  Labels: {batch_labels.shape}")
+
+seg_images, seg_masks = next(iter(seg_loader))
+print(f"\nSegmentation batch:")
+print(f"  Images: {seg_images.shape}")
+print(f"  Masks: {seg_masks.shape}")
+```
+
+## Custom Augmentation
+
+```{python}
+class SpectralNormalization(A.ImageOnlyTransform):
+    """Custom transform for spectral normalization"""
+
+    def __init__(self, band_means=None, band_stds=None, always_apply=False, p=1.0):
+        super().__init__(always_apply, p)
+        self.band_means = band_means
+        self.band_stds = band_stds
+
+    def apply(self, img, **params):
+        if self.band_means is None or self.band_stds is None:
+            return img
+
+        normalized = img.copy()
+        for i in range(img.shape[2]):
+            normalized[:, :, i] = (img[:, :, i] - self.band_means[i]) / self.band_stds[i]
+
+        return normalized
+
+    def get_transform_init_args_names(self):
+        return ("band_means", "band_stds")
+
+band_means = [0.3, 0.4, 0.35, 0.5, 0.45, 0.4]
+band_stds = [0.1, 0.12, 0.11, 0.15, 0.13, 0.12]
+
+custom_transform = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    SpectralNormalization(band_means=band_means, band_stds=band_stds, p=1.0)
+])
+
+custom_augmented = custom_transform(image=multispectral_image)['image']
+
+print(f"Original stats (band 0): mean={multispectral_image[:,:,0].mean():.3f}, "
+      f"std={multispectral_image[:,:,0].std():.3f}")
+print(f"Normalized stats (band 0): mean={custom_augmented[:,:,0].mean():.3f}, "
+      f"std={custom_augmented[:,:,0].std():.3f}")
+```
+
+## Test-Time Augmentation (TTA)
+
+```{python}
+def apply_tta(image, model=None, n_augmentations=5):
+    """Apply test-time augmentation for improved predictions"""
+
+    tta_transforms = A.Compose([
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.5),
+        A.RandomRotate90(p=0.5),
+        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ToTensorV2()
+    ])
+
+    augmented_images = []
+
+    for _ in range(n_augmentations):
+        aug = tta_transforms(image=image)['image']
+        augmented_images.append(aug)
+
+    augmented_batch = torch.stack(augmented_images)
+
+    return augmented_batch
+
+tta_batch = apply_tta(rgb_image, n_augmentations=5)
+
+print(f"TTA batch shape: {tta_batch.shape}")
+print(f"Created {tta_batch.shape[0]} augmented versions for ensemble prediction")
+```
+
+## Augmentation Intensity Control
+
+```{python}
+def get_augmentation_pipeline(intensity='medium'):
+    """Get augmentation pipeline with different intensity levels"""
+
+    if intensity == 'light':
+        return A.Compose([
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.3),
+            A.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, p=0.3),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2()
+        ])
+
+    elif intensity == 'medium':
+        return A.Compose([
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.RandomRotate90(p=0.5),
+            A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.1, rotate_limit=30, p=0.5),
+            A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
+            A.GaussNoise(var_limit=(5.0, 20.0), p=0.3),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2()
+        ])
+
+    else:  # heavy
+        return A.Compose([
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.RandomRotate90(p=0.5),
+            A.ShiftScaleRotate(shift_limit=0.2, scale_limit=0.2, rotate_limit=45, p=0.7),
+            A.OneOf([
+                A.RandomBrightnessContrast(brightness_limit=0.3, contrast_limit=0.3),
+                A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20)
+            ], p=0.7),
+            A.OneOf([
+                A.ElasticTransform(alpha=120, sigma=6),
+                A.GridDistortion(num_steps=5, distort_limit=0.3),
+                A.OpticalDistortion(distort_limit=0.5, shift_limit=0.5)
+            ], p=0.5),
+            A.OneOf([
+                A.GaussNoise(var_limit=(10.0, 50.0)),
+                A.GaussianBlur(blur_limit=(5, 9)),
+                A.MotionBlur(blur_limit=7)
+            ], p=0.5),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2()
+        ])
+
+light_aug = get_augmentation_pipeline('light')
+medium_aug = get_augmentation_pipeline('medium')
+heavy_aug = get_augmentation_pipeline('heavy')
+
+print("Augmentation pipelines created:")
+print(f"  Light: {len(light_aug)} transforms")
+print(f"  Medium: {len(medium_aug)} transforms")
+print(f"  Heavy: {len(heavy_aug)} transforms")
+```
+
+## Composition with Replay
+
+```{python}
+def demonstrate_replay():
+    """Show how to replay same augmentation on multiple inputs"""
+
+    transform = A.ReplayCompose([
+        A.HorizontalFlip(p=0.5),
+        A.RandomRotate90(p=0.5),
+        A.RandomBrightnessContrast(p=0.5)
+    ])
+
+    data1 = transform(image=rgb_image)
+
+    data2 = A.ReplayCompose.replay(data1['replay'], image=multispectral_image[:,:,:3])
+
+    fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+
+    axes[0, 0].imshow(rgb_image)
+    axes[0, 0].set_title('Image 1 - Original')
+    axes[0, 0].axis('off')
+
+    axes[0, 1].imshow(data1['image'])
+    axes[0, 1].set_title('Image 1 - Augmented')
+    axes[0, 1].axis('off')
+
+    axes[1, 0].imshow(multispectral_image[:,:,:3])
+    axes[1, 0].set_title('Image 2 - Original')
+    axes[1, 0].axis('off')
+
+    axes[1, 1].imshow(data2['image'])
+    axes[1, 1].set_title('Image 2 - Same Augmentation')
+    axes[1, 1].axis('off')
+
+    plt.suptitle('ReplayCompose: Same Transform Applied to Different Images')
+    plt.tight_layout()
+    plt.show()
+
+demonstrate_replay()
+```
+
+## Best Practices Summary
+
+```{python}
+def print_best_practices():
+    """Print augmentation best practices for GeoAI"""
+
+    practices = {
+        "Spatial Transforms": [
+            "Always use paired transforms for segmentation (image + mask)",
+            "Set appropriate border_mode for rotations (BORDER_CONSTANT for masks)",
+            "Use RandomResizedCrop for classification to add scale invariance"
+        ],
+        "Color/Spectral": [
+            "Be conservative with color augmentation for multi-spectral data",
+            "Consider physical validity (e.g., negative reflectance)",
+            "Use per-band normalization for multi-spectral imagery"
+        ],
+        "Noise and Blur": [
+            "Add noise to improve robustness to sensor variations",
+            "Use moderate noise levels (var_limit 5-30 for normalized images)",
+            "Blur can simulate atmospheric effects"
+        ],
+        "Composition": [
+            "Use A.OneOf to randomly select from mutually exclusive transforms",
+            "Control augmentation strength with probability parameter p",
+            "Always normalize and convert to tensor at the end"
+        ],
+        "Performance": [
+            "Augmentation happens on CPU, keep transforms efficient",
+            "Use num_workers in DataLoader for parallel augmentation",
+            "Consider caching augmented data for small datasets"
+        ],
+        "Validation": [
+            "Only resize and normalize for validation/test sets",
+            "Never augment test data (except for TTA)",
+            "Visualize augmentations to verify correctness"
+        ]
+    }
+
+    print("\n" + "="*80)
+    print("ALBUMENTATIONS BEST PRACTICES FOR GEOAI")
+    print("="*80)
+
+    for category, tips in practices.items():
+        print(f"\n{category}:")
+        for tip in tips:
+            print(f"  - {tip}")
+
+    print("\n" + "="*80)
+
+print_best_practices()
+```
+
+## Summary
+
+**Key Takeaways:**
+
+- **Spatial transforms** preserve spatial relationships between images and masks
+- **Color augmentation** should be conservative for multi-spectral data
+- **Compose** allows building complex pipelines with probability control
+- **OneOf** selects one transform from a group randomly
+- **ToTensorV2** converts to PyTorch tensors at the end of pipeline
+- **ReplayCompose** applies identical transforms to multiple inputs
+- **Custom transforms** extend albumentations for domain-specific needs
+- **TTA** improves predictions by ensembling augmented versions
+- **Intensity control** allows easy experimentation with augmentation strength
+
+These patterns provide production-ready augmentation pipelines for geospatial classification, segmentation, and other tasks.
