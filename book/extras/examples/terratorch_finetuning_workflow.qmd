@@ -8,12 +8,13 @@ format:
 
 TerraTorch is a package that allows you to easily use and fine tune geospatial foundation models (GeoFMs). This tutorial walks through how to get started with TerraTorch to fine tune a GeoFM on your own data and task, whatever that may be.
 
-Achieving fine tuning and inference using TerraTorch can be achieved in four steps:
+Achieving fine tuning and inference using TerraTorch can be achieved in five steps:
 
-1. **Organize your data:** Make sure your inputs, labels, and spits are organized in a standardized way that TerraTorch generic DataModules can interpret
+1. **Organize your data:** Make sure your inputs, labels, and splits are organized in a standardized way that TerraTorch generic DataModules can interpret
 2. **Set up your DataModule:** Use TerraTorch generic DataModules to create an object which reads in your data, makes any necessary adjustments, and passes it to your model in the format it expects for training.
-3. **Set up your Task:** Identify your chosen task, choose your model and define hyperparemeters
-4. **Train your model:** Use Pytorch Lightning to handle training and logging for a set number of epochs.
+3. **Set up your Task:** Identify your chosen task, choose your model and define hyperparameters
+4. **Train your model:** Use PyTorch Lightning to handle training and logging for a set number of epochs.
+5. **Run inference:** Once training is complete, use your fine-tuned model to make predictions on new data and inspect embeddings.
 
 In this demo, we will show how to fine tune Prithvi on a subset of the EuroSAT benchmark, which classifies 64x64 pixel Sentinel 2 L1C images into one of 10 classes. The demo is written in a general way to help users adapt this code to their specific use case.
 
