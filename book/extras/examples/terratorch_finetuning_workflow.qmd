@@ -28,6 +28,14 @@ Because we are on a shared server with shared conda environment, we need to reor
 import os
 import pathlib
 import torch
+import logging
+import warnings
+
+# Suppress PIL warnings about multi-band TIFFs (common with satellite imagery)
+logging.getLogger('PIL.TiffImagePlugin').setLevel(logging.CRITICAL)
+
+# Suppress other common warnings
+warnings.filterwarnings('ignore', category=UserWarning)
 
 # Specify where you want model weights/datasets to be saved
 DATA_PATH = '/Users/kellycaylor/dev/geoAI/data'
@@ -424,13 +432,10 @@ from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint, RichProg
 # Auto-detect best precision based on available hardware
 if torch.cuda.is_available():
     precision = "16-mixed"  # CUDA supports mixed precision well
-    print("✓ Using CUDA GPU with 16-bit mixed precision")
 elif torch.backends.mps.is_available():
     precision = "32"  # MPS has limited 16-bit support
-    print("✓ Using MPS (Mac GPU) with 32-bit precision")
 else:
     precision = "32"  # CPU doesn't benefit from mixed precision
-    print("⚠ Using CPU with 32-bit precision")
 
 
 # Initialize callbacks
