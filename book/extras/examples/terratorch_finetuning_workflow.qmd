@@ -26,6 +26,7 @@ Because we are on a shared server with shared conda environment, we need to reor
 ```{python}
 import os
 import pathlib
+import torch
 
 # Specify where you want model weights/datasets to be saved
 DATA_PATH = '/Users/kellycaylor/dev/geoAI/data'
@@ -148,10 +149,10 @@ print("Stds by band:", ims[1].std(axis=(1,2)))
 #### Visualization
 
 ```{python}
-def to_rgb(img):
+def to_rgb(img, bands=[3,2,1]):
 
     # select the r,g,b bands
-    rgb = img[[3,2,1]].astype(float)
+    rgb = img[bands].astype(float)
 
     # Follow EuroSAT guidelines for visualization
     # clip to a max of 2750
@@ -465,7 +466,7 @@ trainer = Trainer(
 )
 
 # Fit your model!
-_ = trainer.fit(model=task, datamodule=datamodule)
+#_ = trainer.fit(model=task, datamodule=datamodule)
 ```
 
 ## Step 5: Run inference with your trained model
@@ -478,12 +479,12 @@ After training, the best model is saved. Let's load it.
 
 ```{python}
 # Load the best model from checkpoint
-best_model_path = checkpoint_callback.best_model_path
+#best_model_path = checkpoint_callback.best_model_path
+best_model_path = 'lightning_logs/ym9pbv87/checkpoints/epoch=51-step=156.ckpt'
 print(f"Best model saved at: {best_model_path}")
 ```
 
 ```{python}
-#| eval: false
 # Load the model for inference
 from terratorch.tasks import ClassificationTask
 
@@ -493,42 +494,46 @@ trained_task.eval() # set to evaluation mode
 
 ### Get some test images
 
+### Run predictions
 ```{python}
-# Get a batch from the test dataloader
 val_batch = next(iter(datamodule.val_dataloader()))
 
-val_images = val_batch['image']
+unnormalized_images = val_batch['image'].clone()
+val_images = datamodule.aug(val_batch)
 val_labels = val_batch['label']
 
-print(f"Validation batch shape: {val_images.shape}")
-print(f"Labels: {val_labels}")
-```
+# CHeck stats on images to see if they are normalized
+print(f"Image min: {val_images['image'].min()}")
+print(f"Image max: {val_images['image'].max()}")
+print(f"Image mean: {val_images['image'].mean()}")
+print(f"Image std: {val_images['image'].std()}")
 
-### Run predictions
-
-```{python}
-# Get predictions
+# Now test predictions
+trained_task.eval()
 with torch.no_grad():
-    predictions = trained_task(val_images)
+    outputs = trained_task(val_images['image'])
+    predictions = outputs.output.argmax(dim=1)
 
-# Access the logits from the ModelOutput object
-logits = predictions.output  # or predictions.logits depending on the model
+# Check accuracy on this batch
+correct = (predictions == val_labels).sum().item()
+accuracy = correct / len(val_labels)
 
-# Get predicted classes
-predicted_classes = logits.argmax(dim=1)
-print(f"Predicted labels: {predicted_classes}")
-print(f"True labels: {val_labels}")
+print(f"Batch accuracy: {accuracy:.2%}")
+print(f"Predicted: {predictions}")
+print(f"True:      {val_labels}")
 ```
+
+
 
 ### Compare predictions to ground truth
 
 ```{python}
 # Calculate accuracy on this batch
-correct = (predicted_classes == test_labels).sum().item()
-accuracy = correct / len(test_labels)
+correct = (predictions == val_labels).sum().item()
+accuracy = correct / len(val_labels)
 
 print(f"\nBatch accuracy: {accuracy:.2%}")
-print(f"Correct: {correct}/{len(test_labels)}")
+print(f"Correct: {correct}/{len(val_labels)}")
 ```
 
 ### Visualize predictions
@@ -539,21 +544,37 @@ import numpy as np
 # Pick first 4 images to visualize
 n_images = 4
 
+class_names = [
+    "AnnualCrop",
+    "Forest",
+    "HerbaceousVegetation",
+    "Highway",
+    "Industrial",
+    "Pasture",
+    "PermanentCrop",
+    "Residential",
+    "River",
+    "SeaLake"
+]
+
 fig, axes = plt.subplots(1, n_images, figsize=(15, 4))
 
 for i in range(n_images):
-    # Use to_rgb function to get an RGB image for visualization
-    img_numpy = val_images[i].cpu().numpy()  # Add .cpu().numpy()
-    
-    rgb = to_rgb(img_numpy)
+    # val_images['images'] is now a [batch, 6, 224, 224] tensor
+    # Get the i-th 6-channel image
+    img_numpy = unnormalized_images[i].cpu().numpy()
+
+    # to_rgb expects a 6-channel CHW numpy image as input
+    rgb = to_rgb(img_numpy, bands=[2, 1, 0])
 
     axes[i].imshow(rgb)
 
     true_label = class_names[val_labels[i]]
-    pred_label = class_names[predicted_classes[i]]
+    # predictions is used for predicted classes
+    pred_label = class_names[predictions[i]]
 
     # Color code: green if correct, red if wrong
-    color = 'green' if val_labels[i] == predicted_classes[i] else 'red'
+    color = 'green' if val_labels[i] == predictions[i] else 'red'
 
     axes[i].set_title(f"True: {true_label}\nPred: {pred_label}", color=color)
     axes[i].axis('off')
@@ -565,29 +586,38 @@ plt.show()
 ### Get prediction probabilities
 
 ```{python}
-import torch.nn.functional as F
+# Use the `predict` function to get predictions and probabilities
+# Make sure to apply the same transforms to the image as during training
 
-# Get probabilities instead of just the class
 with torch.no_grad():
-    model_output = trained_task(test_images)
-    logits = model_output.output  # Extract the actual tensor
-    probabilities = F.softmax(logits, dim=1)
+    # Use the validation dataloader to get predictions and probabilities for a batch
+    val_loader = datamodule.val_dataloader()
+    # Get a single batch from the validation dataloader (not yet transformed)
+    val_batch = next(iter(val_loader))
+    # Apply the same transforms used during training/validation
+    transformed_batch = datamodule.aug(val_batch)
+    # Take first image, keep batch dimension [1, C, H, W]
+    transformed_image = transformed_batch['image'][0:1]  # Now properly normalized
+    true_label = val_batch['label'][0]
+    
+    # Get predictions using forward pass
+    trained_task.eval()
+    output = trained_task(transformed_image)
+    logits = output.output
+    
+    # Get predicted class
+    preds = logits.argmax(dim=1)
+    
+    # Get probabilities using softmax
+    import torch.nn.functional as F
+    probs = F.softmax(logits, dim=1)
 
+# `probs` is a tensor of shape (batch_size, num_classes)
 
-# Look at the first prediction
+# Look at the probabilities for the first image in the batch
 print("First image probabilities:")
 for i, class_name in enumerate(class_names):
-    print(f"{class_name}: {probabilities[0, i]:.3f}")
-```
-
-### Evaluate on full test set
-
-```{python}
-# Test the model on the full test set
-test_results = trainer.test(trained_task, datamodule=datamodule)
-
-print("\nTest set results:")
-print(test_results)
+    print(f"{class_name}: {probs[0, i]:.3f}")
 ```
 
 ## Bonus: Exploring model embeddings
@@ -600,18 +630,23 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 # Increase the number of points by using both validation and test images
-# (Or, if suitable, all available data splits)
 all_embeddings = []
 all_labels = []
 
 with torch.no_grad():
-    # Use both validation and test sets for more points in PCA
-    for loader in [datamodule.val_dataloader(), datamodule.test_dataloader()]:
+    # Set up test dataset if available
+    datamodule.setup('test')
+    loaders = [datamodule.val_dataloader(), datamodule.test_dataloader()]
+        
+    # Use validation (and test if available) sets for more points in PCA
+    for loader in loaders:      
         for batch in loader:
-            images = batch['image']
+            # Apply the same transforms used during training/validation
+            transformed_batch = datamodule.aug(batch)
+            images = transformed_batch['image']  # Now properly normalized
             labels = batch['label']
 
-            emb = pretrained_task.model.encoder(images)[-1]
+            emb = trained_task.model.encoder(images)[-1]
             emb_flat = emb.mean(dim=1)  # Global average pooling
 
             all_embeddings.append(emb_flat.cpu())
@@ -649,6 +684,7 @@ plt.title('Validation & Test Set Embeddings (PCA)\n(same for pretrained & fine-t
 plt.xlabel('PC1')
 plt.ylabel('PC2')
 plt.show()
+
 ```
 
 
