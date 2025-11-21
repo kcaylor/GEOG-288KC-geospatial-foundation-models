@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Getting started with fine tuning with TerraTorch</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/quarto-contrib/fontawesome6-1.2.0/all.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/fontawesome6-1.2.0/latex-fontsize.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">GEOG 288KC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">🏠 home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../Syllabus.html"> 
+<span class="menu-text">📋 syllabus</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-weekly-sessions" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">💻 weekly sessions</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-weekly-sessions">    
+        <li>
+    <a class="dropdown-item" href="../chapters/c01-geospatial-data-foundations.html">
+ <span class="dropdown-text">Week 1 - 🚀 Core Tools and Data Access</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c02-spatial-temporal-attention-mechanisms.html">
+ <span class="dropdown-text">Week 2 - ⚡ Rapid Remote Sensing Preprocessing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c03a-terratorch-foundations.html">
+ <span class="dropdown-text">Week 3a - 🌍 TerraTorch Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c03-complete-gfm-architecture.html">
+ <span class="dropdown-text">Week 3b - 🤖 Machine Learning on Remote Sensing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c04-pretraining-implementation.html">
+ <span class="dropdown-text">Week 4 - 🏗️ Foundation Models in Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c05-training-loop-optimization.html">
+ <span class="dropdown-text">Week 5 - 🔧 Fine-Tuning &amp; Transfer Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c06-model-evaluation-analysis.html">
+ <span class="dropdown-text">Week 6 - ⏰ Spatiotemporal Modeling &amp; Projects</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/terratorch_finetuning_workflow.html">
+ <span class="dropdown-text">Week 7 - ⚡ TerraTorch + Lightning Fine-Tuning Workflows</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-cheatsheets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">👀 cheatsheets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-cheatsheets">    
+        <li>
+    <a class="dropdown-item" href="../cheatsheets.html">
+ <span class="dropdown-text">📋 All Cheatsheets</span></a>
+  </li>  
+        <li><hr class="dropdown-divider"></li>
+        <li class="dropdown-header">⚡ Quick Starts</li>
+        <li>
+    <a class="dropdown-item" href="../extras/cheatsheets/week01_imports.html">
+ <span class="dropdown-text">Week 01: Import Guide</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/cheatsheets/dataset_organization_terratorch.html">
+ <span class="dropdown-text">Dataset Organization for Fine-Tuning</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-explainers" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">🧩 explainers</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-explainers">    
+        <li class="dropdown-header">1️⃣ Week 1</li>
+        <li>
+    <a class="dropdown-item" href="../extras/ai-ml-dl-fm-hierarchy.html">
+ <span class="dropdown-text">🤖 AI/ML/DL/FM Hierarchy</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/geospatial-foundation-model-predictions-standalone.html">
+ <span class="dropdown-text">🎯 GFM Predictions (Standalone)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/geospatial-prediction-hierarchy.html">
+ <span class="dropdown-text">✅ Geospatial Task/Prediction Types</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/neural_networks_explainer.html">
+ <span class="dropdown-text">🧠 Neural Networks: Neurons to Transformers</span></a>
+  </li>  
+        <li class="dropdown-header">2️⃣ Week 2</li>
+        <li>
+    <a class="dropdown-item" href="../chapters/c00a-foundation_model_architectures.html">
+ <span class="dropdown-text">🏗️ Foundation Model Architectures</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../chapters/c00b-introduction-to-deeplearning-architecture.html">
+ <span class="dropdown-text">🎓 Introduction to Deep Learning Architecture</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-extras" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">📖 extras</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-extras">    
+        <li class="dropdown-header">🎯 Practical Examples</li>
+        <li>
+    <a class="dropdown-item" href="../extras/examples/normalization_comparison.html">
+ <span class="dropdown-text">Normalization Comparison</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/resnet.html">
+ <span class="dropdown-text">ResNet Implementation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/segmentation_finetuning.html">
+ <span class="dropdown-text">Segmentation Fine-Tuning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/Terramind_EuroSAT.html">
+ <span class="dropdown-text">TerraMind EuroSAT Classification</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/terratorch_finetuning_workflow.html">
+ <span class="dropdown-text">TerraTorch Fine-Tuning Workflow</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/text_encoder.html">
+ <span class="dropdown-text">Text Encoder</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/tiling-and-patches.html">
+ <span class="dropdown-text">Tiling and Patches</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/examples/terratorch_workflows.html">
+ <span class="dropdown-text">TerraTorch Workflows</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/resources/course_resources.html">
+ <span class="dropdown-text">📚 Reference Materials</span></a>
+  </li>  
+        <li class="dropdown-header">📁 Project Templates</li>
+        <li>
+    <a class="dropdown-item" href="../extras/projects/project-proposal-template.html">
+ <span class="dropdown-text">Project Proposal Template</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../extras/projects/mvp-template.html">
+ <span class="dropdown-text">Project Results Template</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/gfms-from-scratch/gfms-from-scratch.github.io" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-page-left">
+      <h1 class="title">Getting started with fine tuning with TerraTorch</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta column-page-left">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#step-0-setup" id="toc-step-0-setup" class="nav-link active" data-scroll-target="#step-0-setup">Step 0: Setup</a>
+  <ul class="collapse">
+  <li><a href="#huggingface-cache" id="toc-huggingface-cache" class="nav-link" data-scroll-target="#huggingface-cache">HuggingFace cache</a></li>
+  </ul></li>
+  <li><a href="#step-1-get-your-data-in-the-right-format-for-terratorch" id="toc-step-1-get-your-data-in-the-right-format-for-terratorch" class="nav-link" data-scroll-target="#step-1-get-your-data-in-the-right-format-for-terratorch">Step 1: Get your data in the right format for TerraTorch</a>
+  <ul class="collapse">
+  <li><a href="#file-organization" id="toc-file-organization" class="nav-link" data-scroll-target="#file-organization">File organization</a></li>
+  <li><a href="#specify-splits" id="toc-specify-splits" class="nav-link" data-scroll-target="#specify-splits">Specify splits</a></li>
+  </ul></li>
+  <li><a href="#step-2-get-your-datamodule-set-up" id="toc-step-2-get-your-datamodule-set-up" class="nav-link" data-scroll-target="#step-2-get-your-datamodule-set-up">Step 2: Get your DataModule set up</a>
+  <ul class="collapse">
+  <li><a href="#inspect-your-data" id="toc-inspect-your-data" class="nav-link" data-scroll-target="#inspect-your-data">Inspect your data</a></li>
+  <li><a href="#define-bands-statistics-and-transforms" id="toc-define-bands-statistics-and-transforms" class="nav-link" data-scroll-target="#define-bands-statistics-and-transforms">Define bands, statistics, and transforms</a></li>
+  <li><a href="#define-your-datamodule" id="toc-define-your-datamodule" class="nav-link" data-scroll-target="#define-your-datamodule">Define your DataModule</a></li>
+  <li><a href="#check-your-datamodule" id="toc-check-your-datamodule" class="nav-link" data-scroll-target="#check-your-datamodule">Check your DataModule</a></li>
+  </ul></li>
+  <li><a href="#step-3-get-your-task-set-up" id="toc-step-3-get-your-task-set-up" class="nav-link" data-scroll-target="#step-3-get-your-task-set-up">Step 3: Get your Task set up</a>
+  <ul class="collapse">
+  <li><a href="#choose-your-model-from-the-model-factory" id="toc-choose-your-model-from-the-model-factory" class="nav-link" data-scroll-target="#choose-your-model-from-the-model-factory">Choose your model from the model factory</a></li>
+  <li><a href="#define-your-task" id="toc-define-your-task" class="nav-link" data-scroll-target="#define-your-task">Define your Task</a></li>
+  </ul></li>
+  <li><a href="#step-4-train-your-model" id="toc-step-4-train-your-model" class="nav-link" data-scroll-target="#step-4-train-your-model">Step 4: Train your model</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+
+
+
+
+
+<p>TerraTorch is a package that allows you to easily use and fine tune geospatial foundation models (GeoFMs). This tutorial walks through how to get started with TerraTorch to fine tune a GeoFM on your own data and task, whatever that may be.</p>
+<p>Achieving fine tuning and inference using TerraTorch can be achieved in four steps: 1. <strong>Organize your data:</strong> Make sure your inputs, labels, and spits are organized in a standardized way that TerraTorch generic DataModules can interpret 2. <strong>Set up your DataModule:</strong> Use TerraTorch generic DataModules to create an object which reads in your data, makes any necessary adjustments, and passes it to your model in the format it expects for training. 3. <strong>Set up your Task:</strong> Identify your chosen task, choose your model and define hyperparemeters 4. <strong>Train your model:</strong> Use Pytorch Lightning to handle training and logging for a set number of epochs.</p>
+<p>In this demo, we will show how to fine tune Prithvi on a subset of the EuroSAT benchmark, which classifies 64x64 pixel Sentinel 2 L1C images into one of 10 classes. The demo is written in a general way to help users adapt this code to their specific use case.</p>
+<section id="step-0-setup" class="level2">
+<h2 class="anchored" data-anchor-id="step-0-setup">Step 0: Setup</h2>
+<section id="huggingface-cache" class="level3">
+<h3 class="anchored" data-anchor-id="huggingface-cache">HuggingFace cache</h3>
+<p>Because we are on a shared server with shared conda environment, we need to reorient where huggingface downloads things like model weights and datasets</p>
+<div id="283e1c05-6416-4502-bce3-ba9904d88ed3" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pathlib</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify where you want model weights/datasets to be saved</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>DATA_PATH <span class="op">=</span> <span class="st">'home/waves/generalist_vs_specialized_geoAI'</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up environment variables that are used by HuggingFace</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"HF_HOME"</span>] <span class="op">=</span> os.path.join(DATA_PATH, <span class="st">"hfhome"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"HF_HUB_CACHE"</span>] <span class="op">=</span> os.path.join(DATA_PATH, <span class="st">"hub"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"HF_DATASETS_CACHE"</span>] <span class="op">=</span> os.path.join(DATA_PATH, <span class="st">"datasets"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TRANSFORMERS_CACHE"</span>] <span class="op">=</span> os.path.join(DATA_PATH, <span class="st">"transformers"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="step-1-get-your-data-in-the-right-format-for-terratorch" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-get-your-data-in-the-right-format-for-terratorch">Step 1: Get your data in the right format for TerraTorch</h2>
+<p>TerraTorch makes your life easier if you organize your data in standard ways. Specifically, following these conventions will allow you to use their generic DataModules and save your the trouble of writing your own.</p>
+<section id="file-organization" class="level3">
+<h3 class="anchored" data-anchor-id="file-organization">File organization</h3>
+<ul>
+<li><strong>Classification:</strong> Organize your images into different folders depending on their class (this is how EuroSAT is organized). Alternatively, have a metadata file listing</li>
+<li><strong>Segmentation/regression:</strong> Have images and their labels (masks or continuous outputs) have the same name but followed by an image vs.&nbsp;mask or label identifier (e.g.&nbsp;image: <code>Im_1_img.tif</code> and <code>Im_1_mask.tif</code></li>
+</ul>
+<section id="eurosat-classification-example" class="level4">
+<h4 class="anchored" data-anchor-id="eurosat-classification-example">EuroSAT classification example</h4>
+<p>We can retrieve a subsample of the EuroSAT dataset using torchgeo. Luckily, we will show it is already in the format TerraTorch expects for a classification task.</p>
+<div id="66e04c5c-9767-413c-907c-f0e595c0e840" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchgeo.datasets <span class="im">import</span> EuroSAT100 <span class="co"># 100 image subset from EuroSAT</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>EuroSAT100(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    root<span class="op">=</span>DATA_PATH, <span class="co"># make sure you have defined the path where you want data saved</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    split<span class="op">=</span><span class="st">'train'</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    download<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>EuroSAT100(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    root<span class="op">=</span>DATA_PATH, </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    split<span class="op">=</span><span class="st">'val'</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    download<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>EuroSAT100(</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    root<span class="op">=</span>DATA_PATH, </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    split<span class="op">=</span><span class="st">'test'</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    download<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>Dataset EuroSAT100
+    Number of datapoints: 20
+    Root location: home/waves/generalist_vs_specialized_geoAI/ds/images/remote_sensing/otherDatasets/sentinel_2/tif</code></pre>
+</div>
+</div>
+<p>When opening inspecting the downloaded dataset, you will find that the data will be stored at the following path:</p>
+<div id="a65c0470-2593-4bfe-8bec-a7f329775056" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the location of the saved EUROSAT data</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>EUROSAT <span class="op">=</span> DATA_PATH <span class="op">+</span> <span class="st">"/ds/images/remote_sensing/otherDatasets/sentinel_2/tif/"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There is one folder for each class, each containing <code>.tif</code> files with the images to be classified.</p>
+<div id="2c6ccfe0-cea6-464e-905a-aac2a9b2b2be" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List the folders each containing images for a given EuroSAT class</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>class_paths <span class="op">=</span> [item <span class="cf">for</span> item <span class="kw">in</span> Path(EUROSAT).iterdir()]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>class_names <span class="op">=</span> [item.name <span class="cf">for</span> item <span class="kw">in</span> class_paths]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(class_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['AnnualCrop', 'Pasture', 'Residential', 'SeaLake', 'River', 'PermanentCrop', 'Industrial', 'Forest', 'HerbaceousVegetation', 'Highway']</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="specify-splits" class="level3">
+<h3 class="anchored" data-anchor-id="specify-splits">Specify splits</h3>
+<p>To specify which images belong to which split, you have two options: * provide <code>.txt</code> files that have the names of the images in each split in them * organize the splits into different folders</p>
+<section id="eurosat-example" class="level4">
+<h4 class="anchored" data-anchor-id="eurosat-example">EuroSAT example</h4>
+<p>In the case of EuroSAT, the names of the images belonging to each split are saved as <code>.txt</code> files.</p>
+<div id="fc8b057c-2ab1-453e-a5d7-5177c5c1064a" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the paths to each split for use in the DataModule setup</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>TRAIN_SPLIT <span class="op">=</span> DATA_PATH <span class="op">+</span> <span class="st">'/eurosat-100-train.txt'</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>VAL_SPLIT <span class="op">=</span> DATA_PATH <span class="op">+</span> <span class="st">'/eurosat-100-val.txt'</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>TEST_SPLIT <span class="op">=</span> DATA_PATH <span class="op">+</span> <span class="st">'/eurosat-100-test.txt'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="step-2-get-your-datamodule-set-up" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-get-your-datamodule-set-up">Step 2: Get your DataModule set up</h2>
+<section id="inspect-your-data" class="level3">
+<h3 class="anchored" data-anchor-id="inspect-your-data">Inspect your data</h3>
+<p>It is important to have a good grasp of the contents of your data in order to set up the DataModule properly. It can therefore be useful to do a bit of exploration and visualization.</p>
+<div id="64a8f633-0ea4-4fff-8695-7977edf0f3d7" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in the first image in each class for inspection</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># get the first image in each class</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>image_sample <span class="op">=</span> [<span class="bu">next</span>(folder.iterdir()) <span class="cf">for</span> folder <span class="kw">in</span> class_paths] <span class="co"># list of 10 images</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># read all 10 sample images</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>ims <span class="op">=</span> [rasterio.<span class="bu">open</span>(image).read() <span class="cf">for</span> image <span class="kw">in</span> image_sample]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="image-statistics" class="level4">
+<h4 class="anchored" data-anchor-id="image-statistics">Image statistics</h4>
+<p>By inspecting the first image, we find that we have 13 bands per image (corresponding to the 13 Sentinel-2 L1C bands) and images are 64x64 pixels. Neither of these is what Prithvi expects, so it’s important to know this so we can adjust it in the DataLoader.</p>
+<p>We also note that the units are in reflectance values.</p>
+<div id="e38a7da0-2c84-4356-b8a4-31f588a5de5a" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print some statistics for the first image</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Shape:"</span>, ims[<span class="dv">1</span>].shape)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Means by band:"</span>, ims[<span class="dv">1</span>].mean(axis<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">2</span>)))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Stds by band:"</span>, ims[<span class="dv">1</span>].std(axis<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">2</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape: (13, 64, 64)
+Means by band: [1111.91015625  878.35302734  860.88916016  561.85717773 1049.72314453
+ 2990.7590332  3927.78759766 3768.70898438  784.35449219    9.52734375
+ 1921.38916016  893.63745117 4360.02270508]
+Stds by band: [ 66.17921288 144.33596733 161.69847222 289.04565891 205.60533486
+ 520.52450006 818.25824945 877.48558976 117.80382851   1.07153073
+ 484.48251268 473.27016809 892.61514993]</code></pre>
+</div>
+</div>
+</section>
+<section id="visualization" class="level4">
+<h4 class="anchored" data-anchor-id="visualization">Visualization</h4>
+<div id="0bfd9adf-28ae-43d7-b132-c4bcbea7245d" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> to_rgb(img):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># select the r,g,b bands</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    rgb <span class="op">=</span> img[[<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>]].astype(<span class="bu">float</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Follow EuroSAT guidelines for visualization</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clip to a max of 2750</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># normalize to 0-1</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    rgb <span class="op">=</span> np.clip(rgb, <span class="dv">0</span>, <span class="dv">2750</span>) <span class="op">/</span> <span class="dv">2750</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># go from (CxWxH) to (WxHxC)</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    rgb <span class="op">=</span> np.transpose(rgb, (<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">0</span>))</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> rgb</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">5</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">6</span>))</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.ravel()</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (ax, img, name) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(axes, ims, class_names)):</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    rgb <span class="op">=</span> to_rgb(img)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    ax.imshow(rgb)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    ax.set_title(name)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="TerraTorch_training_demo_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="define-bands-statistics-and-transforms" class="level3">
+<h3 class="anchored" data-anchor-id="define-bands-statistics-and-transforms">Define bands, statistics, and transforms</h3>
+<p>There are a few important parameters we will need to define when setting up our DataModule in addition to the location of the data and splits that we defined in Step 1.</p>
+<p>We specifically use the GenericNonGeoClassificationDataModule, though all generic DataModules will need these inputs. You can always learn more about the arguments for a given DataModule by adapting the following code:</p>
+<pre class="{python}"><code>from terratorch.datamodules import GenericNonGeoClassificationDataModule
+?GenericNonGeoClassificationDataModule</code></pre>
+<section id="band-names" class="level4">
+<h4 class="anchored" data-anchor-id="band-names">Band names</h4>
+<p>We need to tell the datamodule which bands we actually want to go into the model.</p>
+<p>In our case, we have 13 sentinel 2 bands, but Prithvi is trained on 6 landsay bands, so we need to subset them.</p>
+<div id="8e2c0893-1eec-40be-bbd3-a04ca854d314" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sentinel2_bands <span class="op">=</span> [</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B5"</span>, <span class="st">"B6"</span>, <span class="st">"B7"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"B8"</span>, <span class="st">"B8A"</span>, <span class="st">"B9"</span>, <span class="st">"B10"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># The subset of our bands Prithvi will take</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>prithvi_subset <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">11</span>, <span class="dv">12</span>]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>prithvi_bands <span class="op">=</span> [sentinel2_bands[i] <span class="cf">for</span> i <span class="kw">in</span> prithvi_subset]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(prithvi_bands)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['B2', 'B3', 'B4', 'B8A', 'B11', 'B12']</code></pre>
+</div>
+</div>
+</section>
+<section id="means-and-standard-deviations" class="level4">
+<h4 class="anchored" data-anchor-id="means-and-standard-deviations">Means and standard deviations</h4>
+<p>We need band-level means and standard deviations. Either compute them yourself over your entire dataset, or get general numbers that work well for your data type.</p>
+<p>We have S2 L1C data. We can use TerraMesh statistics I grabbed from their huggingface: https://huggingface.co/api/resolve-cache/datasets/ibm-esa-geospatial/TerraMesh/6c548cdacdd70e98a236de9f5b708d4b9dadf253/terramesh.py</p>
+<div id="92a9424d-bbda-4ef9-978d-066a4d165b01" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>statistics <span class="op">=</span> {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mean"</span>: {</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S2L1C"</span>: [<span class="fl">2357.090</span>, <span class="fl">2137.398</span>, <span class="fl">2018.799</span>, <span class="fl">2082.998</span>, <span class="fl">2295.663</span>, <span class="fl">2854.548</span>, <span class="fl">3122.860</span>, <span class="fl">3040.571</span>, <span class="fl">3306.491</span>, <span class="fl">1473.849</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                  <span class="fl">506.072</span>, <span class="fl">2472.840</span>, <span class="fl">1838.943</span>],</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S2L2A"</span>: [<span class="fl">1390.461</span>, <span class="fl">1503.332</span>, <span class="fl">1718.211</span>, <span class="fl">1853.926</span>, <span class="fl">2199.116</span>, <span class="fl">2779.989</span>, <span class="fl">2987.025</span>, <span class="fl">3083.248</span>, <span class="fl">3132.235</span>, <span class="fl">3162.989</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                  <span class="fl">2424.902</span>, <span class="fl">1857.665</span>],</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S2RGB"</span>: [<span class="fl">110.349</span>, <span class="fl">99.507</span>, <span class="fl">75.843</span>],</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S1GRD"</span>: [<span class="op">-</span><span class="fl">12.577</span>, <span class="op">-</span><span class="fl">20.265</span>],</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S1RTC"</span>: [<span class="op">-</span><span class="fl">10.93</span>, <span class="op">-</span><span class="fl">17.329</span>],</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"NDVI"</span>: [<span class="fl">0.327</span>],</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"DEM"</span>: [<span class="fl">651.663</span>],</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"std"</span>: {</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S2L1C"</span>: [<span class="fl">1673.639</span>, <span class="fl">1722.641</span>, <span class="fl">1602.205</span>, <span class="fl">1873.138</span>, <span class="fl">1866.055</span>, <span class="fl">1779.839</span>, <span class="fl">1776.496</span>, <span class="fl">1724.114</span>, <span class="fl">1771.041</span>, <span class="fl">1079.786</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>                  <span class="fl">512.404</span>, <span class="fl">1340.879</span>, <span class="fl">1172.435</span>],</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S2L2A"</span>: [<span class="fl">2131.157</span>, <span class="fl">2163.666</span>, <span class="fl">2059.311</span>, <span class="fl">2152.477</span>, <span class="fl">2105.179</span>, <span class="fl">1912.773</span>, <span class="fl">1842.326</span>, <span class="fl">1893.568</span>, <span class="fl">1775.656</span>, <span class="fl">1814.907</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                  <span class="fl">1436.282</span>, <span class="fl">1336.155</span>],</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S2RGB"</span>: [<span class="fl">69.905</span>, <span class="fl">53.708</span>, <span class="fl">53.378</span>],</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S1GRD"</span>: [<span class="fl">5.179</span>, <span class="fl">5.872</span>],</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"S1RTC"</span>: [<span class="fl">4.391</span>, <span class="fl">4.459</span>],</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"NDVI"</span>: [<span class="fl">0.322</span>],</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"DEM"</span>: [<span class="fl">928.168</span>]</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We specifically need to pass Sentinel 2 L1C means and stds, but only for the 6 bands we are subsetting for input into prithvi.</p>
+<div id="80161565-25ec-4c07-bfb3-8dd10062814f" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>S2L1C_prithvi_means <span class="op">=</span> [statistics[<span class="st">"mean"</span>][<span class="st">"S2L1C"</span>][i] <span class="cf">for</span> i <span class="kw">in</span> prithvi_subset]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>S2L1C_prithvi_stds <span class="op">=</span> [statistics[<span class="st">"std"</span>][<span class="st">"S2L1C"</span>][i] <span class="cf">for</span> i <span class="kw">in</span> prithvi_subset]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(S2L1C_prithvi_means)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(S2L1C_prithvi_stds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[2137.398, 2018.799, 2082.998, 3306.491, 2472.84, 1838.943]
+[1722.641, 1602.205, 1873.138, 1771.041, 1340.879, 1172.435]</code></pre>
+</div>
+</div>
+</section>
+<section id="transforms" class="level4">
+<h4 class="anchored" data-anchor-id="transforms">Transforms</h4>
+<p>Transforms allow you to make changes to your data on the fly before feeding them to a model for training. There are three important types of transforms: * Reshaping/resizing/clipping: To get your data into the shape your model expects. * Data augmentations: If you don’t have a lot of training data, you can “augment” your dataset by presenting changed versions of your images to the model. For example, flip your images. This type of transform generally should only happen to your training data, and not your validation and testing data. * Make your image a tensor (the data format that GPUs can use)</p>
+<p>We can use albumentations to do any of these.</p>
+<div id="4c4a0b9a-d8bd-4259-a479-21b0bb7401d7" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> albumentations</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>train_transforms <span class="op">=</span> albumentations.Compose([</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    albumentations.Resize(<span class="dv">224</span>, <span class="dv">224</span>), <span class="co"># go from 64x64 to 224x224 (Prithvi expected size)</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    albumentations.HorizontalFlip(), <span class="co"># augmentation</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    albumentations.pytorch.transforms.ToTensorV2(),</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Same transforms but without augmentations for validation and testing</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>val_test_transforms <span class="op">=</span> albumentations.Compose([</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    albumentations.Resize(<span class="dv">224</span>, <span class="dv">224</span>), </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    albumentations.pytorch.transforms.ToTensorV2(),</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="define-your-datamodule" class="level3">
+<h3 class="anchored" data-anchor-id="define-your-datamodule">Define your DataModule</h3>
+<div id="cbbdeec6-f3f2-414b-9eed-caec8f270213" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datamodules <span class="im">import</span> GenericNonGeoClassificationDataModule</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">16</span>, <span class="co"># How many images to give the model at once. More = faster, but more RAM is needed</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">0</span>, <span class="co"># extra CPU threads for image loading</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Where is our data? In our case, all splits are in the same folder</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span>EUROSAT, </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span>EUROSAT, </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span>EUROSAT, </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Because images for all splits are in the same place, we need to specify our split files</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    train_split<span class="op">=</span>TRAIN_SPLIT,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    val_split<span class="op">=</span>VAL_SPLIT,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    test_split<span class="op">=</span>TEST_SPLIT,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># means and standard deviations for the bands being input into the model</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L1C_prithvi_means, </span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L1C_prithvi_stds,</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># number of classes</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="bu">len</span>(class_names),</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Tranforms, defined using albumentations</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>    train_transform<span class="op">=</span>train_transforms,</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>    val_transform<span class="op">=</span>val_test_transforms,</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    test_transform<span class="op">=</span>val_test_transforms,</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bands of our dataset</span></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>sentinel2_bands,</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bands to input into our model</span></span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>prithvi_bands,</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>datamodule.setup(<span class="st">"fit"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/g288kc/miniforge/envs/geoAI/lib/python3.11/site-packages/transformers/utils/hub.py:111: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+/home/g288kc/miniforge/envs/geoAI/lib/python3.11/site-packages/albumentations/core/composition.py:465: UserWarning: transforms is single transform, but a sequence is expected! Transform will be wrapped into list.
+  super().__init__(</code></pre>
+</div>
+</div>
+</section>
+<section id="check-your-datamodule" class="level3">
+<h3 class="anchored" data-anchor-id="check-your-datamodule">Check your DataModule</h3>
+<p>To ensure that the data are as we would expect the model to find them, we can manually iterate through a batch of the datamodule to inspect it.</p>
+<div id="6b580528-c0c4-4953-b8e5-8dc1d5212b47" class="cell" data-scrolled="true" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(datamodule.train_dataloader()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13
+More samples per pixel than can be decoded: 13</code></pre>
+</div>
+</div>
+<div id="39b9cfe6-96a0-4d02-8ec5-2ce3588ca31a" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Batch keys: </span><span class="sc">{</span>batch<span class="sc">.</span>keys()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Image shape: </span><span class="sc">{</span>batch[<span class="st">'image'</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Label shape: </span><span class="sc">{</span>batch[<span class="st">'label'</span>]<span class="sc">.</span>shape <span class="cf">if</span> <span class="st">'label'</span> <span class="kw">in</span> batch <span class="cf">else</span> batch[<span class="st">'labels'</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the actual values</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Image dtype: </span><span class="sc">{</span>batch[<span class="st">'image'</span>]<span class="sc">.</span>dtype<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Image min/max: </span><span class="sc">{</span>batch[<span class="st">'image'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>batch[<span class="st">'image'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Labels: </span><span class="sc">{</span>batch[<span class="st">'label'</span>] <span class="cf">if</span> <span class="st">'label'</span> <span class="kw">in</span> batch <span class="cf">else</span> batch[<span class="st">'labels'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Batch keys: dict_keys(['image', 'label', 'filename'])
+Image shape: torch.Size([16, 6, 224, 224])
+Label shape: torch.Size([16])
+
+Image dtype: torch.float32
+Image min/max: 40.142860412597656, 11904.0712890625
+Labels: tensor([8, 8, 3, 0, 5, 6, 7, 6, 1, 0, 5, 7, 6, 7, 2, 5])</code></pre>
+</div>
+</div>
+<p>As expected, we have 16 images with 6 bands and resized to the width and height the model expects.</p>
+<p>Notice the min and max have not been normalized. This is because normalization occurs during every training and validation step, which happens below.</p>
+</section>
+</section>
+<section id="step-3-get-your-task-set-up" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-get-your-task-set-up">Step 3: Get your Task set up</h2>
+<p>TerraTorch has several Lightning Trainers to easily handle model training, and has Tasks defined for each major task type. We will be using the ClassificationTask.</p>
+<p>These Tasks are where you can define your model choice and model hyperparameters.</p>
+<section id="choose-your-model-from-the-model-factory" class="level3">
+<h3 class="anchored" data-anchor-id="choose-your-model-from-the-model-factory">Choose your model from the model factory</h3>
+<p>If you don’t know which model you would like to use, you can explore what is available in TerraTorch’s model factory.</p>
+<section id="explore-encoders" class="level4">
+<h4 class="anchored" data-anchor-id="explore-encoders">Explore encoders</h4>
+<div id="2dee4346-c4bc-4c57-8a2b-b0dda6718b96" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.registry <span class="im">import</span> BACKBONE_REGISTRY</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># List all the available backbones from different sources</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, source <span class="kw">in</span> BACKBONE_REGISTRY._sources.items():</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">====</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">====="</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="bu">list</span>(source))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+====terratorch=====
+['dofa_small_patch16_224', 'dofa_base_patch16_224', 'dofa_large_patch16_224', 'prithvi_eo_tiny', 'prithvi_eo_v1_100', 'prithvi_eo_v2_tiny_tl', 'prithvi_eo_v2_100_tl', 'prithvi_eo_v2_300', 'prithvi_eo_v2_600', 'prithvi_eo_v2_300_tl', 'prithvi_eo_v2_600_tl', 'terramind_v1_base', 'terramind_v1_base_tim', 'terramind_v01_base', 'terramind_v01_base_tim', 'terramind_v1_large', 'terramind_v1_large_tim', 'terramind_v1_tiny', 'terramind_v1_tiny_tim', 'terramind_v1_small', 'terramind_v1_small_tim', 'terramind_v1_tokenizer_s2l2a', 'terramind_v1_tokenizer_s1rtc', 'terramind_v1_tokenizer_s1grd', 'terramind_v1_tokenizer_dem', 'terramind_v1_tokenizer_lulc', 'terramind_v1_tokenizer_ndvi', 'ssl4eol_resnet18_landsat_tm_toa_moco', 'ssl4eol_resnet18_landsat_tm_toa_simclr', 'ssl4eol_resnet18_landsat_etm_toa_moco', 'ssl4eol_resnet18_landsat_etm_toa_simclr', 'ssl4eol_resnet18_landsat_etm_sr_moco', 'ssl4eol_resnet18_landsat_etm_sr_simclr', 'ssl4eol_resnet18_landsat_oli_tirs_toa_moco', 'ssl4eol_resnet18_landsat_oli_tirs_toa_simclr', 'ssl4eol_resnet18_landsat_oli_sr_moco', 'ssl4eol_resnet18_landsat_oli_sr_simclr', 'ssl4eos12_resnet18_sentinel2_all_moco', 'ssl4eos12_resnet18_sentinel2_rgb_moco', 'seco_resnet18_sentinel2_rgb_seco', 'fmow_resnet50_fmow_rgb_gassl', 'ssl4eol_resnet50_landsat_tm_toa_moco', 'ssl4eol_resnet50_landsat_tm_toa_simclr', 'ssl4eol_resnet50_landsat_etm_toa_moco', 'ssl4eol_resnet50_landsat_etm_toa_simclr', 'ssl4eol_resnet50_landsat_etm_sr_moco', 'ssl4eol_resnet50_landsat_etm_sr_simclr', 'ssl4eol_resnet50_landsat_oli_tirs_toa_moco', 'ssl4eol_resnet50_landsat_oli_tirs_toa_simclr', 'ssl4eol_resnet50_landsat_oli_sr_moco', 'ssl4eol_resnet50_landsat_oli_sr_simclr', 'ssl4eos12_resnet50_sentinel1_all_decur', 'ssl4eos12_resnet50_sentinel1_all_moco', 'ssl4eos12_resnet50_sentinel2_all_decur', 'ssl4eos12_resnet50_sentinel2_all_dino', 'ssl4eos12_resnet50_sentinel2_all_moco', 'ssl4eos12_resnet50_sentinel2_rgb_moco', 'seco_resnet50_sentinel2_rgb_seco', 'satlas_resnet50_sentinel2_mi_ms_satlas', 'satlas_resnet50_sentinel2_mi_rgb_satlas', 'satlas_resnet50_sentinel2_si_ms_satlas', 'satlas_resnet50_sentinel2_si_rgb_satlas', 'satlas_resnet152_sentinel2_mi_ms', 'satlas_resnet152_sentinel2_mi_rgb', 'satlas_resnet152_sentinel2_si_ms_satlas', 'satlas_resnet152_sentinel2_si_rgb_satlas', 'satlas_swin_t_sentinel2_mi_ms', 'satlas_swin_t_sentinel2_mi_rgb', 'satlas_swin_t_sentinel2_si_ms', 'satlas_swin_t_sentinel2_si_rgb', 'satlas_swin_b_sentinel2_mi_ms', 'satlas_swin_b_sentinel2_mi_rgb', 'satlas_swin_b_sentinel2_si_ms', 'satlas_swin_b_sentinel2_si_rgb', 'satlas_swin_b_naip_mi_rgb', 'satlas_swin_b_naip_si_rgb', 'satlas_swin_b_landsat_mi_ms', 'satlas_swin_b_landsat_mi_rgb', 'satlas_swin_b_sentinel1_mi', 'satlas_swin_b_sentinel1_si', 'ssl4eol_vit_small_patch16_224_landsat_tm_toa_moco', 'ssl4eol_vit_small_patch16_224_landsat_tm_toa_simclr', 'ssl4eol_vit_small_patch16_224_landsat_etm_toa_moco', 'ssl4eol_vit_small_patch16_224_landsat_etm_toa_simclr', 'ssl4eol_vit_small_patch16_224_landsat_etm_sr_moco', 'ssl4eol_vit_small_patch16_224_landsat_etm_sr_simclr', 'ssl4eol_vit_small_patch16_224_landsat_oli_tirs_toa_simclr', 'ssl4eol_vit_small_patch16_224_landsat_oli_sr_moco', 'ssl4eol_vit_small_patch16_224_landsat_oli_sr_simclr', 'ssl4eos12_vit_small_patch16_224_sentinel2_all_dino', 'ssl4eos12_vit_small_patch16_224_sentinel2_all_moco', 'UNet']
+
+====timm=====
+['aimv2_1b_patch14_224', 'aimv2_1b_patch14_336', 'aimv2_1b_patch14_448', 'aimv2_3b_patch14_224', 'aimv2_3b_patch14_336', 'aimv2_3b_patch14_448', 'aimv2_huge_patch14_224', 'aimv2_huge_patch14_336', 'aimv2_huge_patch14_448', 'aimv2_large_patch14_224', 'aimv2_large_patch14_336', 'aimv2_large_patch14_448', 'bat_resnext26ts', 'beit3_base_patch16_224', 'beit3_giant_patch14_224', 'beit3_giant_patch14_336', 'beit3_large_patch16_224', 'beit_base_patch16_224', 'beit_base_patch16_384', 'beit_large_patch16_224', 'beit_large_patch16_384', 'beit_large_patch16_512', 'beitv2_base_patch16_224', 'beitv2_large_patch16_224', 'botnet26t_256', 'botnet50ts_256', 'caformer_b36', 'caformer_m36', 'caformer_s18', 'caformer_s36', 'cait_m36_384', 'cait_m48_448', 'cait_s24_224', 'cait_s24_384', 'cait_s36_384', 'cait_xs24_384', 'cait_xxs24_224', 'cait_xxs24_384', 'cait_xxs36_224', 'cait_xxs36_384', 'clay_v1_base', 'coat_lite_medium', 'coat_lite_medium_384', 'coat_lite_mini', 'coat_lite_small', 'coat_lite_tiny', 'coat_mini', 'coat_small', 'coat_tiny', 'coatnet_0_224', 'coatnet_0_rw_224', 'coatnet_1_224', 'coatnet_1_rw_224', 'coatnet_2_224', 'coatnet_2_rw_224', 'coatnet_3_224', 'coatnet_3_rw_224', 'coatnet_4_224', 'coatnet_5_224', 'coatnet_bn_0_rw_224', 'coatnet_nano_cc_224', 'coatnet_nano_rw_224', 'coatnet_pico_rw_224', 'coatnet_rmlp_0_rw_224', 'coatnet_rmlp_1_rw2_224', 'coatnet_rmlp_1_rw_224', 'coatnet_rmlp_2_rw_224', 'coatnet_rmlp_2_rw_384', 'coatnet_rmlp_3_rw_224', 'coatnet_rmlp_nano_rw_224', 'coatnext_nano_rw_224', 'convformer_b36', 'convformer_m36', 'convformer_s18', 'convformer_s36', 'convit_base', 'convit_small', 'convit_tiny', 'convmixer_768_32', 'convmixer_1024_20_ks9_p14', 'convmixer_1536_20', 'convnext_atto', 'convnext_atto_ols', 'convnext_atto_rms', 'convnext_base', 'convnext_femto', 'convnext_femto_ols', 'convnext_large', 'convnext_large_mlp', 'convnext_nano', 'convnext_nano_ols', 'convnext_pico', 'convnext_pico_ols', 'convnext_small', 'convnext_tiny', 'convnext_tiny_hnf', 'convnext_xlarge', 'convnext_xxlarge', 'convnext_zepto_rms', 'convnext_zepto_rms_ols', 'convnextv2_atto', 'convnextv2_base', 'convnextv2_femto', 'convnextv2_huge', 'convnextv2_large', 'convnextv2_nano', 'convnextv2_pico', 'convnextv2_small', 'convnextv2_tiny', 'crossvit_9_240', 'crossvit_9_dagger_240', 'crossvit_15_240', 'crossvit_15_dagger_240', 'crossvit_15_dagger_408', 'crossvit_18_240', 'crossvit_18_dagger_240', 'crossvit_18_dagger_408', 'crossvit_base_240', 'crossvit_small_240', 'crossvit_tiny_240', 'cs3darknet_focus_l', 'cs3darknet_focus_m', 'cs3darknet_focus_s', 'cs3darknet_focus_x', 'cs3darknet_l', 'cs3darknet_m', 'cs3darknet_s', 'cs3darknet_x', 'cs3edgenet_x', 'cs3se_edgenet_x', 'cs3sedarknet_l', 'cs3sedarknet_x', 'cs3sedarknet_xdw', 'cspdarknet53', 'cspresnet50', 'cspresnet50d', 'cspresnet50w', 'cspresnext50', 'darknet17', 'darknet21', 'darknet53', 'darknetaa53', 'davit_base', 'davit_base_fl', 'davit_giant', 'davit_huge', 'davit_huge_fl', 'davit_large', 'davit_small', 'davit_tiny', 'deit3_base_patch16_224', 'deit3_base_patch16_384', 'deit3_huge_patch14_224', 'deit3_large_patch16_224', 'deit3_large_patch16_384', 'deit3_medium_patch16_224', 'deit3_small_patch16_224', 'deit3_small_patch16_384', 'deit_base_distilled_patch16_224', 'deit_base_distilled_patch16_384', 'deit_base_patch16_224', 'deit_base_patch16_384', 'deit_small_distilled_patch16_224', 'deit_small_patch16_224', 'deit_tiny_distilled_patch16_224', 'deit_tiny_patch16_224', 'densenet121', 'densenet161', 'densenet169', 'densenet201', 'densenet264d', 'densenetblur121d', 'dla34', 'dla46_c', 'dla46x_c', 'dla60', 'dla60_res2net', 'dla60_res2next', 'dla60x', 'dla60x_c', 'dla102', 'dla102x', 'dla102x2', 'dla169', 'dm_nfnet_f0', 'dm_nfnet_f1', 'dm_nfnet_f2', 'dm_nfnet_f3', 'dm_nfnet_f4', 'dm_nfnet_f5', 'dm_nfnet_f6', 'dpn48b', 'dpn68', 'dpn68b', 'dpn92', 'dpn98', 'dpn107', 'dpn131', 'eca_botnext26ts_256', 'eca_halonext26ts', 'eca_nfnet_l0', 'eca_nfnet_l1', 'eca_nfnet_l2', 'eca_nfnet_l3', 'eca_resnet33ts', 'eca_resnext26ts', 'eca_vovnet39b', 'ecaresnet26t', 'ecaresnet50d', 'ecaresnet50d_pruned', 'ecaresnet50t', 'ecaresnet101d', 'ecaresnet101d_pruned', 'ecaresnet200d', 'ecaresnet269d', 'ecaresnetlight', 'ecaresnext26t_32x4d', 'ecaresnext50t_32x4d', 'edgenext_base', 'edgenext_small', 'edgenext_small_rw', 'edgenext_x_small', 'edgenext_xx_small', 'efficientformer_l1', 'efficientformer_l3', 'efficientformer_l7', 'efficientformerv2_l', 'efficientformerv2_s0', 'efficientformerv2_s1', 'efficientformerv2_s2', 'efficientnet_b0', 'efficientnet_b0_g8_gn', 'efficientnet_b0_g16_evos', 'efficientnet_b0_gn', 'efficientnet_b1', 'efficientnet_b1_pruned', 'efficientnet_b2', 'efficientnet_b2_pruned', 'efficientnet_b3', 'efficientnet_b3_g8_gn', 'efficientnet_b3_gn', 'efficientnet_b3_pruned', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7', 'efficientnet_b8', 'efficientnet_blur_b0', 'efficientnet_cc_b0_4e', 'efficientnet_cc_b0_8e', 'efficientnet_cc_b1_8e', 'efficientnet_el', 'efficientnet_el_pruned', 'efficientnet_em', 'efficientnet_es', 'efficientnet_es_pruned', 'efficientnet_h_b5', 'efficientnet_l2', 'efficientnet_lite0', 'efficientnet_lite1', 'efficientnet_lite2', 'efficientnet_lite3', 'efficientnet_lite4', 'efficientnet_x_b3', 'efficientnet_x_b5', 'efficientnetv2_l', 'efficientnetv2_m', 'efficientnetv2_rw_m', 'efficientnetv2_rw_s', 'efficientnetv2_rw_t', 'efficientnetv2_s', 'efficientnetv2_xl', 'efficientvit_b0', 'efficientvit_b1', 'efficientvit_b2', 'efficientvit_b3', 'efficientvit_l1', 'efficientvit_l2', 'efficientvit_l3', 'efficientvit_m0', 'efficientvit_m1', 'efficientvit_m2', 'efficientvit_m3', 'efficientvit_m4', 'efficientvit_m5', 'ese_vovnet19b_dw', 'ese_vovnet19b_slim', 'ese_vovnet19b_slim_dw', 'ese_vovnet39b', 'ese_vovnet39b_evos', 'ese_vovnet57b', 'ese_vovnet99b', 'eva02_base_patch14_224', 'eva02_base_patch14_448', 'eva02_base_patch16_clip_224', 'eva02_enormous_patch14_clip_224', 'eva02_large_patch14_224', 'eva02_large_patch14_448', 'eva02_large_patch14_clip_224', 'eva02_large_patch14_clip_336', 'eva02_small_patch14_224', 'eva02_small_patch14_336', 'eva02_tiny_patch14_224', 'eva02_tiny_patch14_336', 'eva_giant_patch14_224', 'eva_giant_patch14_336', 'eva_giant_patch14_560', 'eva_giant_patch14_clip_224', 'eva_large_patch14_196', 'eva_large_patch14_336', 'fasternet_l', 'fasternet_m', 'fasternet_s', 'fasternet_t0', 'fasternet_t1', 'fasternet_t2', 'fastvit_ma36', 'fastvit_mci0', 'fastvit_mci1', 'fastvit_mci2', 'fastvit_s12', 'fastvit_sa12', 'fastvit_sa24', 'fastvit_sa36', 'fastvit_t8', 'fastvit_t12', 'fbnetc_100', 'fbnetv3_b', 'fbnetv3_d', 'fbnetv3_g', 'flexivit_base', 'flexivit_large', 'flexivit_small', 'focalnet_base_lrf', 'focalnet_base_srf', 'focalnet_huge_fl3', 'focalnet_huge_fl4', 'focalnet_large_fl3', 'focalnet_large_fl4', 'focalnet_small_lrf', 'focalnet_small_srf', 'focalnet_tiny_lrf', 'focalnet_tiny_srf', 'focalnet_xlarge_fl3', 'focalnet_xlarge_fl4', 'gc_efficientnetv2_rw_t', 'gcresnet33ts', 'gcresnet50t', 'gcresnext26ts', 'gcresnext50ts', 'gcvit_base', 'gcvit_small', 'gcvit_tiny', 'gcvit_xtiny', 'gcvit_xxtiny', 'gernet_l', 'gernet_m', 'gernet_s', 'ghostnet_050', 'ghostnet_100', 'ghostnet_130', 'ghostnetv2_100', 'ghostnetv2_130', 'ghostnetv2_160', 'ghostnetv3_050', 'ghostnetv3_100', 'ghostnetv3_130', 'ghostnetv3_160', 'gmixer_12_224', 'gmixer_24_224', 'gmlp_b16_224', 'gmlp_s16_224', 'gmlp_ti16_224', 'halo2botnet50ts_256', 'halonet26t', 'halonet50ts', 'halonet_h1', 'haloregnetz_b', 'hardcorenas_a', 'hardcorenas_b', 'hardcorenas_c', 'hardcorenas_d', 'hardcorenas_e', 'hardcorenas_f', 'hgnet_base', 'hgnet_small', 'hgnet_tiny', 'hgnetv2_b0', 'hgnetv2_b1', 'hgnetv2_b2', 'hgnetv2_b3', 'hgnetv2_b4', 'hgnetv2_b5', 'hgnetv2_b6', 'hiera_base_224', 'hiera_base_abswin_256', 'hiera_base_plus_224', 'hiera_huge_224', 'hiera_large_224', 'hiera_small_224', 'hiera_small_abswin_256', 'hiera_tiny_224', 'hieradet_small', 'hrnet_w18', 'hrnet_w18_small', 'hrnet_w18_small_v2', 'hrnet_w18_ssld', 'hrnet_w30', 'hrnet_w32', 'hrnet_w40', 'hrnet_w44', 'hrnet_w48', 'hrnet_w48_ssld', 'hrnet_w64', 'inception_next_atto', 'inception_next_base', 'inception_next_small', 'inception_next_tiny', 'inception_resnet_v2', 'inception_v3', 'inception_v4', 'lambda_resnet26rpt_256', 'lambda_resnet26t', 'lambda_resnet50ts', 'lamhalobotnet50ts_256', 'lcnet_035', 'lcnet_050', 'lcnet_075', 'lcnet_100', 'lcnet_150', 'legacy_senet154', 'legacy_seresnet18', 'legacy_seresnet34', 'legacy_seresnet50', 'legacy_seresnet101', 'legacy_seresnet152', 'legacy_seresnext26_32x4d', 'legacy_seresnext50_32x4d', 'legacy_seresnext101_32x4d', 'legacy_xception', 'levit_128', 'levit_128s', 'levit_192', 'levit_256', 'levit_256d', 'levit_384', 'levit_384_s8', 'levit_512', 'levit_512_s8', 'levit_512d', 'levit_conv_128', 'levit_conv_128s', 'levit_conv_192', 'levit_conv_256', 'levit_conv_256d', 'levit_conv_384', 'levit_conv_384_s8', 'levit_conv_512', 'levit_conv_512_s8', 'levit_conv_512d', 'mambaout_base', 'mambaout_base_plus_rw', 'mambaout_base_short_rw', 'mambaout_base_tall_rw', 'mambaout_base_wide_rw', 'mambaout_femto', 'mambaout_kobe', 'mambaout_small', 'mambaout_small_rw', 'mambaout_tiny', 'maxvit_base_tf_224', 'maxvit_base_tf_384', 'maxvit_base_tf_512', 'maxvit_large_tf_224', 'maxvit_large_tf_384', 'maxvit_large_tf_512', 'maxvit_nano_rw_256', 'maxvit_pico_rw_256', 'maxvit_rmlp_base_rw_224', 'maxvit_rmlp_base_rw_384', 'maxvit_rmlp_nano_rw_256', 'maxvit_rmlp_pico_rw_256', 'maxvit_rmlp_small_rw_224', 'maxvit_rmlp_small_rw_256', 'maxvit_rmlp_tiny_rw_256', 'maxvit_small_tf_224', 'maxvit_small_tf_384', 'maxvit_small_tf_512', 'maxvit_tiny_pm_256', 'maxvit_tiny_rw_224', 'maxvit_tiny_rw_256', 'maxvit_tiny_tf_224', 'maxvit_tiny_tf_384', 'maxvit_tiny_tf_512', 'maxvit_xlarge_tf_224', 'maxvit_xlarge_tf_384', 'maxvit_xlarge_tf_512', 'maxxvit_rmlp_nano_rw_256', 'maxxvit_rmlp_small_rw_256', 'maxxvit_rmlp_tiny_rw_256', 'maxxvitv2_nano_rw_256', 'maxxvitv2_rmlp_base_rw_224', 'maxxvitv2_rmlp_base_rw_384', 'maxxvitv2_rmlp_large_rw_224', 'mixer_b16_224', 'mixer_b32_224', 'mixer_l16_224', 'mixer_l32_224', 'mixer_s16_224', 'mixer_s32_224', 'mixnet_l', 'mixnet_m', 'mixnet_s', 'mixnet_xl', 'mixnet_xxl', 'mnasnet_050', 'mnasnet_075', 'mnasnet_100', 'mnasnet_140', 'mnasnet_small', 'mobilenet_edgetpu_100', 'mobilenet_edgetpu_v2_l', 'mobilenet_edgetpu_v2_m', 'mobilenet_edgetpu_v2_s', 'mobilenet_edgetpu_v2_xs', 'mobilenetv1_100', 'mobilenetv1_100h', 'mobilenetv1_125', 'mobilenetv2_035', 'mobilenetv2_050', 'mobilenetv2_075', 'mobilenetv2_100', 'mobilenetv2_110d', 'mobilenetv2_120d', 'mobilenetv2_140', 'mobilenetv3_large_075', 'mobilenetv3_large_100', 'mobilenetv3_large_150d', 'mobilenetv3_rw', 'mobilenetv3_small_050', 'mobilenetv3_small_075', 'mobilenetv3_small_100', 'mobilenetv4_conv_aa_large', 'mobilenetv4_conv_aa_medium', 'mobilenetv4_conv_blur_medium', 'mobilenetv4_conv_large', 'mobilenetv4_conv_medium', 'mobilenetv4_conv_small', 'mobilenetv4_conv_small_035', 'mobilenetv4_conv_small_050', 'mobilenetv4_hybrid_large', 'mobilenetv4_hybrid_large_075', 'mobilenetv4_hybrid_medium', 'mobilenetv4_hybrid_medium_075', 'mobilenetv5_300m', 'mobilenetv5_300m_enc', 'mobilenetv5_base', 'mobileone_s0', 'mobileone_s1', 'mobileone_s2', 'mobileone_s3', 'mobileone_s4', 'mobilevit_s', 'mobilevit_xs', 'mobilevit_xxs', 'mobilevitv2_050', 'mobilevitv2_075', 'mobilevitv2_100', 'mobilevitv2_125', 'mobilevitv2_150', 'mobilevitv2_175', 'mobilevitv2_200', 'mvitv2_base', 'mvitv2_base_cls', 'mvitv2_huge_cls', 'mvitv2_large', 'mvitv2_large_cls', 'mvitv2_small', 'mvitv2_small_cls', 'mvitv2_tiny', 'naflexvit_base_patch16_gap', 'naflexvit_base_patch16_map', 'naflexvit_base_patch16_par_gap', 'naflexvit_base_patch16_parfac_gap', 'naflexvit_base_patch16_siglip', 'naflexvit_so150m2_patch16_reg1_gap', 'naflexvit_so150m2_patch16_reg1_map', 'naflexvit_so400m_patch16_siglip', 'nasnetalarge', 'nest_base', 'nest_base_jx', 'nest_small', 'nest_small_jx', 'nest_tiny', 'nest_tiny_jx', 'nextvit_base', 'nextvit_large', 'nextvit_small', 'nf_ecaresnet26', 'nf_ecaresnet50', 'nf_ecaresnet101', 'nf_regnet_b0', 'nf_regnet_b1', 'nf_regnet_b2', 'nf_regnet_b3', 'nf_regnet_b4', 'nf_regnet_b5', 'nf_resnet26', 'nf_resnet50', 'nf_resnet101', 'nf_seresnet26', 'nf_seresnet50', 'nf_seresnet101', 'nfnet_f0', 'nfnet_f1', 'nfnet_f2', 'nfnet_f3', 'nfnet_f4', 'nfnet_f5', 'nfnet_f6', 'nfnet_f7', 'nfnet_l0', 'pit_b_224', 'pit_b_distilled_224', 'pit_s_224', 'pit_s_distilled_224', 'pit_ti_224', 'pit_ti_distilled_224', 'pit_xs_224', 'pit_xs_distilled_224', 'pnasnet5large', 'poolformer_m36', 'poolformer_m48', 'poolformer_s12', 'poolformer_s24', 'poolformer_s36', 'poolformerv2_m36', 'poolformerv2_m48', 'poolformerv2_s12', 'poolformerv2_s24', 'poolformerv2_s36', 'prithvi_swin_B', 'prithvi_swin_L', 'pvt_v2_b0', 'pvt_v2_b1', 'pvt_v2_b2', 'pvt_v2_b2_li', 'pvt_v2_b3', 'pvt_v2_b4', 'pvt_v2_b5', 'rdnet_base', 'rdnet_large', 'rdnet_small', 'rdnet_tiny', 'regnetv_040', 'regnetv_064', 'regnetx_002', 'regnetx_004', 'regnetx_004_tv', 'regnetx_006', 'regnetx_008', 'regnetx_016', 'regnetx_032', 'regnetx_040', 'regnetx_064', 'regnetx_080', 'regnetx_120', 'regnetx_160', 'regnetx_320', 'regnety_002', 'regnety_004', 'regnety_006', 'regnety_008', 'regnety_008_tv', 'regnety_016', 'regnety_032', 'regnety_040', 'regnety_040_sgn', 'regnety_064', 'regnety_080', 'regnety_080_tv', 'regnety_120', 'regnety_160', 'regnety_320', 'regnety_640', 'regnety_1280', 'regnety_2560', 'regnetz_005', 'regnetz_040', 'regnetz_040_h', 'regnetz_b16', 'regnetz_b16_evos', 'regnetz_c16', 'regnetz_c16_evos', 'regnetz_d8', 'regnetz_d8_evos', 'regnetz_d32', 'regnetz_e8', 'repghostnet_050', 'repghostnet_058', 'repghostnet_080', 'repghostnet_100', 'repghostnet_111', 'repghostnet_130', 'repghostnet_150', 'repghostnet_200', 'repvgg_a0', 'repvgg_a1', 'repvgg_a2', 'repvgg_b0', 'repvgg_b1', 'repvgg_b1g4', 'repvgg_b2', 'repvgg_b2g4', 'repvgg_b3', 'repvgg_b3g4', 'repvgg_d2se', 'repvit_m0_9', 'repvit_m1', 'repvit_m1_0', 'repvit_m1_1', 'repvit_m1_5', 'repvit_m2', 'repvit_m2_3', 'repvit_m3', 'res2net50_14w_8s', 'res2net50_26w_4s', 'res2net50_26w_6s', 'res2net50_26w_8s', 'res2net50_48w_2s', 'res2net50d', 'res2net101_26w_4s', 'res2net101d', 'res2next50', 'resmlp_12_224', 'resmlp_24_224', 'resmlp_36_224', 'resmlp_big_24_224', 'resnest14d', 'resnest26d', 'resnest50d', 'resnest50d_1s4x24d', 'resnest50d_4s2x40d', 'resnest101e', 'resnest200e', 'resnest269e', 'resnet10t', 'resnet14t', 'resnet18', 'resnet18d', 'resnet26', 'resnet26d', 'resnet26t', 'resnet32ts', 'resnet33ts', 'resnet34', 'resnet34d', 'resnet50', 'resnet50_clip', 'resnet50_clip_gap', 'resnet50_gn', 'resnet50_mlp', 'resnet50c', 'resnet50d', 'resnet50s', 'resnet50t', 'resnet50x4_clip', 'resnet50x4_clip_gap', 'resnet50x16_clip', 'resnet50x16_clip_gap', 'resnet50x64_clip', 'resnet50x64_clip_gap', 'resnet51q', 'resnet61q', 'resnet101', 'resnet101_clip', 'resnet101_clip_gap', 'resnet101c', 'resnet101d', 'resnet101s', 'resnet152', 'resnet152c', 'resnet152d', 'resnet152s', 'resnet200', 'resnet200d', 'resnetaa34d', 'resnetaa50', 'resnetaa50d', 'resnetaa101d', 'resnetblur18', 'resnetblur50', 'resnetblur50d', 'resnetblur101d', 'resnetrs50', 'resnetrs101', 'resnetrs152', 'resnetrs200', 'resnetrs270', 'resnetrs350', 'resnetrs420', 'resnetv2_18', 'resnetv2_18d', 'resnetv2_34', 'resnetv2_34d', 'resnetv2_50', 'resnetv2_50d', 'resnetv2_50d_evos', 'resnetv2_50d_frn', 'resnetv2_50d_gn', 'resnetv2_50t', 'resnetv2_50x1_bit', 'resnetv2_50x3_bit', 'resnetv2_101', 'resnetv2_101d', 'resnetv2_101x1_bit', 'resnetv2_101x3_bit', 'resnetv2_152', 'resnetv2_152d', 'resnetv2_152x2_bit', 'resnetv2_152x4_bit', 'resnext26ts', 'resnext50_32x4d', 'resnext50d_32x4d', 'resnext101_32x4d', 'resnext101_32x8d', 'resnext101_32x16d', 'resnext101_32x32d', 'resnext101_64x4d', 'rexnet_100', 'rexnet_130', 'rexnet_150', 'rexnet_200', 'rexnet_300', 'rexnetr_100', 'rexnetr_130', 'rexnetr_150', 'rexnetr_200', 'rexnetr_300', 'sam2_hiera_base_plus', 'sam2_hiera_large', 'sam2_hiera_small', 'sam2_hiera_tiny', 'samvit_base_patch16', 'samvit_base_patch16_224', 'samvit_huge_patch16', 'samvit_large_patch16', 'sebotnet33ts_256', 'sedarknet21', 'sehalonet33ts', 'selecsls42', 'selecsls42b', 'selecsls60', 'selecsls60b', 'selecsls84', 'semnasnet_050', 'semnasnet_075', 'semnasnet_100', 'semnasnet_140', 'senet154', 'sequencer2d_l', 'sequencer2d_m', 'sequencer2d_s', 'seresnet18', 'seresnet33ts', 'seresnet34', 'seresnet50', 'seresnet50t', 'seresnet101', 'seresnet152', 'seresnet152d', 'seresnet200d', 'seresnet269d', 'seresnetaa50d', 'seresnext26d_32x4d', 'seresnext26t_32x4d', 'seresnext26ts', 'seresnext50_32x4d', 'seresnext101_32x4d', 'seresnext101_32x8d', 'seresnext101_64x4d', 'seresnext101d_32x8d', 'seresnextaa101d_32x8d', 'seresnextaa201d_32x8d', 'shvit_s1', 'shvit_s2', 'shvit_s3', 'shvit_s4', 'skresnet18', 'skresnet34', 'skresnet50', 'skresnet50d', 'skresnext50_32x4d', 'spnasnet_100', 'starnet_s1', 'starnet_s2', 'starnet_s3', 'starnet_s4', 'starnet_s050', 'starnet_s100', 'starnet_s150', 'swiftformer_l1', 'swiftformer_l3', 'swiftformer_s', 'swiftformer_xs', 'swin_base_patch4_window7_224', 'swin_base_patch4_window12_384', 'swin_large_patch4_window7_224', 'swin_large_patch4_window12_384', 'swin_s3_base_224', 'swin_s3_small_224', 'swin_s3_tiny_224', 'swin_small_patch4_window7_224', 'swin_tiny_patch4_window7_224', 'swinv2_base_window8_256', 'swinv2_base_window12_192', 'swinv2_base_window12to16_192to256', 'swinv2_base_window12to24_192to384', 'swinv2_base_window16_256', 'swinv2_cr_base_224', 'swinv2_cr_base_384', 'swinv2_cr_base_ns_224', 'swinv2_cr_giant_224', 'swinv2_cr_giant_384', 'swinv2_cr_huge_224', 'swinv2_cr_huge_384', 'swinv2_cr_large_224', 'swinv2_cr_large_384', 'swinv2_cr_small_224', 'swinv2_cr_small_384', 'swinv2_cr_small_ns_224', 'swinv2_cr_small_ns_256', 'swinv2_cr_tiny_224', 'swinv2_cr_tiny_384', 'swinv2_cr_tiny_ns_224', 'swinv2_large_window12_192', 'swinv2_large_window12to16_192to256', 'swinv2_large_window12to24_192to384', 'swinv2_small_window8_256', 'swinv2_small_window16_256', 'swinv2_tiny_window8_256', 'swinv2_tiny_window16_256', 'test_byobnet', 'test_convnext', 'test_convnext2', 'test_convnext3', 'test_efficientnet', 'test_efficientnet_evos', 'test_efficientnet_gn', 'test_efficientnet_ln', 'test_mambaout', 'test_nfnet', 'test_resnet', 'test_vit', 'test_vit2', 'test_vit3', 'test_vit4', 'tf_efficientnet_b0', 'tf_efficientnet_b1', 'tf_efficientnet_b2', 'tf_efficientnet_b3', 'tf_efficientnet_b4', 'tf_efficientnet_b5', 'tf_efficientnet_b6', 'tf_efficientnet_b7', 'tf_efficientnet_b8', 'tf_efficientnet_cc_b0_4e', 'tf_efficientnet_cc_b0_8e', 'tf_efficientnet_cc_b1_8e', 'tf_efficientnet_el', 'tf_efficientnet_em', 'tf_efficientnet_es', 'tf_efficientnet_l2', 'tf_efficientnet_lite0', 'tf_efficientnet_lite1', 'tf_efficientnet_lite2', 'tf_efficientnet_lite3', 'tf_efficientnet_lite4', 'tf_efficientnetv2_b0', 'tf_efficientnetv2_b1', 'tf_efficientnetv2_b2', 'tf_efficientnetv2_b3', 'tf_efficientnetv2_l', 'tf_efficientnetv2_m', 'tf_efficientnetv2_s', 'tf_efficientnetv2_xl', 'tf_mixnet_l', 'tf_mixnet_m', 'tf_mixnet_s', 'tf_mobilenetv3_large_075', 'tf_mobilenetv3_large_100', 'tf_mobilenetv3_large_minimal_100', 'tf_mobilenetv3_small_075', 'tf_mobilenetv3_small_100', 'tf_mobilenetv3_small_minimal_100', 'tiny_vit_5m_224', 'tiny_vit_11m_224', 'tiny_vit_21m_224', 'tiny_vit_21m_384', 'tiny_vit_21m_512', 'tinynet_a', 'tinynet_b', 'tinynet_c', 'tinynet_d', 'tinynet_e', 'tnt_b_patch16_224', 'tnt_s_legacy_patch16_224', 'tnt_s_patch16_224', 'tresnet_l', 'tresnet_m', 'tresnet_v2_l', 'tresnet_xl', 'twins_pcpvt_base', 'twins_pcpvt_large', 'twins_pcpvt_small', 'twins_svt_base', 'twins_svt_large', 'twins_svt_small', 'vgg11', 'vgg11_bn', 'vgg13', 'vgg13_bn', 'vgg16', 'vgg16_bn', 'vgg19', 'vgg19_bn', 'visformer_small', 'visformer_tiny', 'vit_base_mci_224', 'vit_base_patch8_224', 'vit_base_patch14_dinov2', 'vit_base_patch14_reg4_dinov2', 'vit_base_patch16_18x2_224', 'vit_base_patch16_224', 'vit_base_patch16_224_miil', 'vit_base_patch16_384', 'vit_base_patch16_clip_224', 'vit_base_patch16_clip_384', 'vit_base_patch16_clip_quickgelu_224', 'vit_base_patch16_gap_224', 'vit_base_patch16_plus_240', 'vit_base_patch16_plus_clip_240', 'vit_base_patch16_reg4_gap_256', 'vit_base_patch16_rope_224', 'vit_base_patch16_rope_ape_224', 'vit_base_patch16_rope_mixed_224', 'vit_base_patch16_rope_mixed_ape_224', 'vit_base_patch16_rope_reg1_gap_256', 'vit_base_patch16_rpn_224', 'vit_base_patch16_siglip_224', 'vit_base_patch16_siglip_256', 'vit_base_patch16_siglip_384', 'vit_base_patch16_siglip_512', 'vit_base_patch16_siglip_gap_224', 'vit_base_patch16_siglip_gap_256', 'vit_base_patch16_siglip_gap_384', 'vit_base_patch16_siglip_gap_512', 'vit_base_patch16_xp_224', 'vit_base_patch32_224', 'vit_base_patch32_384', 'vit_base_patch32_clip_224', 'vit_base_patch32_clip_256', 'vit_base_patch32_clip_384', 'vit_base_patch32_clip_448', 'vit_base_patch32_clip_quickgelu_224', 'vit_base_patch32_plus_256', 'vit_base_patch32_siglip_256', 'vit_base_patch32_siglip_gap_256', 'vit_base_r26_s32_224', 'vit_base_r50_s16_224', 'vit_base_r50_s16_384', 'vit_base_resnet26d_224', 'vit_base_resnet50d_224', 'vit_betwixt_patch16_gap_256', 'vit_betwixt_patch16_reg1_gap_256', 'vit_betwixt_patch16_reg4_gap_256', 'vit_betwixt_patch16_reg4_gap_384', 'vit_betwixt_patch16_rope_reg4_gap_256', 'vit_betwixt_patch32_clip_224', 'vit_giant_patch14_224', 'vit_giant_patch14_clip_224', 'vit_giant_patch14_dinov2', 'vit_giant_patch14_reg4_dinov2', 'vit_giant_patch16_gap_224', 'vit_giantopt_patch16_siglip_256', 'vit_giantopt_patch16_siglip_384', 'vit_giantopt_patch16_siglip_gap_256', 'vit_giantopt_patch16_siglip_gap_384', 'vit_gigantic_patch14_224', 'vit_gigantic_patch14_clip_224', 'vit_gigantic_patch14_clip_quickgelu_224', 'vit_huge_patch14_224', 'vit_huge_patch14_clip_224', 'vit_huge_patch14_clip_336', 'vit_huge_patch14_clip_378', 'vit_huge_patch14_clip_quickgelu_224', 'vit_huge_patch14_clip_quickgelu_378', 'vit_huge_patch14_gap_224', 'vit_huge_patch14_xp_224', 'vit_huge_patch16_gap_448', 'vit_intern300m_patch14_448', 'vit_large_patch14_224', 'vit_large_patch14_clip_224', 'vit_large_patch14_clip_336', 'vit_large_patch14_clip_quickgelu_224', 'vit_large_patch14_clip_quickgelu_336', 'vit_large_patch14_dinov2', 'vit_large_patch14_reg4_dinov2', 'vit_large_patch14_xp_224', 'vit_large_patch16_224', 'vit_large_patch16_384', 'vit_large_patch16_rope_224', 'vit_large_patch16_rope_ape_224', 'vit_large_patch16_rope_mixed_224', 'vit_large_patch16_rope_mixed_ape_224', 'vit_large_patch16_siglip_256', 'vit_large_patch16_siglip_384', 'vit_large_patch16_siglip_512', 'vit_large_patch16_siglip_gap_256', 'vit_large_patch16_siglip_gap_384', 'vit_large_patch16_siglip_gap_512', 'vit_large_patch32_224', 'vit_large_patch32_384', 'vit_large_r50_s32_224', 'vit_large_r50_s32_384', 'vit_little_patch16_reg1_gap_256', 'vit_little_patch16_reg4_gap_256', 'vit_medium_patch16_clip_224', 'vit_medium_patch16_gap_240', 'vit_medium_patch16_gap_256', 'vit_medium_patch16_gap_384', 'vit_medium_patch16_reg1_gap_256', 'vit_medium_patch16_reg4_gap_256', 'vit_medium_patch16_rope_reg1_gap_256', 'vit_medium_patch32_clip_224', 'vit_mediumd_patch16_reg4_gap_256', 'vit_mediumd_patch16_reg4_gap_384', 'vit_mediumd_patch16_rope_reg1_gap_256', 'vit_pe_core_base_patch16_224', 'vit_pe_core_gigantic_patch14_448', 'vit_pe_core_large_patch14_336', 'vit_pe_core_small_patch16_384', 'vit_pe_core_tiny_patch16_384', 'vit_pe_lang_gigantic_patch14_448', 'vit_pe_lang_large_patch14_448', 'vit_pe_spatial_base_patch16_512', 'vit_pe_spatial_gigantic_patch14_448', 'vit_pe_spatial_large_patch14_448', 'vit_pe_spatial_small_patch16_512', 'vit_pe_spatial_tiny_patch16_512', 'vit_pwee_patch16_reg1_gap_256', 'vit_relpos_base_patch16_224', 'vit_relpos_base_patch16_cls_224', 'vit_relpos_base_patch16_clsgap_224', 'vit_relpos_base_patch16_plus_240', 'vit_relpos_base_patch16_rpn_224', 'vit_relpos_base_patch32_plus_rpn_256', 'vit_relpos_medium_patch16_224', 'vit_relpos_medium_patch16_cls_224', 'vit_relpos_medium_patch16_rpn_224', 'vit_relpos_small_patch16_224', 'vit_relpos_small_patch16_rpn_224', 'vit_small_patch8_224', 'vit_small_patch14_dinov2', 'vit_small_patch14_reg4_dinov2', 'vit_small_patch16_18x2_224', 'vit_small_patch16_36x1_224', 'vit_small_patch16_224', 'vit_small_patch16_384', 'vit_small_patch16_rope_224', 'vit_small_patch16_rope_ape_224', 'vit_small_patch16_rope_mixed_224', 'vit_small_patch16_rope_mixed_ape_224', 'vit_small_patch32_224', 'vit_small_patch32_384', 'vit_small_r26_s32_224', 'vit_small_r26_s32_384', 'vit_small_resnet26d_224', 'vit_small_resnet50d_s16_224', 'vit_so150m2_patch16_reg1_gap_256', 'vit_so150m2_patch16_reg1_gap_384', 'vit_so150m2_patch16_reg1_gap_448', 'vit_so150m_patch16_reg4_gap_256', 'vit_so150m_patch16_reg4_gap_384', 'vit_so150m_patch16_reg4_map_256', 'vit_so400m_patch14_siglip_224', 'vit_so400m_patch14_siglip_378', 'vit_so400m_patch14_siglip_384', 'vit_so400m_patch14_siglip_gap_224', 'vit_so400m_patch14_siglip_gap_378', 'vit_so400m_patch14_siglip_gap_384', 'vit_so400m_patch14_siglip_gap_448', 'vit_so400m_patch14_siglip_gap_896', 'vit_so400m_patch16_siglip_256', 'vit_so400m_patch16_siglip_384', 'vit_so400m_patch16_siglip_512', 'vit_so400m_patch16_siglip_gap_256', 'vit_so400m_patch16_siglip_gap_384', 'vit_so400m_patch16_siglip_gap_512', 'vit_srelpos_medium_patch16_224', 'vit_srelpos_small_patch16_224', 'vit_tiny_patch16_224', 'vit_tiny_patch16_384', 'vit_tiny_r_s16_p8_224', 'vit_tiny_r_s16_p8_384', 'vit_wee_patch16_reg1_gap_256', 'vit_xsmall_patch16_clip_224', 'vitamin_base_224', 'vitamin_large2_224', 'vitamin_large2_256', 'vitamin_large2_336', 'vitamin_large2_384', 'vitamin_large_224', 'vitamin_large_256', 'vitamin_large_336', 'vitamin_large_384', 'vitamin_small_224', 'vitamin_xlarge_256', 'vitamin_xlarge_336', 'vitamin_xlarge_384', 'volo_d1_224', 'volo_d1_384', 'volo_d2_224', 'volo_d2_384', 'volo_d3_224', 'volo_d3_448', 'volo_d4_224', 'volo_d4_448', 'volo_d5_224', 'volo_d5_448', 'volo_d5_512', 'vovnet39a', 'vovnet57a', 'wide_resnet50_2', 'wide_resnet101_2', 'xception41', 'xception41p', 'xception65', 'xception65p', 'xception71', 'xcit_large_24_p8_224', 'xcit_large_24_p8_384', 'xcit_large_24_p16_224', 'xcit_large_24_p16_384', 'xcit_medium_24_p8_224', 'xcit_medium_24_p8_384', 'xcit_medium_24_p16_224', 'xcit_medium_24_p16_384', 'xcit_nano_12_p8_224', 'xcit_nano_12_p8_384', 'xcit_nano_12_p16_224', 'xcit_nano_12_p16_384', 'xcit_small_12_p8_224', 'xcit_small_12_p8_384', 'xcit_small_12_p16_224', 'xcit_small_12_p16_384', 'xcit_small_24_p8_224', 'xcit_small_24_p8_384', 'xcit_small_24_p16_224', 'xcit_small_24_p16_384', 'xcit_tiny_12_p8_224', 'xcit_tiny_12_p8_384', 'xcit_tiny_12_p16_224', 'xcit_tiny_12_p16_384', 'xcit_tiny_24_p8_224', 'xcit_tiny_24_p8_384', 'xcit_tiny_24_p16_224', 'xcit_tiny_24_p16_384']</code></pre>
+</div>
+</div>
+<div id="f30cb5ee-3ec4-49e1-bb3c-16f1409a496e" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let's just list out the Prithvi models in the terratorch source</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>([mod <span class="cf">for</span> mod <span class="kw">in</span> BACKBONE_REGISTRY._sources[<span class="st">'terratorch'</span>] <span class="cf">if</span> <span class="st">'prithvi'</span> <span class="kw">in</span> mod])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['prithvi_eo_tiny', 'prithvi_eo_v1_100', 'prithvi_eo_v2_tiny_tl', 'prithvi_eo_v2_100_tl', 'prithvi_eo_v2_300', 'prithvi_eo_v2_600', 'prithvi_eo_v2_300_tl', 'prithvi_eo_v2_600_tl']</code></pre>
+</div>
+</div>
+<p>There are many different prithvi versions to select from – for this demo we will choose the smaller <code>prithvi_eo_v1_100</code>.</p>
+</section>
+<section id="explore-decoders" class="level4">
+<h4 class="anchored" data-anchor-id="explore-decoders">Explore decoders</h4>
+<div id="81afaa9c-401a-48b4-9452-779977b09540" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.registry <span class="im">import</span> DECODER_REGISTRY</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check available decoders</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, source <span class="kw">in</span> DECODER_REGISTRY._sources.items():</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">====</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">====="</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="bu">list</span>(source))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+====terratorch=====
+['ASPPModule', 'ASPPHead', 'ASPPSegmentationHead', 'ASPPRegressionHead', 'FCNDecoder', 'IdentityDecoder', 'LinearDecoder', 'MLPDecoder', 'SatMAEHead', 'UNetDecoder', 'UperNetDecoder']
+
+====smp=====
+['PAN', 'DeepLabV3', 'PSPNet', 'UPerNet', 'Linknet', 'FPN', 'MAnet', 'Unet', 'UnetPlusPlus', 'Segformer', 'DeepLabV3Plus']</code></pre>
+</div>
+</div>
+<p>We choose the FCNDecoder because it is good for Classification tasks.</p>
+</section>
+</section>
+<section id="define-your-task" class="level3">
+<h3 class="anchored" data-anchor-id="define-your-task">Define your Task</h3>
+<div id="bdd0c73a-d250-4010-b65a-610f789dd027" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.tasks <span class="im">import</span> ClassificationTask</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>task <span class="op">=</span> ClassificationTask(</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define your model</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    model_factory<span class="op">=</span><span class="st">"EncoderDecoderFactory"</span>, <span class="co"># TerraTorch's EncoderDecoderFactory, where we found our models</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    model_args<span class="op">=</span>{</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'backbone'</span>: <span class="st">'prithvi_eo_v1_100'</span>, <span class="co"># Smaller Prithvi model for demo</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">'backbone_pretrained'</span>: <span class="va">True</span>, <span class="co"># Train from scratch or use pre-trained weights? </span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'decoder'</span>: <span class="st">'FCNDecoder'</span>, <span class="co"># Chosen decoder for classification</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'num_classes'</span>: <span class="bu">len</span>(class_names),</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># What would you like to train? </span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    freeze_backbone<span class="op">=</span><span class="va">True</span>, <span class="co"># Do not update prithvi weights for demo</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    freeze_decoder<span class="op">=</span><span class="va">False</span>, <span class="co"># Train the decoder</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Optionally, change hyperparameters from the defaults</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    loss<span class="op">=</span><span class="st">'ce'</span>, </span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>    lr<span class="op">=</span><span class="fl">1e-4</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>WARNING:root:Decoder FCNDecoder does not have an `includes_head` attribute. Falling back to the value of the registry.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="step-4-train-your-model" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-train-your-model">Step 4: Train your model</h2>
+<p>Now that we have our Task and DataModule, we can easily use PyTorch Lightning to train our model.</p>
+<p>We also use Weights and Biases to check our progress during training.</p>
+<div id="e93d4b2d-873e-432a-b7f5-c94e152cb6e3" class="cell" data-scrolled="true">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightning.pytorch <span class="im">import</span> Trainer</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightning.pytorch.callbacks <span class="im">import</span> EarlyStopping, ModelCheckpoint, RichProgressBar, LearningRateMonitor</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize callbacks</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the best and the last model</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>checkpoint_callback <span class="op">=</span> ModelCheckpoint(monitor<span class="op">=</span>task.monitor, save_top_k<span class="op">=</span><span class="dv">1</span>, save_last<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop training if validation metrics stop improving for a certain number of epochs</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>early_stopping_callback <span class="op">=</span> EarlyStopping(monitor<span class="op">=</span>task.monitor, min_delta<span class="op">=</span><span class="fl">0.00</span>, patience<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check your progress and results during training using Weights and Biases. </span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="co"># You'll have to make an account but it's very useful. </span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Just click the link it gives you to watch your training progress plotted in real time. </span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightning.pytorch.loggers <span class="im">import</span> WandbLogger</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>wandb_logger <span class="op">=</span> WandbLogger(log_model<span class="op">=</span><span class="st">"all"</span>) </span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Define your Trainer</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> Trainer(</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>    devices<span class="op">=</span><span class="dv">1</span>, <span class="co"># Number of GPUs. Interactive mode recommended with 1 device</span></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>    precision<span class="op">=</span><span class="st">"16-mixed"</span>, <span class="co"># Use 16-bit floats as opposed to 32-bit (higher precision) when it's safe to save on time and memory</span></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    callbacks<span class="op">=</span>[</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>        RichProgressBar(),</span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>        checkpoint_callback,</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>        early_stopping_callback,</span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>        LearningRateMonitor(logging_interval<span class="op">=</span><span class="st">"epoch"</span>),</span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>    logger<span class="op">=</span>wandb_logger,</span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>    max_epochs<span class="op">=</span><span class="dv">100</span>, <span class="co"># Train for up to 100 epochs</span></span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>    default_root_dir<span class="op">=</span><span class="st">'output/tutorial'</span>, <span class="co"># where checkpoints/logs go.</span></span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a>    log_every_n_steps<span class="op">=</span><span class="dv">1</span>, </span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a>    check_val_every_n_epoch<span class="op">=</span><span class="dv">1</span> <span class="co"># How frequently to calcualte validation performance</span></span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit your model!</span></span>
+<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> trainer.fit(model<span class="op">=</span>task, datamodule<span class="op">=</span>datamodule)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/g288kc/miniforge/envs/geoAI/lib/python3.11/site-packages/lightning/fabric/plugins/environments/slurm.py:204: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python /home/g288kc/miniforge/envs/geoAI/lib/python3.11/sit ...
+Using 16bit Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+wandb: Currently logged in as: boseranna (boseranna-university-of-california-santa-barbara) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+</div>
+<div class="cell-output cell-output-display">
+Tracking run with wandb version 0.22.2
+</div>
+<div class="cell-output cell-output-display">
+Run data is saved locally in <code>./wandb/run-20251114_132345-ym9pbv87</code>
+</div>
+<div class="cell-output cell-output-display">
+Syncing run <strong><a href="https://wandb.ai/boseranna-university-of-california-santa-barbara/lightning_logs/runs/ym9pbv87" target="_blank">robust-dew-4</a></strong> to <a href="https://wandb.ai/boseranna-university-of-california-santa-barbara/lightning_logs" target="_blank">Weights &amp; Biases</a> (<a href="https://wandb.me/developer-guide" target="_blank">docs</a>)<br>
+</div>
+<div class="cell-output cell-output-display">
+ View project at <a href="https://wandb.ai/boseranna-university-of-california-santa-barbara/lightning_logs" target="_blank">https://wandb.ai/boseranna-university-of-california-santa-barbara/lightning_logs</a>
+</div>
+<div class="cell-output cell-output-display">
+ View run at <a href="https://wandb.ai/boseranna-university-of-california-santa-barbara/lightning_logs/runs/ym9pbv87" target="_blank">https://wandb.ai/boseranna-university-of-california-santa-barbara/lightning_logs/runs/ym9pbv87</a>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┓
+┃<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">   </span>┃<span style="color: #800080; text-decoration-color: #800080; font-weight: bold"> Name          </span>┃<span style="color: #800080; text-decoration-color: #800080; font-weight: bold"> Type              </span>┃<span style="color: #800080; text-decoration-color: #800080; font-weight: bold"> Params </span>┃<span style="color: #800080; text-decoration-color: #800080; font-weight: bold"> Mode  </span>┃
+┡━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━┩
+│<span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 0 </span>│ model         │ ScalarOutputModel │ 90.2 M │ train │
+│<span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 1 </span>│ criterion     │ CrossEntropyLoss  │      0 │ train │
+│<span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 2 </span>│ train_metrics │ MetricCollection  │      0 │ train │
+│<span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 3 </span>│ val_metrics   │ MetricCollection  │      0 │ train │
+│<span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 4 </span>│ test_metrics  │ ModuleList        │      0 │ train │
+└───┴───────────────┴───────────────────┴────────┴───────┘
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">Trainable params</span>: 3.9 M                                                                                            
+<span style="font-weight: bold">Non-trainable params</span>: 86.2 M                                                                                       
+<span style="font-weight: bold">Total params</span>: 90.2 M                                                                                               
+<span style="font-weight: bold">Total estimated model params size (MB)</span>: 360                                                                        
+<span style="font-weight: bold">Modules in train mode</span>: 335                                                                                         
+<span style="font-weight: bold">Modules in eval mode</span>: 0                                                                                            
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"f19dcb8e04aa443cbe6b9a1acdde6e47","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">/home/g288kc/miniforge/envs/geoAI/lib/python3.11/site-packages/torchmetrics/utilities/prints.py:43: UserWarning: 
+The ``compute`` method of metric MulticlassAccuracy was called before the ``update`` method which may lead to 
+errors, as metric states have not yet been updated.
+  warnings.warn(*args, **kwargs)
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">/home/g288kc/miniforge/envs/geoAI/lib/python3.11/site-packages/torchmetrics/utilities/prints.py:43: UserWarning: 
+The ``compute`` method of metric MulticlassF1Score was called before the ``update`` method which may lead to 
+errors, as metric states have not yet been updated.
+  warnings.warn(*args, **kwargs)
+</pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13
+ERROR:PIL.TiffImagePlugin:More samples per pixel than can be decoded: 13</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/kcaylor\.github\.io\/GEOG-288KC-geospatial-foundation-models");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../images/geog-logo.png" class="img-fluid figure-img" width="250"></p>
+<figcaption>Department of Geography logo</figcaption>
+</figure>
+</div>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>This website is built with <a href="https://github.com/kcaylor/GEOG-288KC-geospatial-foundation-models"><i class="fa-brands fa-github" title="the github octocat logo" aria-label="github"></i></a> and <a href="https://quarto.org/">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

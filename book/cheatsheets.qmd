@@ -31,6 +31,7 @@ format:
 
 ## 🌎 TerraTorch for Geospatial AI
 
+- [Dataset Organization for Fine-Tuning](extras/cheatsheets/dataset_organization_terratorch.qmd)
 - [Modular GFM Architecture in TerraTorch](extras/cheatsheets/modular_gfm_architecture.qmd)
 - [TerraTorch Workflows](extras/examples/terratorch_workflows.qmd)
 - [TerraTorch Model Zoo](extras/cheatsheets/terratorch_model_zoo.qmd)

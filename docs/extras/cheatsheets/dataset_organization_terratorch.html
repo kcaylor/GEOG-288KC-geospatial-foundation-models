@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Dataset Organization for GeoAI Fine-Tuning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/quarto-contrib/fontawesome6-1.2.0/all.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/fontawesome6-1.2.0/latex-fontsize.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">GEOG 288KC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">🏠 home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../Syllabus.html"> 
+<span class="menu-text">📋 syllabus</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-weekly-sessions" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">💻 weekly sessions</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-weekly-sessions">    
+        <li>
+    <a class="dropdown-item" href="../../chapters/c01-geospatial-data-foundations.html">
+ <span class="dropdown-text">Week 1 - 🚀 Core Tools and Data Access</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../chapters/c02-spatial-temporal-attention-mechanisms.html">
+ <span class="dropdown-text">Week 2 - ⚡ Rapid Remote Sensing Preprocessing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../chapters/c03a-terratorch-foundations.html">
+ <span class="dropdown-text">Week 3a - 🌍 TerraTorch Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../chapters/c03-complete-gfm-architecture.html">
+ <span class="dropdown-text">Week 3b - 🤖 Machine Learning on Remote Sensing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../chapters/c04-pretraining-implementation.html">
+ <span class="dropdown-text">Week 4 - 🏗️ Foundation Models in Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../chapters/c05-training-loop-optimization.html">
+ <span class="dropdown-text">Week 5 - 🔧 Fine-Tuning &amp; Transfer Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../chapters/c06-model-evaluation-analysis.html">
+ <span class="dropdown-text">Week 6 - ⏰ Spatiotemporal Modeling &amp; Projects</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-cheatsheets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">👀 cheatsheets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-cheatsheets">    
+        <li>
+    <a class="dropdown-item" href="../../cheatsheets.html">
+ <span class="dropdown-text">📋 All Cheatsheets</span></a>
+  </li>  
+        <li><hr class="dropdown-divider"></li>
+        <li class="dropdown-header">⚡ Quick Starts</li>
+        <li>
+    <a class="dropdown-item" href="../../extras/cheatsheets/week01_imports.html">
+ <span class="dropdown-text">Week 01: Import Guide</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/cheatsheets/dataset_organization_terratorch.html">
+ <span class="dropdown-text">Dataset Organization for Fine-Tuning</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-explainers" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">🧩 explainers</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-explainers">    
+        <li class="dropdown-header">1️⃣ Week 1</li>
+        <li>
+    <a class="dropdown-item" href="../../extras/ai-ml-dl-fm-hierarchy.html">
+ <span class="dropdown-text">🤖 AI/ML/DL/FM Hierarchy</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/geospatial-foundation-model-predictions-standalone.html">
+ <span class="dropdown-text">🎯 GFM Predictions (Standalone)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/geospatial-prediction-hierarchy.html">
+ <span class="dropdown-text">✅ Geospatial Task/Prediction Types</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/neural_networks_explainer.html">
+ <span class="dropdown-text">🧠 Neural Networks: Neurons to Transformers</span></a>
+  </li>  
+        <li class="dropdown-header">2️⃣ Week 2</li>
+        <li>
+    <a class="dropdown-item" href="../../chapters/c00a-foundation_model_architectures.html">
+ <span class="dropdown-text">🏗️ Foundation Model Architectures</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../chapters/c00b-introduction-to-deeplearning-architecture.html">
+ <span class="dropdown-text">🎓 Introduction to Deep Learning Architecture</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-extras" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">📖 extras</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-extras">    
+        <li class="dropdown-header">🎯 Practical Examples</li>
+        <li>
+    <a class="dropdown-item" href="../../extras/examples/normalization_comparison.html">
+ <span class="dropdown-text">Normalization Comparison</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/examples/resnet.html">
+ <span class="dropdown-text">ResNet Implementation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/examples/segmentation_finetuning.html">
+ <span class="dropdown-text">Segmentation Fine-Tuning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/examples/Terramind_EuroSAT.html">
+ <span class="dropdown-text">TerraMind EuroSAT Classification</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/examples/text_encoder.html">
+ <span class="dropdown-text">Text Encoder</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/examples/tiling-and-patches.html">
+ <span class="dropdown-text">Tiling and Patches</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/examples/terratorch_workflows.html">
+ <span class="dropdown-text">TerraTorch Workflows</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/resources/course_resources.html">
+ <span class="dropdown-text">📚 Reference Materials</span></a>
+  </li>  
+        <li class="dropdown-header">📁 Project Templates</li>
+        <li>
+    <a class="dropdown-item" href="../../extras/projects/project-proposal-template.html">
+ <span class="dropdown-text">Project Proposal Template</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../extras/projects/mvp-template.html">
+ <span class="dropdown-text">Project Results Template</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/gfms-from-scratch/gfms-from-scratch.github.io" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-page-left">
+      <div class="quarto-title-block"><div><h1 class="title">Dataset Organization for GeoAI Fine-Tuning</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+            <p class="subtitle lead">From raw data to TerraTorch DataModules</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta column-page-left">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#task-specific-organization-patterns" id="toc-task-specific-organization-patterns" class="nav-link" data-scroll-target="#task-specific-organization-patterns">Task-Specific Organization Patterns</a>
+  <ul class="collapse">
+  <li><a href="#classification-tasks" id="toc-classification-tasks" class="nav-link" data-scroll-target="#classification-tasks">Classification Tasks</a></li>
+  <li><a href="#segmentation-tasks" id="toc-segmentation-tasks" class="nav-link" data-scroll-target="#segmentation-tasks">Segmentation Tasks</a></li>
+  <li><a href="#object-detection-tasks" id="toc-object-detection-tasks" class="nav-link" data-scroll-target="#object-detection-tasks">Object Detection Tasks</a></li>
+  </ul></li>
+  <li><a href="#trainvaltest-split-strategies" id="toc-trainvaltest-split-strategies" class="nav-link" data-scroll-target="#trainvaltest-split-strategies">Train/Val/Test Split Strategies</a>
+  <ul class="collapse">
+  <li><a href="#strategy-1-separate-directories" id="toc-strategy-1-separate-directories" class="nav-link" data-scroll-target="#strategy-1-separate-directories">Strategy 1: Separate Directories</a></li>
+  <li><a href="#strategy-2-split-files-recommended-for-benchmarks" id="toc-strategy-2-split-files-recommended-for-benchmarks" class="nav-link" data-scroll-target="#strategy-2-split-files-recommended-for-benchmarks">Strategy 2: Split Files (Recommended for Benchmarks)</a></li>
+  </ul></li>
+  <li><a href="#band-selection-and-ordering" id="toc-band-selection-and-ordering" class="nav-link" data-scroll-target="#band-selection-and-ordering">Band Selection and Ordering</a>
+  <ul class="collapse">
+  <li><a href="#specifying-input-bands" id="toc-specifying-input-bands" class="nav-link" data-scroll-target="#specifying-input-bands">Specifying Input Bands</a></li>
+  </ul></li>
+  <li><a href="#normalization-statistics" id="toc-normalization-statistics" class="nav-link" data-scroll-target="#normalization-statistics">Normalization Statistics</a>
+  <ul class="collapse">
+  <li><a href="#computing-dataset-statistics" id="toc-computing-dataset-statistics" class="nav-link" data-scroll-target="#computing-dataset-statistics">Computing Dataset Statistics</a></li>
+  <li><a href="#using-pre-computed-statistics" id="toc-using-pre-computed-statistics" class="nav-link" data-scroll-target="#using-pre-computed-statistics">Using Pre-computed Statistics</a></li>
+  </ul></li>
+  <li><a href="#data-transforms" id="toc-data-transforms" class="nav-link" data-scroll-target="#data-transforms">Data Transforms</a>
+  <ul class="collapse">
+  <li><a href="#basic-transform-pipeline" id="toc-basic-transform-pipeline" class="nav-link" data-scroll-target="#basic-transform-pipeline">Basic Transform Pipeline</a></li>
+  <li><a href="#cropping-for-model-input-size" id="toc-cropping-for-model-input-size" class="nav-link" data-scroll-target="#cropping-for-model-input-size">Cropping for Model Input Size</a></li>
+  </ul></li>
+  <li><a href="#integration-with-huggingface-datasets" id="toc-integration-with-huggingface-datasets" class="nav-link" data-scroll-target="#integration-with-huggingface-datasets">Integration with HuggingFace Datasets</a>
+  <ul class="collapse">
+  <li><a href="#loading-from-huggingface-hub" id="toc-loading-from-huggingface-hub" class="nav-link" data-scroll-target="#loading-from-huggingface-hub">Loading from HuggingFace Hub</a></li>
+  <li><a href="#using-huggingface-split-files" id="toc-using-huggingface-split-files" class="nav-link" data-scroll-target="#using-huggingface-split-files">Using HuggingFace Split Files</a></li>
+  </ul></li>
+  <li><a href="#complete-datamodule-example" id="toc-complete-datamodule-example" class="nav-link" data-scroll-target="#complete-datamodule-example">Complete DataModule Example</a>
+  <ul class="collapse">
+  <li><a href="#classification-with-eurosat" id="toc-classification-with-eurosat" class="nav-link" data-scroll-target="#classification-with-eurosat">Classification with EuroSAT</a></li>
+  <li><a href="#segmentation-with-custom-dataset" id="toc-segmentation-with-custom-dataset" class="nav-link" data-scroll-target="#segmentation-with-custom-dataset">Segmentation with Custom Dataset</a></li>
+  </ul></li>
+  <li><a href="#common-issues-and-solutions" id="toc-common-issues-and-solutions" class="nav-link" data-scroll-target="#common-issues-and-solutions">Common Issues and Solutions</a>
+  <ul class="collapse">
+  <li><a href="#issue-split-file-paths-dont-match-actual-files" id="toc-issue-split-file-paths-dont-match-actual-files" class="nav-link" data-scroll-target="#issue-split-file-paths-dont-match-actual-files">Issue: Split file paths don’t match actual files</a></li>
+  <li><a href="#issue-band-mismatch-errors" id="toc-issue-band-mismatch-errors" class="nav-link" data-scroll-target="#issue-band-mismatch-errors">Issue: Band mismatch errors</a></li>
+  <li><a href="#issue-normalization-from-wrong-sensor" id="toc-issue-normalization-from-wrong-sensor" class="nav-link" data-scroll-target="#issue-normalization-from-wrong-sensor">Issue: Normalization from wrong sensor</a></li>
+  <li><a href="#issue-images-cant-be-stacked-into-batches" id="toc-issue-images-cant-be-stacked-into-batches" class="nav-link" data-scroll-target="#issue-images-cant-be-stacked-into-batches">Issue: Images can’t be stacked into batches</a></li>
+  </ul></li>
+  <li><a href="#quick-reference" id="toc-quick-reference" class="nav-link" data-scroll-target="#quick-reference">Quick Reference</a>
+  <ul class="collapse">
+  <li><a href="#datamodule-parameters" id="toc-datamodule-parameters" class="nav-link" data-scroll-target="#datamodule-parameters">DataModule Parameters</a></li>
+  <li><a href="#common-dataset-patterns" id="toc-common-dataset-patterns" class="nav-link" data-scroll-target="#common-dataset-patterns">Common Dataset Patterns</a></li>
+  <li><a href="#workflow-summary" id="toc-workflow-summary" class="nav-link" data-scroll-target="#workflow-summary">Workflow Summary</a></li>
+  </ul></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+
+
+
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>This guide explains how to organize geospatial datasets for fine-tuning foundation models, with a focus on TerraTorch’s DataModule system. You’ll learn:</p>
+<ul>
+<li>Standard dataset organization patterns for different tasks</li>
+<li>How to structure files for TerraTorch DataModules</li>
+<li>Integration with HuggingFace datasets</li>
+<li>Train/validation/test split strategies</li>
+<li>Band selection and normalization</li>
+</ul>
+</section>
+<section id="task-specific-organization-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="task-specific-organization-patterns">Task-Specific Organization Patterns</h2>
+<section id="classification-tasks" class="level3">
+<h3 class="anchored" data-anchor-id="classification-tasks">Classification Tasks</h3>
+<p><strong>Directory Structure:</strong></p>
+<pre><code>dataset_root/
+├── class_1/
+│   ├── image_001.tif
+│   ├── image_002.tif
+│   └── ...
+├── class_2/
+│   ├── image_001.tif
+│   └── ...
+└── class_n/
+    └── ...</code></pre>
+<p><strong>Key Points:</strong> - One folder per class, named with the class label - All images for that class inside the folder - Works with <code>GenericNonGeoClassificationDataModule</code></p>
+<p><strong>Example: EuroSAT Dataset</strong></p>
+<pre><code>EuroSAT_MS/
+├── AnnualCrop/
+│   ├── AnnualCrop_1.tif
+│   └── ...
+├── Forest/
+│   └── ...
+└── Residential/
+    └── ...</code></pre>
+</section>
+<section id="segmentation-tasks" class="level3">
+<h3 class="anchored" data-anchor-id="segmentation-tasks">Segmentation Tasks</h3>
+<p><strong>Directory Structure (Separate Folders):</strong></p>
+<pre><code>dataset_root/
+├── images/
+│   ├── scene_001_image.tif
+│   ├── scene_002_image.tif
+│   └── ...
+└── labels/
+    ├── scene_001_mask.tif
+    ├── scene_002_mask.tif
+    └── ...</code></pre>
+<p><strong>Directory Structure (Matching Names):</strong></p>
+<pre><code>dataset_root/
+├── train_images/
+│   ├── scene_001.tif
+│   └── ...
+├── train_labels/
+│   ├── scene_001.tif
+│   └── ...
+├── val_images/
+│   └── ...
+└── val_labels/
+    └── ...</code></pre>
+<p><strong>Key Points:</strong> - Image and label files must have matching names (or matching patterns) - Common patterns: <code>*_image.tif</code> paired with <code>*_mask.tif</code> - Or identical names in separate <code>images/</code> and <code>labels/</code> folders - Labels are typically single-band rasters with integer class values</p>
+</section>
+<section id="object-detection-tasks" class="level3">
+<h3 class="anchored" data-anchor-id="object-detection-tasks">Object Detection Tasks</h3>
+<p><strong>Directory Structure:</strong></p>
+<pre><code>dataset_root/
+├── images/
+│   ├── scene_001.tif
+│   └── ...
+└── annotations/
+    ├── scene_001.json  # or .xml
+    └── ...</code></pre>
+<p><strong>Annotation Format (COCO-style JSON):</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"images"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">"id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">"file_name"</span><span class="fu">:</span> <span class="st">"scene_001.tif"</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"annotations"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"image_id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"category_id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"bbox"</span><span class="fu">:</span> <span class="ot">[</span><span class="er">x</span><span class="ot">,</span> <span class="er">y</span><span class="ot">,</span> <span class="er">width</span><span class="ot">,</span> <span class="er">height</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"area"</span><span class="fu">:</span> <span class="dv">1000</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"categories"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">"id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"building"</span><span class="fu">}</span><span class="ot">]</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="trainvaltest-split-strategies" class="level2">
+<h2 class="anchored" data-anchor-id="trainvaltest-split-strategies">Train/Val/Test Split Strategies</h2>
+<section id="strategy-1-separate-directories" class="level3">
+<h3 class="anchored" data-anchor-id="strategy-1-separate-directories">Strategy 1: Separate Directories</h3>
+<p><strong>Structure:</strong></p>
+<pre><code>dataset_root/
+├── train/
+│   ├── class_1/
+│   └── class_2/
+├── val/
+│   ├── class_1/
+│   └── class_2/
+└── test/
+    ├── class_1/
+    └── class_2/</code></pre>
+<p><strong>TerraTorch Usage:</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datamodules <span class="im">import</span> GenericNonGeoClassificationDataModule</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root/train"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root/val"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root/test"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>[...],</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>[...],</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">10</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="strategy-2-split-files-recommended-for-benchmarks" class="level3">
+<h3 class="anchored" data-anchor-id="strategy-2-split-files-recommended-for-benchmarks">Strategy 2: Split Files (Recommended for Benchmarks)</h3>
+<p><strong>Structure:</strong></p>
+<pre><code>dataset_root/
+├── class_1/
+├── class_2/
+└── splits/
+    ├── train.txt
+    ├── val.txt
+    └── test.txt</code></pre>
+<p><strong>Split File Format (train.txt):</strong></p>
+<pre><code>class_1/image_001.tif
+class_1/image_005.tif
+class_2/image_003.tif
+...</code></pre>
+<p><strong>TerraTorch Usage:</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># All splits use same root</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># But different split files</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    train_split<span class="op">=</span><span class="st">"dataset_root/splits/train.txt"</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    val_split<span class="op">=</span><span class="st">"dataset_root/splits/val.txt"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    test_split<span class="op">=</span><span class="st">"dataset_root/splits/test.txt"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>[...],</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>[...],</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Important options for split files</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    ignore_split_file_extensions<span class="op">=</span><span class="va">True</span>,  <span class="co"># Match "image.tif" with "image.jpg" in split</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    allow_substring_split_file<span class="op">=</span><span class="va">True</span>      <span class="co"># Split file can contain substrings</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Key Parameters:</strong> - <code>ignore_split_file_extensions</code>: Set to <code>True</code> if split files list different extensions than actual files - <code>allow_substring_split_file</code>: Set to <code>True</code> for partial filename matching (mmsegmentation style)</p>
+</section>
+</section>
+<section id="band-selection-and-ordering" class="level2">
+<h2 class="anchored" data-anchor-id="band-selection-and-ordering">Band Selection and Ordering</h2>
+<section id="specifying-input-bands" class="level3">
+<h3 class="anchored" data-anchor-id="specifying-input-bands">Specifying Input Bands</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Your dataset has all Sentinel-2 bands</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>dataset_bands <span class="op">=</span> [</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B5"</span>, <span class="st">"B6"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"B7"</span>, <span class="st">"B8"</span>, <span class="st">"B8A"</span>, <span class="st">"B9"</span>, <span class="st">"B10"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># But your model only needs these 6</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>output_bands <span class="op">=</span> [<span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B8A"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>]</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>dataset_bands,  <span class="co"># What your files contain</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>output_bands,     <span class="co"># What the model receives</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Using HLSBands Enums:</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datasets <span class="im">import</span> HLSBands</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>output_bands <span class="op">=</span> [</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    HLSBands.BLUE,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    HLSBands.GREEN,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    HLSBands.RED,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    HLSBands.NIR_NARROW,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    HLSBands.SWIR_1,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    HLSBands.SWIR_2</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="normalization-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="normalization-statistics">Normalization Statistics</h2>
+<section id="computing-dataset-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="computing-dataset-statistics">Computing Dataset Statistics</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_band_statistics(data_root, band_indices):</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Compute mean and std for each band across dataset"""</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    means <span class="op">=</span> []</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    stds <span class="op">=</span> []</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> band_idx <span class="kw">in</span> band_indices:</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        band_values <span class="op">=</span> []</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> img_path <span class="kw">in</span> Path(data_root).rglob(<span class="st">"*.tif"</span>):</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> rasterio.<span class="bu">open</span>(img_path) <span class="im">as</span> src:</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                band_data <span class="op">=</span> src.read(band_idx <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                band_values.append(band_data.flatten())</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        all_values <span class="op">=</span> np.concatenate(band_values)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        means.append(<span class="bu">float</span>(np.mean(all_values)))</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        stds.append(<span class="bu">float</span>(np.std(all_values)))</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> means, stds</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>means, stds <span class="op">=</span> compute_band_statistics(<span class="st">"dataset_root"</span>, <span class="bu">range</span>(<span class="dv">6</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="using-pre-computed-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="using-pre-computed-statistics">Using Pre-computed Statistics</h3>
+<p>Common datasets have published statistics:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentinel-2 L1C statistics (from TerraMesh)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>S2L1C_STATS <span class="op">=</span> {</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mean"</span>: [<span class="fl">2357.090</span>, <span class="fl">2137.398</span>, <span class="fl">2018.799</span>, <span class="fl">2082.998</span>, <span class="fl">2295.663</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>             <span class="fl">2854.548</span>, <span class="fl">3122.860</span>, <span class="fl">3040.571</span>, <span class="fl">3306.491</span>, <span class="fl">1473.849</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>             <span class="fl">506.072</span>, <span class="fl">2472.840</span>, <span class="fl">1838.943</span>],</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"std"</span>: [<span class="fl">1673.639</span>, <span class="fl">1722.641</span>, <span class="fl">1602.205</span>, <span class="fl">1873.138</span>, <span class="fl">1866.055</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>            <span class="fl">1779.839</span>, <span class="fl">1776.496</span>, <span class="fl">1724.114</span>, <span class="fl">1771.041</span>, <span class="fl">1079.786</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>            <span class="fl">512.404</span>, <span class="fl">1340.879</span>, <span class="fl">1172.435</span>]</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentinel-2 L2A statistics</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>S2L2A_STATS <span class="op">=</span> {</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mean"</span>: [<span class="fl">1390.461</span>, <span class="fl">1503.332</span>, <span class="fl">1718.211</span>, <span class="fl">1853.926</span>, <span class="fl">2199.116</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>             <span class="fl">2779.989</span>, <span class="fl">2987.025</span>, <span class="fl">3083.248</span>, <span class="fl">3132.235</span>, <span class="fl">3162.989</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>             <span class="fl">2424.902</span>, <span class="fl">1857.665</span>],</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"std"</span>: [<span class="fl">2131.157</span>, <span class="fl">2163.666</span>, <span class="fl">2059.311</span>, <span class="fl">2152.477</span>, <span class="fl">2105.179</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>            <span class="fl">1912.773</span>, <span class="fl">1842.326</span>, <span class="fl">1893.568</span>, <span class="fl">1775.656</span>, <span class="fl">1814.907</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>            <span class="fl">1436.282</span>, <span class="fl">1336.155</span>]</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L1C_STATS[<span class="st">"mean"</span>],</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L1C_STATS[<span class="st">"std"</span>]</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="data-transforms" class="level2">
+<h2 class="anchored" data-anchor-id="data-transforms">Data Transforms</h2>
+<section id="basic-transform-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="basic-transform-pipeline">Basic Transform Pipeline</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> albumentations <span class="im">as</span> A</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Training transforms with augmentation</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    A.HorizontalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    A.VerticalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    A.RandomRotate90(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Validation/test transforms (no augmentation)</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>val_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    train_transform<span class="op">=</span>train_transform,</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    val_transform<span class="op">=</span>val_transform,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    test_transform<span class="op">=</span>val_transform</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="cropping-for-model-input-size" class="level3">
+<h3 class="anchored" data-anchor-id="cropping-for-model-input-size">Cropping for Model Input Size</h3>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If your images are larger than model input</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    A.RandomCrop(height<span class="op">=</span><span class="dv">224</span>, width<span class="op">=</span><span class="dv">224</span>),  <span class="co"># Random crops for training</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    A.HorizontalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>val_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    A.CenterCrop(height<span class="op">=</span><span class="dv">224</span>, width<span class="op">=</span><span class="dv">224</span>),  <span class="co"># Center crop for validation</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="integration-with-huggingface-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="integration-with-huggingface-datasets">Integration with HuggingFace Datasets</h2>
+<section id="loading-from-huggingface-hub" class="level3">
+<h3 class="anchored" data-anchor-id="loading-from-huggingface-hub">Loading from HuggingFace Hub</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load dataset</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"torchgeo/eurosat"</span>, <span class="st">"sentinel2-all"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Save to disk in TerraTorch-compatible format</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_classification_dataset(dataset, output_root):</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Convert HF dataset to folder-per-class structure"""</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> shutil</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> split_name <span class="kw">in</span> [<span class="st">"train"</span>, <span class="st">"validation"</span>, <span class="st">"test"</span>]:</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        split <span class="op">=</span> dataset[split_name]</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> idx, example <span class="kw">in</span> <span class="bu">enumerate</span>(split):</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>            class_name <span class="op">=</span> example[<span class="st">"label"</span>]</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>            class_dir <span class="op">=</span> Path(output_root) <span class="op">/</span> split_name <span class="op">/</span> class_name</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>            class_dir.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Save image</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            img_path <span class="op">=</span> class_dir <span class="op">/</span> <span class="ss">f"image_</span><span class="sc">{</span>idx<span class="sc">:05d}</span><span class="ss">.tif"</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>            <span class="co"># ... save logic ...</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the saved dataset</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"output_root/train"</span>,</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"output_root/validation"</span>,</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"output_root/test"</span>,</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="using-huggingface-split-files" class="level3">
+<h3 class="anchored" data-anchor-id="using-huggingface-split-files">Using HuggingFace Split Files</h3>
+<p>Many HuggingFace datasets provide split files:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> urllib.request</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Download split files from HF</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">"https://huggingface.co/datasets/torchgeo/eurosat/resolve/main"</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> split <span class="kw">in</span> [<span class="st">"train"</span>, <span class="st">"val"</span>, <span class="st">"test"</span>]:</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>base_url<span class="sc">}</span><span class="ss">/eurosat-</span><span class="sc">{</span>split<span class="sc">}</span><span class="ss">.txt"</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    urllib.request.urlretrieve(url, <span class="ss">f"splits/eurosat-</span><span class="sc">{</span>split<span class="sc">}</span><span class="ss">.txt"</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Use with TerraTorch</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    train_split<span class="op">=</span><span class="st">"splits/eurosat-train.txt"</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    val_split<span class="op">=</span><span class="st">"splits/eurosat-val.txt"</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    test_split<span class="op">=</span><span class="st">"splits/eurosat-test.txt"</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="complete-datamodule-example" class="level2">
+<h2 class="anchored" data-anchor-id="complete-datamodule-example">Complete DataModule Example</h2>
+<section id="classification-with-eurosat" class="level3">
+<h3 class="anchored" data-anchor-id="classification-with-eurosat">Classification with EuroSAT</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datamodules <span class="im">import</span> GenericNonGeoClassificationDataModule</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> albumentations <span class="im">as</span> A</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Dataset paths</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>EUROSAT_ROOT <span class="op">=</span> <span class="st">"/data/EuroSAT_MS"</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>SPLIT_DIR <span class="op">=</span> <span class="st">"/data/EuroSAT/splits"</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentinel-2 bands</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>S2_BANDS <span class="op">=</span> [<span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B5"</span>, <span class="st">"B6"</span>, <span class="st">"B7"</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"B8"</span>, <span class="st">"B8A"</span>, <span class="st">"B9"</span>, <span class="st">"B10"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>]</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>MODEL_BANDS <span class="op">=</span> [<span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B8A"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>]</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Statistics</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>S2L1C_MEAN <span class="op">=</span> [<span class="fl">2357.090</span>, <span class="fl">2137.398</span>, <span class="fl">2018.799</span>, <span class="fl">2082.998</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>              <span class="fl">2295.663</span>, <span class="fl">2854.548</span>, <span class="fl">3122.860</span>, <span class="fl">3040.571</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>              <span class="fl">3306.491</span>, <span class="fl">1473.849</span>, <span class="fl">506.072</span>, <span class="fl">2472.840</span>, <span class="fl">1838.943</span>]</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>S2L1C_STD <span class="op">=</span> [<span class="fl">1673.639</span>, <span class="fl">1722.641</span>, <span class="fl">1602.205</span>, <span class="fl">1873.138</span>,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>             <span class="fl">1866.055</span>, <span class="fl">1779.839</span>, <span class="fl">1776.496</span>, <span class="fl">1724.114</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>             <span class="fl">1771.041</span>, <span class="fl">1079.786</span>, <span class="fl">512.404</span>, <span class="fl">1340.879</span>, <span class="fl">1172.435</span>]</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Transforms</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    A.HorizontalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>val_transform <span class="op">=</span> A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataModule</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span>EUROSAT_ROOT,</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span>EUROSAT_ROOT,</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span>EUROSAT_ROOT,</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>    train_split<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>SPLIT_DIR<span class="sc">}</span><span class="ss">/eurosat-train.txt"</span>,</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>    val_split<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>SPLIT_DIR<span class="sc">}</span><span class="ss">/eurosat-val.txt"</span>,</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>    test_split<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>SPLIT_DIR<span class="sc">}</span><span class="ss">/eurosat-test.txt"</span>,</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L1C_MEAN,</span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L1C_STD,</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>S2_BANDS,</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>MODEL_BANDS,</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>    train_transform<span class="op">=</span>train_transform,</span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>    val_transform<span class="op">=</span>val_transform,</span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>    test_transform<span class="op">=</span>val_transform,</span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a>    ignore_split_file_extensions<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>    allow_substring_split_file<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Setup for training</span></span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a>datamodule.setup(<span class="st">"fit"</span>)</span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a batch</span></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> datamodule.train_dataloader()</span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(train_loader))</span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Batch image shape: </span><span class="sc">{</span>batch[<span class="st">'image'</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Batch label shape: </span><span class="sc">{</span>batch[<span class="st">'label'</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="segmentation-with-custom-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="segmentation-with-custom-dataset">Segmentation with Custom Dataset</h3>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datamodules <span class="im">import</span> GenericNonGeoSegmentationDataModule</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Segmentation dataset structure:</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset_root/</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   train_images/</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   train_labels/</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   val_images/</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   val_labels/</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoSegmentationDataModule(</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root/train_images"</span>,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    train_label_data_root<span class="op">=</span><span class="st">"dataset_root/train_labels"</span>,</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root/val_images"</span>,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    val_label_data_root<span class="op">=</span><span class="st">"dataset_root/val_labels"</span>,</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root/test_images"</span>,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    test_label_data_root<span class="op">=</span><span class="st">"dataset_root/test_labels"</span>,</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L2A_MEAN,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L2A_STD,</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">5</span>,  <span class="co"># Number of segmentation classes</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>S2_BANDS,</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>MODEL_BANDS,</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    train_transform<span class="op">=</span>train_transform,</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    val_transform<span class="op">=</span>val_transform,</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    test_transform<span class="op">=</span>val_transform,</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    ignore_index<span class="op">=</span><span class="dv">255</span>,  <span class="co"># Ignore value in labels</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="common-issues-and-solutions" class="level2">
+<h2 class="anchored" data-anchor-id="common-issues-and-solutions">Common Issues and Solutions</h2>
+<section id="issue-split-file-paths-dont-match-actual-files" class="level3">
+<h3 class="anchored" data-anchor-id="issue-split-file-paths-dont-match-actual-files">Issue: Split file paths don’t match actual files</h3>
+<p><strong>Problem:</strong> Split file lists <code>image.jpg</code> but files are <code>image.tif</code></p>
+<p><strong>Solution:</strong></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    ignore_split_file_extensions<span class="op">=</span><span class="va">True</span>  <span class="co"># Ignore extension when matching</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="issue-band-mismatch-errors" class="level3">
+<h3 class="anchored" data-anchor-id="issue-band-mismatch-errors">Issue: Band mismatch errors</h3>
+<p><strong>Problem:</strong> Model expects 6 bands but receives 13</p>
+<p><strong>Solution:</strong> Specify both <code>dataset_bands</code> and <code>output_bands</code></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>ALL_13_BANDS,  <span class="co"># What files contain</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>MODEL_6_BANDS   <span class="co"># What model needs</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="issue-normalization-from-wrong-sensor" class="level3">
+<h3 class="anchored" data-anchor-id="issue-normalization-from-wrong-sensor">Issue: Normalization from wrong sensor</h3>
+<p><strong>Problem:</strong> Using L2A statistics on L1C data</p>
+<p><strong>Solution:</strong> Match statistics to your data product</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check your data source</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># L1C = Top of Atmosphere reflectance (e.g., EuroSAT)</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># L2A = Bottom of Atmosphere reflectance (e.g., Sentinel-2 L2A)</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L1C_MEAN <span class="cf">if</span> is_l1c <span class="cf">else</span> S2L2A_MEAN,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L1C_STD <span class="cf">if</span> is_l1c <span class="cf">else</span> S2L2A_STD</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="issue-images-cant-be-stacked-into-batches" class="level3">
+<h3 class="anchored" data-anchor-id="issue-images-cant-be-stacked-into-batches">Issue: Images can’t be stacked into batches</h3>
+<p><strong>Problem:</strong> Images have different dimensions</p>
+<p><strong>Solution:</strong> Use transforms to ensure consistent sizes</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    A.RandomCrop(height<span class="op">=</span><span class="dv">224</span>, width<span class="op">=</span><span class="dv">224</span>),  <span class="co"># Ensures all same size</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Or disable stackability checking (if intentional):</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    check_stackability<span class="op">=</span><span class="va">False</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="quick-reference" class="level2">
+<h2 class="anchored" data-anchor-id="quick-reference">Quick Reference</h2>
+<section id="datamodule-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="datamodule-parameters">DataModule Parameters</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 37%">
+<col style="width: 31%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>batch_size</code></td>
+<td>Samples per batch</td>
+<td><code>32</code></td>
+</tr>
+<tr class="even">
+<td><code>num_workers</code></td>
+<td>Parallel data loading threads</td>
+<td><code>4</code></td>
+</tr>
+<tr class="odd">
+<td><code>train_data_root</code></td>
+<td>Path to training images</td>
+<td><code>"data/train"</code></td>
+</tr>
+<tr class="even">
+<td><code>train_split</code></td>
+<td>File listing training samples</td>
+<td><code>"splits/train.txt"</code></td>
+</tr>
+<tr class="odd">
+<td><code>means</code></td>
+<td>Per-band normalization means</td>
+<td><code>[2357.09, ...]</code></td>
+</tr>
+<tr class="even">
+<td><code>stds</code></td>
+<td>Per-band normalization stds</td>
+<td><code>[1673.64, ...]</code></td>
+</tr>
+<tr class="odd">
+<td><code>num_classes</code></td>
+<td>Number of output classes</td>
+<td><code>10</code></td>
+</tr>
+<tr class="even">
+<td><code>dataset_bands</code></td>
+<td>Bands in your files</td>
+<td><code>["B2", "B3", ...]</code></td>
+</tr>
+<tr class="odd">
+<td><code>output_bands</code></td>
+<td>Bands model receives</td>
+<td><code>["B2", "B3", "B4"]</code></td>
+</tr>
+<tr class="even">
+<td><code>train_transform</code></td>
+<td>Training augmentations</td>
+<td><code>A.Compose([...])</code></td>
+</tr>
+<tr class="odd">
+<td><code>ignore_split_file_extensions</code></td>
+<td>Match files ignoring extension</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td><code>allow_substring_split_file</code></td>
+<td>Allow partial filename matching</td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td><code>drop_last</code></td>
+<td>Drop incomplete final batch</td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td><code>check_stackability</code></td>
+<td>Verify all images same size</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="common-dataset-patterns" class="level3">
+<h3 class="anchored" data-anchor-id="common-dataset-patterns">Common Dataset Patterns</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 31%">
+<col style="width: 51%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Structure</th>
+<th>DataModule Class</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Classification</td>
+<td><code>class_name/image.tif</code></td>
+<td><code>GenericNonGeoClassificationDataModule</code></td>
+</tr>
+<tr class="even">
+<td>Segmentation</td>
+<td><code>images/</code> + <code>labels/</code></td>
+<td><code>GenericNonGeoSegmentationDataModule</code></td>
+</tr>
+<tr class="odd">
+<td>Regression</td>
+<td><code>images/</code> + <code>labels.csv</code></td>
+<td><code>GenericNonGeoRegressionDataModule</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="workflow-summary" class="level3">
+<h3 class="anchored" data-anchor-id="workflow-summary">Workflow Summary</h3>
+<ol type="1">
+<li><strong>Organize data</strong> according to task pattern</li>
+<li><strong>Create split files</strong> or separate directories</li>
+<li><strong>Compute or obtain</strong> normalization statistics</li>
+<li><strong>Define transforms</strong> for train/val/test</li>
+<li><strong>Initialize DataModule</strong> with all parameters</li>
+<li><strong>Setup and validate</strong> with <code>datamodule.setup("fit")</code></li>
+<li><strong>Use with Trainer</strong> for fine-tuning</li>
+</ol>
+</section>
+</section>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next Steps</h2>
+<ul>
+<li>See <a href="../../extras/examples/Terramind_EuroSAT.html">TerraMind EuroSAT Example</a> for complete classification workflow</li>
+<li>See <a href="../../extras/examples/segmentation_tutorial.html">Segmentation Tutorial</a> for segmentation workflow</li>
+<li>Check <a href="../../extras/cheatsheets/torchgeo_basics.html">TorchGeo Basics</a> for additional dataset utilities</li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/kcaylor\.github\.io\/GEOG-288KC-geospatial-foundation-models");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb27" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Dataset Organization for GeoAI Fine-Tuning"</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "From raw data to TerraTorch DataModules"</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> geoai</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: false</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>This guide explains how to organize geospatial datasets for fine-tuning foundation models, with a focus on TerraTorch's DataModule system. You'll learn:</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Standard dataset organization patterns for different tasks</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How to structure files for TerraTorch DataModules</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Integration with HuggingFace datasets</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Train/validation/test split strategies</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Band selection and normalization</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="fu">## Task-Specific Organization Patterns</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### Classification Tasks</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>**Directory Structure:**</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a><span class="in">dataset_root/</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a><span class="in">├── class_1/</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── image_001.tif</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── image_002.tif</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a><span class="in">├── class_2/</span></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── image_001.tif</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a><span class="in">└── class_n/</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a><span class="in">    └── ...</span></span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>**Key Points:**</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>One folder per class, named with the class label</span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>All images for that class inside the folder</span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Works with <span class="in">`GenericNonGeoClassificationDataModule`</span></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>**Example: EuroSAT Dataset**</span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a><span class="in">EuroSAT_MS/</span></span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a><span class="in">├── AnnualCrop/</span></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── AnnualCrop_1.tif</span></span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a><span class="in">├── Forest/</span></span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a><span class="in">└── Residential/</span></span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a><span class="in">    └── ...</span></span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a><span class="fu">### Segmentation Tasks</span></span>
+<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a>**Directory Structure (Separate Folders):**</span>
+<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a><span class="in">dataset_root/</span></span>
+<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a><span class="in">├── images/</span></span>
+<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── scene_001_image.tif</span></span>
+<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── scene_002_image.tif</span></span>
+<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a><span class="in">└── labels/</span></span>
+<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a><span class="in">    ├── scene_001_mask.tif</span></span>
+<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a><span class="in">    ├── scene_002_mask.tif</span></span>
+<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a><span class="in">    └── ...</span></span>
+<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>**Directory Structure (Matching Names):**</span>
+<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a><span class="in">dataset_root/</span></span>
+<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a><span class="in">├── train_images/</span></span>
+<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── scene_001.tif</span></span>
+<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a><span class="in">├── train_labels/</span></span>
+<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── scene_001.tif</span></span>
+<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a><span class="in">├── val_images/</span></span>
+<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a><span class="in">└── val_labels/</span></span>
+<span id="cb27-83"><a href="#cb27-83" aria-hidden="true" tabindex="-1"></a><span class="in">    └── ...</span></span>
+<span id="cb27-84"><a href="#cb27-84" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-85"><a href="#cb27-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-86"><a href="#cb27-86" aria-hidden="true" tabindex="-1"></a>**Key Points:**</span>
+<span id="cb27-87"><a href="#cb27-87" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Image and label files must have matching names (or matching patterns)</span>
+<span id="cb27-88"><a href="#cb27-88" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Common patterns: <span class="in">`*_image.tif`</span> paired with <span class="in">`*_mask.tif`</span></span>
+<span id="cb27-89"><a href="#cb27-89" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Or identical names in separate <span class="in">`images/`</span> and <span class="in">`labels/`</span> folders</span>
+<span id="cb27-90"><a href="#cb27-90" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Labels are typically single-band rasters with integer class values</span>
+<span id="cb27-91"><a href="#cb27-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-92"><a href="#cb27-92" aria-hidden="true" tabindex="-1"></a><span class="fu">### Object Detection Tasks</span></span>
+<span id="cb27-93"><a href="#cb27-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-94"><a href="#cb27-94" aria-hidden="true" tabindex="-1"></a>**Directory Structure:**</span>
+<span id="cb27-95"><a href="#cb27-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-96"><a href="#cb27-96" aria-hidden="true" tabindex="-1"></a><span class="in">dataset_root/</span></span>
+<span id="cb27-97"><a href="#cb27-97" aria-hidden="true" tabindex="-1"></a><span class="in">├── images/</span></span>
+<span id="cb27-98"><a href="#cb27-98" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── scene_001.tif</span></span>
+<span id="cb27-99"><a href="#cb27-99" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── ...</span></span>
+<span id="cb27-100"><a href="#cb27-100" aria-hidden="true" tabindex="-1"></a><span class="in">└── annotations/</span></span>
+<span id="cb27-101"><a href="#cb27-101" aria-hidden="true" tabindex="-1"></a><span class="in">    ├── scene_001.json  # or .xml</span></span>
+<span id="cb27-102"><a href="#cb27-102" aria-hidden="true" tabindex="-1"></a><span class="in">    └── ...</span></span>
+<span id="cb27-103"><a href="#cb27-103" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-104"><a href="#cb27-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-105"><a href="#cb27-105" aria-hidden="true" tabindex="-1"></a>**Annotation Format (COCO-style JSON):**</span>
+<span id="cb27-106"><a href="#cb27-106" aria-hidden="true" tabindex="-1"></a><span class="in">```json</span></span>
+<span id="cb27-107"><a href="#cb27-107" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb27-108"><a href="#cb27-108" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"images"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">"id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">"file_name"</span><span class="fu">:</span> <span class="st">"scene_001.tif"</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb27-109"><a href="#cb27-109" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"annotations"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb27-110"><a href="#cb27-110" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb27-111"><a href="#cb27-111" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb27-112"><a href="#cb27-112" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"image_id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb27-113"><a href="#cb27-113" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"category_id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb27-114"><a href="#cb27-114" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"bbox"</span><span class="fu">:</span> <span class="ot">[</span><span class="er">x</span><span class="ot">,</span> <span class="er">y</span><span class="ot">,</span> <span class="er">width</span><span class="ot">,</span> <span class="er">height</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb27-115"><a href="#cb27-115" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"area"</span><span class="fu">:</span> <span class="dv">1000</span></span>
+<span id="cb27-116"><a href="#cb27-116" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb27-117"><a href="#cb27-117" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb27-118"><a href="#cb27-118" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"categories"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">"id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"building"</span><span class="fu">}</span><span class="ot">]</span></span>
+<span id="cb27-119"><a href="#cb27-119" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span>
+<span id="cb27-120"><a href="#cb27-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-121"><a href="#cb27-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-122"><a href="#cb27-122" aria-hidden="true" tabindex="-1"></a><span class="fu">## Train/Val/Test Split Strategies</span></span>
+<span id="cb27-123"><a href="#cb27-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-124"><a href="#cb27-124" aria-hidden="true" tabindex="-1"></a><span class="fu">### Strategy 1: Separate Directories</span></span>
+<span id="cb27-125"><a href="#cb27-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-126"><a href="#cb27-126" aria-hidden="true" tabindex="-1"></a>**Structure:**</span>
+<span id="cb27-127"><a href="#cb27-127" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-128"><a href="#cb27-128" aria-hidden="true" tabindex="-1"></a><span class="in">dataset_root/</span></span>
+<span id="cb27-129"><a href="#cb27-129" aria-hidden="true" tabindex="-1"></a><span class="in">├── train/</span></span>
+<span id="cb27-130"><a href="#cb27-130" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── class_1/</span></span>
+<span id="cb27-131"><a href="#cb27-131" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── class_2/</span></span>
+<span id="cb27-132"><a href="#cb27-132" aria-hidden="true" tabindex="-1"></a><span class="in">├── val/</span></span>
+<span id="cb27-133"><a href="#cb27-133" aria-hidden="true" tabindex="-1"></a><span class="in">│   ├── class_1/</span></span>
+<span id="cb27-134"><a href="#cb27-134" aria-hidden="true" tabindex="-1"></a><span class="in">│   └── class_2/</span></span>
+<span id="cb27-135"><a href="#cb27-135" aria-hidden="true" tabindex="-1"></a><span class="in">└── test/</span></span>
+<span id="cb27-136"><a href="#cb27-136" aria-hidden="true" tabindex="-1"></a><span class="in">    ├── class_1/</span></span>
+<span id="cb27-137"><a href="#cb27-137" aria-hidden="true" tabindex="-1"></a><span class="in">    └── class_2/</span></span>
+<span id="cb27-138"><a href="#cb27-138" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-139"><a href="#cb27-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-140"><a href="#cb27-140" aria-hidden="true" tabindex="-1"></a>**TerraTorch Usage:**</span>
+<span id="cb27-141"><a href="#cb27-141" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-142"><a href="#cb27-142" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datamodules <span class="im">import</span> GenericNonGeoClassificationDataModule</span>
+<span id="cb27-143"><a href="#cb27-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-144"><a href="#cb27-144" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-145"><a href="#cb27-145" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb27-146"><a href="#cb27-146" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb27-147"><a href="#cb27-147" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root/train"</span>,</span>
+<span id="cb27-148"><a href="#cb27-148" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root/val"</span>,</span>
+<span id="cb27-149"><a href="#cb27-149" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root/test"</span>,</span>
+<span id="cb27-150"><a href="#cb27-150" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>[...],</span>
+<span id="cb27-151"><a href="#cb27-151" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>[...],</span>
+<span id="cb27-152"><a href="#cb27-152" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">10</span></span>
+<span id="cb27-153"><a href="#cb27-153" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-154"><a href="#cb27-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-155"><a href="#cb27-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-156"><a href="#cb27-156" aria-hidden="true" tabindex="-1"></a><span class="fu">### Strategy 2: Split Files (Recommended for Benchmarks)</span></span>
+<span id="cb27-157"><a href="#cb27-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-158"><a href="#cb27-158" aria-hidden="true" tabindex="-1"></a>**Structure:**</span>
+<span id="cb27-159"><a href="#cb27-159" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-160"><a href="#cb27-160" aria-hidden="true" tabindex="-1"></a><span class="in">dataset_root/</span></span>
+<span id="cb27-161"><a href="#cb27-161" aria-hidden="true" tabindex="-1"></a><span class="in">├── class_1/</span></span>
+<span id="cb27-162"><a href="#cb27-162" aria-hidden="true" tabindex="-1"></a><span class="in">├── class_2/</span></span>
+<span id="cb27-163"><a href="#cb27-163" aria-hidden="true" tabindex="-1"></a><span class="in">└── splits/</span></span>
+<span id="cb27-164"><a href="#cb27-164" aria-hidden="true" tabindex="-1"></a><span class="in">    ├── train.txt</span></span>
+<span id="cb27-165"><a href="#cb27-165" aria-hidden="true" tabindex="-1"></a><span class="in">    ├── val.txt</span></span>
+<span id="cb27-166"><a href="#cb27-166" aria-hidden="true" tabindex="-1"></a><span class="in">    └── test.txt</span></span>
+<span id="cb27-167"><a href="#cb27-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-168"><a href="#cb27-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-169"><a href="#cb27-169" aria-hidden="true" tabindex="-1"></a>**Split File Format (train.txt):**</span>
+<span id="cb27-170"><a href="#cb27-170" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-171"><a href="#cb27-171" aria-hidden="true" tabindex="-1"></a><span class="in">class_1/image_001.tif</span></span>
+<span id="cb27-172"><a href="#cb27-172" aria-hidden="true" tabindex="-1"></a><span class="in">class_1/image_005.tif</span></span>
+<span id="cb27-173"><a href="#cb27-173" aria-hidden="true" tabindex="-1"></a><span class="in">class_2/image_003.tif</span></span>
+<span id="cb27-174"><a href="#cb27-174" aria-hidden="true" tabindex="-1"></a><span class="in">...</span></span>
+<span id="cb27-175"><a href="#cb27-175" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-176"><a href="#cb27-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-177"><a href="#cb27-177" aria-hidden="true" tabindex="-1"></a>**TerraTorch Usage:**</span>
+<span id="cb27-178"><a href="#cb27-178" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-179"><a href="#cb27-179" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-180"><a href="#cb27-180" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb27-181"><a href="#cb27-181" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb27-182"><a href="#cb27-182" aria-hidden="true" tabindex="-1"></a>    <span class="co"># All splits use same root</span></span>
+<span id="cb27-183"><a href="#cb27-183" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb27-184"><a href="#cb27-184" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb27-185"><a href="#cb27-185" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb27-186"><a href="#cb27-186" aria-hidden="true" tabindex="-1"></a>    <span class="co"># But different split files</span></span>
+<span id="cb27-187"><a href="#cb27-187" aria-hidden="true" tabindex="-1"></a>    train_split<span class="op">=</span><span class="st">"dataset_root/splits/train.txt"</span>,</span>
+<span id="cb27-188"><a href="#cb27-188" aria-hidden="true" tabindex="-1"></a>    val_split<span class="op">=</span><span class="st">"dataset_root/splits/val.txt"</span>,</span>
+<span id="cb27-189"><a href="#cb27-189" aria-hidden="true" tabindex="-1"></a>    test_split<span class="op">=</span><span class="st">"dataset_root/splits/test.txt"</span>,</span>
+<span id="cb27-190"><a href="#cb27-190" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>[...],</span>
+<span id="cb27-191"><a href="#cb27-191" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>[...],</span>
+<span id="cb27-192"><a href="#cb27-192" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb27-193"><a href="#cb27-193" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Important options for split files</span></span>
+<span id="cb27-194"><a href="#cb27-194" aria-hidden="true" tabindex="-1"></a>    ignore_split_file_extensions<span class="op">=</span><span class="va">True</span>,  <span class="co"># Match "image.tif" with "image.jpg" in split</span></span>
+<span id="cb27-195"><a href="#cb27-195" aria-hidden="true" tabindex="-1"></a>    allow_substring_split_file<span class="op">=</span><span class="va">True</span>      <span class="co"># Split file can contain substrings</span></span>
+<span id="cb27-196"><a href="#cb27-196" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-197"><a href="#cb27-197" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-198"><a href="#cb27-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-199"><a href="#cb27-199" aria-hidden="true" tabindex="-1"></a>**Key Parameters:**</span>
+<span id="cb27-200"><a href="#cb27-200" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ignore_split_file_extensions`</span>: Set to <span class="in">`True`</span> if split files list different extensions than actual files</span>
+<span id="cb27-201"><a href="#cb27-201" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`allow_substring_split_file`</span>: Set to <span class="in">`True`</span> for partial filename matching (mmsegmentation style)</span>
+<span id="cb27-202"><a href="#cb27-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-203"><a href="#cb27-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Band Selection and Ordering</span></span>
+<span id="cb27-204"><a href="#cb27-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-205"><a href="#cb27-205" aria-hidden="true" tabindex="-1"></a><span class="fu">### Specifying Input Bands</span></span>
+<span id="cb27-206"><a href="#cb27-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-207"><a href="#cb27-207" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-208"><a href="#cb27-208" aria-hidden="true" tabindex="-1"></a><span class="co"># Your dataset has all Sentinel-2 bands</span></span>
+<span id="cb27-209"><a href="#cb27-209" aria-hidden="true" tabindex="-1"></a>dataset_bands <span class="op">=</span> [</span>
+<span id="cb27-210"><a href="#cb27-210" aria-hidden="true" tabindex="-1"></a>    <span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B5"</span>, <span class="st">"B6"</span>,</span>
+<span id="cb27-211"><a href="#cb27-211" aria-hidden="true" tabindex="-1"></a>    <span class="st">"B7"</span>, <span class="st">"B8"</span>, <span class="st">"B8A"</span>, <span class="st">"B9"</span>, <span class="st">"B10"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span></span>
+<span id="cb27-212"><a href="#cb27-212" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb27-213"><a href="#cb27-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-214"><a href="#cb27-214" aria-hidden="true" tabindex="-1"></a><span class="co"># But your model only needs these 6</span></span>
+<span id="cb27-215"><a href="#cb27-215" aria-hidden="true" tabindex="-1"></a>output_bands <span class="op">=</span> [<span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B8A"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>]</span>
+<span id="cb27-216"><a href="#cb27-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-217"><a href="#cb27-217" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-218"><a href="#cb27-218" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-219"><a href="#cb27-219" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>dataset_bands,  <span class="co"># What your files contain</span></span>
+<span id="cb27-220"><a href="#cb27-220" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>output_bands,     <span class="co"># What the model receives</span></span>
+<span id="cb27-221"><a href="#cb27-221" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-222"><a href="#cb27-222" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-223"><a href="#cb27-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-224"><a href="#cb27-224" aria-hidden="true" tabindex="-1"></a>**Using HLSBands Enums:**</span>
+<span id="cb27-225"><a href="#cb27-225" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-226"><a href="#cb27-226" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datasets <span class="im">import</span> HLSBands</span>
+<span id="cb27-227"><a href="#cb27-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-228"><a href="#cb27-228" aria-hidden="true" tabindex="-1"></a>output_bands <span class="op">=</span> [</span>
+<span id="cb27-229"><a href="#cb27-229" aria-hidden="true" tabindex="-1"></a>    HLSBands.BLUE,</span>
+<span id="cb27-230"><a href="#cb27-230" aria-hidden="true" tabindex="-1"></a>    HLSBands.GREEN,</span>
+<span id="cb27-231"><a href="#cb27-231" aria-hidden="true" tabindex="-1"></a>    HLSBands.RED,</span>
+<span id="cb27-232"><a href="#cb27-232" aria-hidden="true" tabindex="-1"></a>    HLSBands.NIR_NARROW,</span>
+<span id="cb27-233"><a href="#cb27-233" aria-hidden="true" tabindex="-1"></a>    HLSBands.SWIR_1,</span>
+<span id="cb27-234"><a href="#cb27-234" aria-hidden="true" tabindex="-1"></a>    HLSBands.SWIR_2</span>
+<span id="cb27-235"><a href="#cb27-235" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb27-236"><a href="#cb27-236" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-237"><a href="#cb27-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-238"><a href="#cb27-238" aria-hidden="true" tabindex="-1"></a><span class="fu">## Normalization Statistics</span></span>
+<span id="cb27-239"><a href="#cb27-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-240"><a href="#cb27-240" aria-hidden="true" tabindex="-1"></a><span class="fu">### Computing Dataset Statistics</span></span>
+<span id="cb27-241"><a href="#cb27-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-242"><a href="#cb27-242" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-243"><a href="#cb27-243" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
+<span id="cb27-244"><a href="#cb27-244" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb27-245"><a href="#cb27-245" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb27-246"><a href="#cb27-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-247"><a href="#cb27-247" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_band_statistics(data_root, band_indices):</span>
+<span id="cb27-248"><a href="#cb27-248" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Compute mean and std for each band across dataset"""</span></span>
+<span id="cb27-249"><a href="#cb27-249" aria-hidden="true" tabindex="-1"></a>    means <span class="op">=</span> []</span>
+<span id="cb27-250"><a href="#cb27-250" aria-hidden="true" tabindex="-1"></a>    stds <span class="op">=</span> []</span>
+<span id="cb27-251"><a href="#cb27-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-252"><a href="#cb27-252" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> band_idx <span class="kw">in</span> band_indices:</span>
+<span id="cb27-253"><a href="#cb27-253" aria-hidden="true" tabindex="-1"></a>        band_values <span class="op">=</span> []</span>
+<span id="cb27-254"><a href="#cb27-254" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> img_path <span class="kw">in</span> Path(data_root).rglob(<span class="st">"*.tif"</span>):</span>
+<span id="cb27-255"><a href="#cb27-255" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> rasterio.<span class="bu">open</span>(img_path) <span class="im">as</span> src:</span>
+<span id="cb27-256"><a href="#cb27-256" aria-hidden="true" tabindex="-1"></a>                band_data <span class="op">=</span> src.read(band_idx <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb27-257"><a href="#cb27-257" aria-hidden="true" tabindex="-1"></a>                band_values.append(band_data.flatten())</span>
+<span id="cb27-258"><a href="#cb27-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-259"><a href="#cb27-259" aria-hidden="true" tabindex="-1"></a>        all_values <span class="op">=</span> np.concatenate(band_values)</span>
+<span id="cb27-260"><a href="#cb27-260" aria-hidden="true" tabindex="-1"></a>        means.append(<span class="bu">float</span>(np.mean(all_values)))</span>
+<span id="cb27-261"><a href="#cb27-261" aria-hidden="true" tabindex="-1"></a>        stds.append(<span class="bu">float</span>(np.std(all_values)))</span>
+<span id="cb27-262"><a href="#cb27-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-263"><a href="#cb27-263" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> means, stds</span>
+<span id="cb27-264"><a href="#cb27-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-265"><a href="#cb27-265" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage</span></span>
+<span id="cb27-266"><a href="#cb27-266" aria-hidden="true" tabindex="-1"></a>means, stds <span class="op">=</span> compute_band_statistics(<span class="st">"dataset_root"</span>, <span class="bu">range</span>(<span class="dv">6</span>))</span>
+<span id="cb27-267"><a href="#cb27-267" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-268"><a href="#cb27-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-269"><a href="#cb27-269" aria-hidden="true" tabindex="-1"></a><span class="fu">### Using Pre-computed Statistics</span></span>
+<span id="cb27-270"><a href="#cb27-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-271"><a href="#cb27-271" aria-hidden="true" tabindex="-1"></a>Common datasets have published statistics:</span>
+<span id="cb27-272"><a href="#cb27-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-273"><a href="#cb27-273" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-274"><a href="#cb27-274" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentinel-2 L1C statistics (from TerraMesh)</span></span>
+<span id="cb27-275"><a href="#cb27-275" aria-hidden="true" tabindex="-1"></a>S2L1C_STATS <span class="op">=</span> {</span>
+<span id="cb27-276"><a href="#cb27-276" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mean"</span>: [<span class="fl">2357.090</span>, <span class="fl">2137.398</span>, <span class="fl">2018.799</span>, <span class="fl">2082.998</span>, <span class="fl">2295.663</span>,</span>
+<span id="cb27-277"><a href="#cb27-277" aria-hidden="true" tabindex="-1"></a>             <span class="fl">2854.548</span>, <span class="fl">3122.860</span>, <span class="fl">3040.571</span>, <span class="fl">3306.491</span>, <span class="fl">1473.849</span>,</span>
+<span id="cb27-278"><a href="#cb27-278" aria-hidden="true" tabindex="-1"></a>             <span class="fl">506.072</span>, <span class="fl">2472.840</span>, <span class="fl">1838.943</span>],</span>
+<span id="cb27-279"><a href="#cb27-279" aria-hidden="true" tabindex="-1"></a>    <span class="st">"std"</span>: [<span class="fl">1673.639</span>, <span class="fl">1722.641</span>, <span class="fl">1602.205</span>, <span class="fl">1873.138</span>, <span class="fl">1866.055</span>,</span>
+<span id="cb27-280"><a href="#cb27-280" aria-hidden="true" tabindex="-1"></a>            <span class="fl">1779.839</span>, <span class="fl">1776.496</span>, <span class="fl">1724.114</span>, <span class="fl">1771.041</span>, <span class="fl">1079.786</span>,</span>
+<span id="cb27-281"><a href="#cb27-281" aria-hidden="true" tabindex="-1"></a>            <span class="fl">512.404</span>, <span class="fl">1340.879</span>, <span class="fl">1172.435</span>]</span>
+<span id="cb27-282"><a href="#cb27-282" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-283"><a href="#cb27-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-284"><a href="#cb27-284" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentinel-2 L2A statistics</span></span>
+<span id="cb27-285"><a href="#cb27-285" aria-hidden="true" tabindex="-1"></a>S2L2A_STATS <span class="op">=</span> {</span>
+<span id="cb27-286"><a href="#cb27-286" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mean"</span>: [<span class="fl">1390.461</span>, <span class="fl">1503.332</span>, <span class="fl">1718.211</span>, <span class="fl">1853.926</span>, <span class="fl">2199.116</span>,</span>
+<span id="cb27-287"><a href="#cb27-287" aria-hidden="true" tabindex="-1"></a>             <span class="fl">2779.989</span>, <span class="fl">2987.025</span>, <span class="fl">3083.248</span>, <span class="fl">3132.235</span>, <span class="fl">3162.989</span>,</span>
+<span id="cb27-288"><a href="#cb27-288" aria-hidden="true" tabindex="-1"></a>             <span class="fl">2424.902</span>, <span class="fl">1857.665</span>],</span>
+<span id="cb27-289"><a href="#cb27-289" aria-hidden="true" tabindex="-1"></a>    <span class="st">"std"</span>: [<span class="fl">2131.157</span>, <span class="fl">2163.666</span>, <span class="fl">2059.311</span>, <span class="fl">2152.477</span>, <span class="fl">2105.179</span>,</span>
+<span id="cb27-290"><a href="#cb27-290" aria-hidden="true" tabindex="-1"></a>            <span class="fl">1912.773</span>, <span class="fl">1842.326</span>, <span class="fl">1893.568</span>, <span class="fl">1775.656</span>, <span class="fl">1814.907</span>,</span>
+<span id="cb27-291"><a href="#cb27-291" aria-hidden="true" tabindex="-1"></a>            <span class="fl">1436.282</span>, <span class="fl">1336.155</span>]</span>
+<span id="cb27-292"><a href="#cb27-292" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-293"><a href="#cb27-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-294"><a href="#cb27-294" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-295"><a href="#cb27-295" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-296"><a href="#cb27-296" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L1C_STATS[<span class="st">"mean"</span>],</span>
+<span id="cb27-297"><a href="#cb27-297" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L1C_STATS[<span class="st">"std"</span>]</span>
+<span id="cb27-298"><a href="#cb27-298" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-299"><a href="#cb27-299" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-300"><a href="#cb27-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-301"><a href="#cb27-301" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Transforms</span></span>
+<span id="cb27-302"><a href="#cb27-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-303"><a href="#cb27-303" aria-hidden="true" tabindex="-1"></a><span class="fu">### Basic Transform Pipeline</span></span>
+<span id="cb27-304"><a href="#cb27-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-305"><a href="#cb27-305" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-306"><a href="#cb27-306" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> albumentations <span class="im">as</span> A</span>
+<span id="cb27-307"><a href="#cb27-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-308"><a href="#cb27-308" aria-hidden="true" tabindex="-1"></a><span class="co"># Training transforms with augmentation</span></span>
+<span id="cb27-309"><a href="#cb27-309" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb27-310"><a href="#cb27-310" aria-hidden="true" tabindex="-1"></a>    A.HorizontalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb27-311"><a href="#cb27-311" aria-hidden="true" tabindex="-1"></a>    A.VerticalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb27-312"><a href="#cb27-312" aria-hidden="true" tabindex="-1"></a>    A.RandomRotate90(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb27-313"><a href="#cb27-313" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb27-314"><a href="#cb27-314" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb27-315"><a href="#cb27-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-316"><a href="#cb27-316" aria-hidden="true" tabindex="-1"></a><span class="co"># Validation/test transforms (no augmentation)</span></span>
+<span id="cb27-317"><a href="#cb27-317" aria-hidden="true" tabindex="-1"></a>val_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb27-318"><a href="#cb27-318" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb27-319"><a href="#cb27-319" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb27-320"><a href="#cb27-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-321"><a href="#cb27-321" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-322"><a href="#cb27-322" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-323"><a href="#cb27-323" aria-hidden="true" tabindex="-1"></a>    train_transform<span class="op">=</span>train_transform,</span>
+<span id="cb27-324"><a href="#cb27-324" aria-hidden="true" tabindex="-1"></a>    val_transform<span class="op">=</span>val_transform,</span>
+<span id="cb27-325"><a href="#cb27-325" aria-hidden="true" tabindex="-1"></a>    test_transform<span class="op">=</span>val_transform</span>
+<span id="cb27-326"><a href="#cb27-326" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-327"><a href="#cb27-327" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-328"><a href="#cb27-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-329"><a href="#cb27-329" aria-hidden="true" tabindex="-1"></a><span class="fu">### Cropping for Model Input Size</span></span>
+<span id="cb27-330"><a href="#cb27-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-331"><a href="#cb27-331" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-332"><a href="#cb27-332" aria-hidden="true" tabindex="-1"></a><span class="co"># If your images are larger than model input</span></span>
+<span id="cb27-333"><a href="#cb27-333" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb27-334"><a href="#cb27-334" aria-hidden="true" tabindex="-1"></a>    A.RandomCrop(height<span class="op">=</span><span class="dv">224</span>, width<span class="op">=</span><span class="dv">224</span>),  <span class="co"># Random crops for training</span></span>
+<span id="cb27-335"><a href="#cb27-335" aria-hidden="true" tabindex="-1"></a>    A.HorizontalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb27-336"><a href="#cb27-336" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb27-337"><a href="#cb27-337" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb27-338"><a href="#cb27-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-339"><a href="#cb27-339" aria-hidden="true" tabindex="-1"></a>val_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb27-340"><a href="#cb27-340" aria-hidden="true" tabindex="-1"></a>    A.CenterCrop(height<span class="op">=</span><span class="dv">224</span>, width<span class="op">=</span><span class="dv">224</span>),  <span class="co"># Center crop for validation</span></span>
+<span id="cb27-341"><a href="#cb27-341" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb27-342"><a href="#cb27-342" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb27-343"><a href="#cb27-343" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-344"><a href="#cb27-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-345"><a href="#cb27-345" aria-hidden="true" tabindex="-1"></a><span class="fu">## Integration with HuggingFace Datasets</span></span>
+<span id="cb27-346"><a href="#cb27-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-347"><a href="#cb27-347" aria-hidden="true" tabindex="-1"></a><span class="fu">### Loading from HuggingFace Hub</span></span>
+<span id="cb27-348"><a href="#cb27-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-349"><a href="#cb27-349" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-350"><a href="#cb27-350" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb27-351"><a href="#cb27-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-352"><a href="#cb27-352" aria-hidden="true" tabindex="-1"></a><span class="co"># Load dataset</span></span>
+<span id="cb27-353"><a href="#cb27-353" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"torchgeo/eurosat"</span>, <span class="st">"sentinel2-all"</span>)</span>
+<span id="cb27-354"><a href="#cb27-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-355"><a href="#cb27-355" aria-hidden="true" tabindex="-1"></a><span class="co"># Save to disk in TerraTorch-compatible format</span></span>
+<span id="cb27-356"><a href="#cb27-356" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_classification_dataset(dataset, output_root):</span>
+<span id="cb27-357"><a href="#cb27-357" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Convert HF dataset to folder-per-class structure"""</span></span>
+<span id="cb27-358"><a href="#cb27-358" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb27-359"><a href="#cb27-359" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> shutil</span>
+<span id="cb27-360"><a href="#cb27-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-361"><a href="#cb27-361" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> split_name <span class="kw">in</span> [<span class="st">"train"</span>, <span class="st">"validation"</span>, <span class="st">"test"</span>]:</span>
+<span id="cb27-362"><a href="#cb27-362" aria-hidden="true" tabindex="-1"></a>        split <span class="op">=</span> dataset[split_name]</span>
+<span id="cb27-363"><a href="#cb27-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-364"><a href="#cb27-364" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> idx, example <span class="kw">in</span> <span class="bu">enumerate</span>(split):</span>
+<span id="cb27-365"><a href="#cb27-365" aria-hidden="true" tabindex="-1"></a>            class_name <span class="op">=</span> example[<span class="st">"label"</span>]</span>
+<span id="cb27-366"><a href="#cb27-366" aria-hidden="true" tabindex="-1"></a>            class_dir <span class="op">=</span> Path(output_root) <span class="op">/</span> split_name <span class="op">/</span> class_name</span>
+<span id="cb27-367"><a href="#cb27-367" aria-hidden="true" tabindex="-1"></a>            class_dir.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-368"><a href="#cb27-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-369"><a href="#cb27-369" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Save image</span></span>
+<span id="cb27-370"><a href="#cb27-370" aria-hidden="true" tabindex="-1"></a>            img_path <span class="op">=</span> class_dir <span class="op">/</span> <span class="ss">f"image_</span><span class="sc">{</span>idx<span class="sc">:05d}</span><span class="ss">.tif"</span></span>
+<span id="cb27-371"><a href="#cb27-371" aria-hidden="true" tabindex="-1"></a>            <span class="co"># ... save logic ...</span></span>
+<span id="cb27-372"><a href="#cb27-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-373"><a href="#cb27-373" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the saved dataset</span></span>
+<span id="cb27-374"><a href="#cb27-374" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-375"><a href="#cb27-375" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"output_root/train"</span>,</span>
+<span id="cb27-376"><a href="#cb27-376" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"output_root/validation"</span>,</span>
+<span id="cb27-377"><a href="#cb27-377" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"output_root/test"</span>,</span>
+<span id="cb27-378"><a href="#cb27-378" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-379"><a href="#cb27-379" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-380"><a href="#cb27-380" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-381"><a href="#cb27-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-382"><a href="#cb27-382" aria-hidden="true" tabindex="-1"></a><span class="fu">### Using HuggingFace Split Files</span></span>
+<span id="cb27-383"><a href="#cb27-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-384"><a href="#cb27-384" aria-hidden="true" tabindex="-1"></a>Many HuggingFace datasets provide split files:</span>
+<span id="cb27-385"><a href="#cb27-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-386"><a href="#cb27-386" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-387"><a href="#cb27-387" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> urllib.request</span>
+<span id="cb27-388"><a href="#cb27-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-389"><a href="#cb27-389" aria-hidden="true" tabindex="-1"></a><span class="co"># Download split files from HF</span></span>
+<span id="cb27-390"><a href="#cb27-390" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">"https://huggingface.co/datasets/torchgeo/eurosat/resolve/main"</span></span>
+<span id="cb27-391"><a href="#cb27-391" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> split <span class="kw">in</span> [<span class="st">"train"</span>, <span class="st">"val"</span>, <span class="st">"test"</span>]:</span>
+<span id="cb27-392"><a href="#cb27-392" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>base_url<span class="sc">}</span><span class="ss">/eurosat-</span><span class="sc">{</span>split<span class="sc">}</span><span class="ss">.txt"</span></span>
+<span id="cb27-393"><a href="#cb27-393" aria-hidden="true" tabindex="-1"></a>    urllib.request.urlretrieve(url, <span class="ss">f"splits/eurosat-</span><span class="sc">{</span>split<span class="sc">}</span><span class="ss">.txt"</span>)</span>
+<span id="cb27-394"><a href="#cb27-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-395"><a href="#cb27-395" aria-hidden="true" tabindex="-1"></a><span class="co"># Use with TerraTorch</span></span>
+<span id="cb27-396"><a href="#cb27-396" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-397"><a href="#cb27-397" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb27-398"><a href="#cb27-398" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb27-399"><a href="#cb27-399" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root"</span>,</span>
+<span id="cb27-400"><a href="#cb27-400" aria-hidden="true" tabindex="-1"></a>    train_split<span class="op">=</span><span class="st">"splits/eurosat-train.txt"</span>,</span>
+<span id="cb27-401"><a href="#cb27-401" aria-hidden="true" tabindex="-1"></a>    val_split<span class="op">=</span><span class="st">"splits/eurosat-val.txt"</span>,</span>
+<span id="cb27-402"><a href="#cb27-402" aria-hidden="true" tabindex="-1"></a>    test_split<span class="op">=</span><span class="st">"splits/eurosat-test.txt"</span>,</span>
+<span id="cb27-403"><a href="#cb27-403" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-404"><a href="#cb27-404" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-405"><a href="#cb27-405" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-406"><a href="#cb27-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-407"><a href="#cb27-407" aria-hidden="true" tabindex="-1"></a><span class="fu">## Complete DataModule Example</span></span>
+<span id="cb27-408"><a href="#cb27-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-409"><a href="#cb27-409" aria-hidden="true" tabindex="-1"></a><span class="fu">### Classification with EuroSAT</span></span>
+<span id="cb27-410"><a href="#cb27-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-411"><a href="#cb27-411" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-412"><a href="#cb27-412" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datamodules <span class="im">import</span> GenericNonGeoClassificationDataModule</span>
+<span id="cb27-413"><a href="#cb27-413" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> albumentations <span class="im">as</span> A</span>
+<span id="cb27-414"><a href="#cb27-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-415"><a href="#cb27-415" aria-hidden="true" tabindex="-1"></a><span class="co"># Dataset paths</span></span>
+<span id="cb27-416"><a href="#cb27-416" aria-hidden="true" tabindex="-1"></a>EUROSAT_ROOT <span class="op">=</span> <span class="st">"/data/EuroSAT_MS"</span></span>
+<span id="cb27-417"><a href="#cb27-417" aria-hidden="true" tabindex="-1"></a>SPLIT_DIR <span class="op">=</span> <span class="st">"/data/EuroSAT/splits"</span></span>
+<span id="cb27-418"><a href="#cb27-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-419"><a href="#cb27-419" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentinel-2 bands</span></span>
+<span id="cb27-420"><a href="#cb27-420" aria-hidden="true" tabindex="-1"></a>S2_BANDS <span class="op">=</span> [<span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B5"</span>, <span class="st">"B6"</span>, <span class="st">"B7"</span>,</span>
+<span id="cb27-421"><a href="#cb27-421" aria-hidden="true" tabindex="-1"></a>            <span class="st">"B8"</span>, <span class="st">"B8A"</span>, <span class="st">"B9"</span>, <span class="st">"B10"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>]</span>
+<span id="cb27-422"><a href="#cb27-422" aria-hidden="true" tabindex="-1"></a>MODEL_BANDS <span class="op">=</span> [<span class="st">"B2"</span>, <span class="st">"B3"</span>, <span class="st">"B4"</span>, <span class="st">"B8A"</span>, <span class="st">"B11"</span>, <span class="st">"B12"</span>]</span>
+<span id="cb27-423"><a href="#cb27-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-424"><a href="#cb27-424" aria-hidden="true" tabindex="-1"></a><span class="co"># Statistics</span></span>
+<span id="cb27-425"><a href="#cb27-425" aria-hidden="true" tabindex="-1"></a>S2L1C_MEAN <span class="op">=</span> [<span class="fl">2357.090</span>, <span class="fl">2137.398</span>, <span class="fl">2018.799</span>, <span class="fl">2082.998</span>,</span>
+<span id="cb27-426"><a href="#cb27-426" aria-hidden="true" tabindex="-1"></a>              <span class="fl">2295.663</span>, <span class="fl">2854.548</span>, <span class="fl">3122.860</span>, <span class="fl">3040.571</span>,</span>
+<span id="cb27-427"><a href="#cb27-427" aria-hidden="true" tabindex="-1"></a>              <span class="fl">3306.491</span>, <span class="fl">1473.849</span>, <span class="fl">506.072</span>, <span class="fl">2472.840</span>, <span class="fl">1838.943</span>]</span>
+<span id="cb27-428"><a href="#cb27-428" aria-hidden="true" tabindex="-1"></a>S2L1C_STD <span class="op">=</span> [<span class="fl">1673.639</span>, <span class="fl">1722.641</span>, <span class="fl">1602.205</span>, <span class="fl">1873.138</span>,</span>
+<span id="cb27-429"><a href="#cb27-429" aria-hidden="true" tabindex="-1"></a>             <span class="fl">1866.055</span>, <span class="fl">1779.839</span>, <span class="fl">1776.496</span>, <span class="fl">1724.114</span>,</span>
+<span id="cb27-430"><a href="#cb27-430" aria-hidden="true" tabindex="-1"></a>             <span class="fl">1771.041</span>, <span class="fl">1079.786</span>, <span class="fl">512.404</span>, <span class="fl">1340.879</span>, <span class="fl">1172.435</span>]</span>
+<span id="cb27-431"><a href="#cb27-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-432"><a href="#cb27-432" aria-hidden="true" tabindex="-1"></a><span class="co"># Transforms</span></span>
+<span id="cb27-433"><a href="#cb27-433" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb27-434"><a href="#cb27-434" aria-hidden="true" tabindex="-1"></a>    A.HorizontalFlip(p<span class="op">=</span><span class="fl">0.5</span>),</span>
+<span id="cb27-435"><a href="#cb27-435" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb27-436"><a href="#cb27-436" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb27-437"><a href="#cb27-437" aria-hidden="true" tabindex="-1"></a>val_transform <span class="op">=</span> A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb27-438"><a href="#cb27-438" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-439"><a href="#cb27-439" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataModule</span></span>
+<span id="cb27-440"><a href="#cb27-440" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-441"><a href="#cb27-441" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb27-442"><a href="#cb27-442" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb27-443"><a href="#cb27-443" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span>EUROSAT_ROOT,</span>
+<span id="cb27-444"><a href="#cb27-444" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span>EUROSAT_ROOT,</span>
+<span id="cb27-445"><a href="#cb27-445" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span>EUROSAT_ROOT,</span>
+<span id="cb27-446"><a href="#cb27-446" aria-hidden="true" tabindex="-1"></a>    train_split<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>SPLIT_DIR<span class="sc">}</span><span class="ss">/eurosat-train.txt"</span>,</span>
+<span id="cb27-447"><a href="#cb27-447" aria-hidden="true" tabindex="-1"></a>    val_split<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>SPLIT_DIR<span class="sc">}</span><span class="ss">/eurosat-val.txt"</span>,</span>
+<span id="cb27-448"><a href="#cb27-448" aria-hidden="true" tabindex="-1"></a>    test_split<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>SPLIT_DIR<span class="sc">}</span><span class="ss">/eurosat-test.txt"</span>,</span>
+<span id="cb27-449"><a href="#cb27-449" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L1C_MEAN,</span>
+<span id="cb27-450"><a href="#cb27-450" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L1C_STD,</span>
+<span id="cb27-451"><a href="#cb27-451" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb27-452"><a href="#cb27-452" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>S2_BANDS,</span>
+<span id="cb27-453"><a href="#cb27-453" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>MODEL_BANDS,</span>
+<span id="cb27-454"><a href="#cb27-454" aria-hidden="true" tabindex="-1"></a>    train_transform<span class="op">=</span>train_transform,</span>
+<span id="cb27-455"><a href="#cb27-455" aria-hidden="true" tabindex="-1"></a>    val_transform<span class="op">=</span>val_transform,</span>
+<span id="cb27-456"><a href="#cb27-456" aria-hidden="true" tabindex="-1"></a>    test_transform<span class="op">=</span>val_transform,</span>
+<span id="cb27-457"><a href="#cb27-457" aria-hidden="true" tabindex="-1"></a>    ignore_split_file_extensions<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb27-458"><a href="#cb27-458" aria-hidden="true" tabindex="-1"></a>    allow_substring_split_file<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb27-459"><a href="#cb27-459" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-460"><a href="#cb27-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-461"><a href="#cb27-461" aria-hidden="true" tabindex="-1"></a><span class="co"># Setup for training</span></span>
+<span id="cb27-462"><a href="#cb27-462" aria-hidden="true" tabindex="-1"></a>datamodule.setup(<span class="st">"fit"</span>)</span>
+<span id="cb27-463"><a href="#cb27-463" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-464"><a href="#cb27-464" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a batch</span></span>
+<span id="cb27-465"><a href="#cb27-465" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> datamodule.train_dataloader()</span>
+<span id="cb27-466"><a href="#cb27-466" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(train_loader))</span>
+<span id="cb27-467"><a href="#cb27-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-468"><a href="#cb27-468" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Batch image shape: </span><span class="sc">{</span>batch[<span class="st">'image'</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb27-469"><a href="#cb27-469" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Batch label shape: </span><span class="sc">{</span>batch[<span class="st">'label'</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb27-470"><a href="#cb27-470" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-471"><a href="#cb27-471" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-472"><a href="#cb27-472" aria-hidden="true" tabindex="-1"></a><span class="fu">### Segmentation with Custom Dataset</span></span>
+<span id="cb27-473"><a href="#cb27-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-474"><a href="#cb27-474" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-475"><a href="#cb27-475" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> terratorch.datamodules <span class="im">import</span> GenericNonGeoSegmentationDataModule</span>
+<span id="cb27-476"><a href="#cb27-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-477"><a href="#cb27-477" aria-hidden="true" tabindex="-1"></a><span class="co"># Segmentation dataset structure:</span></span>
+<span id="cb27-478"><a href="#cb27-478" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset_root/</span></span>
+<span id="cb27-479"><a href="#cb27-479" aria-hidden="true" tabindex="-1"></a><span class="co">#   train_images/</span></span>
+<span id="cb27-480"><a href="#cb27-480" aria-hidden="true" tabindex="-1"></a><span class="co">#   train_labels/</span></span>
+<span id="cb27-481"><a href="#cb27-481" aria-hidden="true" tabindex="-1"></a><span class="co">#   val_images/</span></span>
+<span id="cb27-482"><a href="#cb27-482" aria-hidden="true" tabindex="-1"></a><span class="co">#   val_labels/</span></span>
+<span id="cb27-483"><a href="#cb27-483" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-484"><a href="#cb27-484" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoSegmentationDataModule(</span>
+<span id="cb27-485"><a href="#cb27-485" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb27-486"><a href="#cb27-486" aria-hidden="true" tabindex="-1"></a>    num_workers<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb27-487"><a href="#cb27-487" aria-hidden="true" tabindex="-1"></a>    train_data_root<span class="op">=</span><span class="st">"dataset_root/train_images"</span>,</span>
+<span id="cb27-488"><a href="#cb27-488" aria-hidden="true" tabindex="-1"></a>    train_label_data_root<span class="op">=</span><span class="st">"dataset_root/train_labels"</span>,</span>
+<span id="cb27-489"><a href="#cb27-489" aria-hidden="true" tabindex="-1"></a>    val_data_root<span class="op">=</span><span class="st">"dataset_root/val_images"</span>,</span>
+<span id="cb27-490"><a href="#cb27-490" aria-hidden="true" tabindex="-1"></a>    val_label_data_root<span class="op">=</span><span class="st">"dataset_root/val_labels"</span>,</span>
+<span id="cb27-491"><a href="#cb27-491" aria-hidden="true" tabindex="-1"></a>    test_data_root<span class="op">=</span><span class="st">"dataset_root/test_images"</span>,</span>
+<span id="cb27-492"><a href="#cb27-492" aria-hidden="true" tabindex="-1"></a>    test_label_data_root<span class="op">=</span><span class="st">"dataset_root/test_labels"</span>,</span>
+<span id="cb27-493"><a href="#cb27-493" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L2A_MEAN,</span>
+<span id="cb27-494"><a href="#cb27-494" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L2A_STD,</span>
+<span id="cb27-495"><a href="#cb27-495" aria-hidden="true" tabindex="-1"></a>    num_classes<span class="op">=</span><span class="dv">5</span>,  <span class="co"># Number of segmentation classes</span></span>
+<span id="cb27-496"><a href="#cb27-496" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>S2_BANDS,</span>
+<span id="cb27-497"><a href="#cb27-497" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>MODEL_BANDS,</span>
+<span id="cb27-498"><a href="#cb27-498" aria-hidden="true" tabindex="-1"></a>    train_transform<span class="op">=</span>train_transform,</span>
+<span id="cb27-499"><a href="#cb27-499" aria-hidden="true" tabindex="-1"></a>    val_transform<span class="op">=</span>val_transform,</span>
+<span id="cb27-500"><a href="#cb27-500" aria-hidden="true" tabindex="-1"></a>    test_transform<span class="op">=</span>val_transform,</span>
+<span id="cb27-501"><a href="#cb27-501" aria-hidden="true" tabindex="-1"></a>    ignore_index<span class="op">=</span><span class="dv">255</span>,  <span class="co"># Ignore value in labels</span></span>
+<span id="cb27-502"><a href="#cb27-502" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-503"><a href="#cb27-503" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-504"><a href="#cb27-504" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-505"><a href="#cb27-505" aria-hidden="true" tabindex="-1"></a><span class="fu">## Common Issues and Solutions</span></span>
+<span id="cb27-506"><a href="#cb27-506" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-507"><a href="#cb27-507" aria-hidden="true" tabindex="-1"></a><span class="fu">### Issue: Split file paths don't match actual files</span></span>
+<span id="cb27-508"><a href="#cb27-508" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-509"><a href="#cb27-509" aria-hidden="true" tabindex="-1"></a>**Problem:** Split file lists <span class="in">`image.jpg`</span> but files are <span class="in">`image.tif`</span></span>
+<span id="cb27-510"><a href="#cb27-510" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-511"><a href="#cb27-511" aria-hidden="true" tabindex="-1"></a>**Solution:**</span>
+<span id="cb27-512"><a href="#cb27-512" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-513"><a href="#cb27-513" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-514"><a href="#cb27-514" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-515"><a href="#cb27-515" aria-hidden="true" tabindex="-1"></a>    ignore_split_file_extensions<span class="op">=</span><span class="va">True</span>  <span class="co"># Ignore extension when matching</span></span>
+<span id="cb27-516"><a href="#cb27-516" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-517"><a href="#cb27-517" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-518"><a href="#cb27-518" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-519"><a href="#cb27-519" aria-hidden="true" tabindex="-1"></a><span class="fu">### Issue: Band mismatch errors</span></span>
+<span id="cb27-520"><a href="#cb27-520" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-521"><a href="#cb27-521" aria-hidden="true" tabindex="-1"></a>**Problem:** Model expects 6 bands but receives 13</span>
+<span id="cb27-522"><a href="#cb27-522" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-523"><a href="#cb27-523" aria-hidden="true" tabindex="-1"></a>**Solution:** Specify both <span class="in">`dataset_bands`</span> and <span class="in">`output_bands`</span></span>
+<span id="cb27-524"><a href="#cb27-524" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-525"><a href="#cb27-525" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-526"><a href="#cb27-526" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-527"><a href="#cb27-527" aria-hidden="true" tabindex="-1"></a>    dataset_bands<span class="op">=</span>ALL_13_BANDS,  <span class="co"># What files contain</span></span>
+<span id="cb27-528"><a href="#cb27-528" aria-hidden="true" tabindex="-1"></a>    output_bands<span class="op">=</span>MODEL_6_BANDS   <span class="co"># What model needs</span></span>
+<span id="cb27-529"><a href="#cb27-529" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-530"><a href="#cb27-530" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-531"><a href="#cb27-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-532"><a href="#cb27-532" aria-hidden="true" tabindex="-1"></a><span class="fu">### Issue: Normalization from wrong sensor</span></span>
+<span id="cb27-533"><a href="#cb27-533" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-534"><a href="#cb27-534" aria-hidden="true" tabindex="-1"></a>**Problem:** Using L2A statistics on L1C data</span>
+<span id="cb27-535"><a href="#cb27-535" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-536"><a href="#cb27-536" aria-hidden="true" tabindex="-1"></a>**Solution:** Match statistics to your data product</span>
+<span id="cb27-537"><a href="#cb27-537" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-538"><a href="#cb27-538" aria-hidden="true" tabindex="-1"></a><span class="co"># Check your data source</span></span>
+<span id="cb27-539"><a href="#cb27-539" aria-hidden="true" tabindex="-1"></a><span class="co"># L1C = Top of Atmosphere reflectance (e.g., EuroSAT)</span></span>
+<span id="cb27-540"><a href="#cb27-540" aria-hidden="true" tabindex="-1"></a><span class="co"># L2A = Bottom of Atmosphere reflectance (e.g., Sentinel-2 L2A)</span></span>
+<span id="cb27-541"><a href="#cb27-541" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-542"><a href="#cb27-542" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-543"><a href="#cb27-543" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-544"><a href="#cb27-544" aria-hidden="true" tabindex="-1"></a>    means<span class="op">=</span>S2L1C_MEAN <span class="cf">if</span> is_l1c <span class="cf">else</span> S2L2A_MEAN,</span>
+<span id="cb27-545"><a href="#cb27-545" aria-hidden="true" tabindex="-1"></a>    stds<span class="op">=</span>S2L1C_STD <span class="cf">if</span> is_l1c <span class="cf">else</span> S2L2A_STD</span>
+<span id="cb27-546"><a href="#cb27-546" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-547"><a href="#cb27-547" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-548"><a href="#cb27-548" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-549"><a href="#cb27-549" aria-hidden="true" tabindex="-1"></a><span class="fu">### Issue: Images can't be stacked into batches</span></span>
+<span id="cb27-550"><a href="#cb27-550" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-551"><a href="#cb27-551" aria-hidden="true" tabindex="-1"></a>**Problem:** Images have different dimensions</span>
+<span id="cb27-552"><a href="#cb27-552" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-553"><a href="#cb27-553" aria-hidden="true" tabindex="-1"></a>**Solution:** Use transforms to ensure consistent sizes</span>
+<span id="cb27-554"><a href="#cb27-554" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-555"><a href="#cb27-555" aria-hidden="true" tabindex="-1"></a>train_transform <span class="op">=</span> A.Compose([</span>
+<span id="cb27-556"><a href="#cb27-556" aria-hidden="true" tabindex="-1"></a>    A.RandomCrop(height<span class="op">=</span><span class="dv">224</span>, width<span class="op">=</span><span class="dv">224</span>),  <span class="co"># Ensures all same size</span></span>
+<span id="cb27-557"><a href="#cb27-557" aria-hidden="true" tabindex="-1"></a>    A.pytorch.transforms.ToTensorV2()</span>
+<span id="cb27-558"><a href="#cb27-558" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb27-559"><a href="#cb27-559" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-560"><a href="#cb27-560" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-561"><a href="#cb27-561" aria-hidden="true" tabindex="-1"></a>Or disable stackability checking (if intentional):</span>
+<span id="cb27-562"><a href="#cb27-562" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb27-563"><a href="#cb27-563" aria-hidden="true" tabindex="-1"></a>datamodule <span class="op">=</span> GenericNonGeoClassificationDataModule(</span>
+<span id="cb27-564"><a href="#cb27-564" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... other params ...</span></span>
+<span id="cb27-565"><a href="#cb27-565" aria-hidden="true" tabindex="-1"></a>    check_stackability<span class="op">=</span><span class="va">False</span></span>
+<span id="cb27-566"><a href="#cb27-566" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-567"><a href="#cb27-567" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb27-568"><a href="#cb27-568" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-569"><a href="#cb27-569" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quick Reference</span></span>
+<span id="cb27-570"><a href="#cb27-570" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-571"><a href="#cb27-571" aria-hidden="true" tabindex="-1"></a><span class="fu">### DataModule Parameters</span></span>
+<span id="cb27-572"><a href="#cb27-572" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-573"><a href="#cb27-573" aria-hidden="true" tabindex="-1"></a>| Parameter | Purpose | Example |</span>
+<span id="cb27-574"><a href="#cb27-574" aria-hidden="true" tabindex="-1"></a>|-----------|---------|---------|</span>
+<span id="cb27-575"><a href="#cb27-575" aria-hidden="true" tabindex="-1"></a>| <span class="in">`batch_size`</span> | Samples per batch | <span class="in">`32`</span> |</span>
+<span id="cb27-576"><a href="#cb27-576" aria-hidden="true" tabindex="-1"></a>| <span class="in">`num_workers`</span> | Parallel data loading threads | <span class="in">`4`</span> |</span>
+<span id="cb27-577"><a href="#cb27-577" aria-hidden="true" tabindex="-1"></a>| <span class="in">`train_data_root`</span> | Path to training images | <span class="in">`"data/train"`</span> |</span>
+<span id="cb27-578"><a href="#cb27-578" aria-hidden="true" tabindex="-1"></a>| <span class="in">`train_split`</span> | File listing training samples | <span class="in">`"splits/train.txt"`</span> |</span>
+<span id="cb27-579"><a href="#cb27-579" aria-hidden="true" tabindex="-1"></a>| <span class="in">`means`</span> | Per-band normalization means | <span class="in">`[2357.09, ...]`</span> |</span>
+<span id="cb27-580"><a href="#cb27-580" aria-hidden="true" tabindex="-1"></a>| <span class="in">`stds`</span> | Per-band normalization stds | <span class="in">`[1673.64, ...]`</span> |</span>
+<span id="cb27-581"><a href="#cb27-581" aria-hidden="true" tabindex="-1"></a>| <span class="in">`num_classes`</span> | Number of output classes | <span class="in">`10`</span> |</span>
+<span id="cb27-582"><a href="#cb27-582" aria-hidden="true" tabindex="-1"></a>| <span class="in">`dataset_bands`</span> | Bands in your files | <span class="in">`["B2", "B3", ...]`</span> |</span>
+<span id="cb27-583"><a href="#cb27-583" aria-hidden="true" tabindex="-1"></a>| <span class="in">`output_bands`</span> | Bands model receives | <span class="in">`["B2", "B3", "B4"]`</span> |</span>
+<span id="cb27-584"><a href="#cb27-584" aria-hidden="true" tabindex="-1"></a>| <span class="in">`train_transform`</span> | Training augmentations | <span class="in">`A.Compose([...])`</span> |</span>
+<span id="cb27-585"><a href="#cb27-585" aria-hidden="true" tabindex="-1"></a>| <span class="in">`ignore_split_file_extensions`</span> | Match files ignoring extension | <span class="in">`True`</span> |</span>
+<span id="cb27-586"><a href="#cb27-586" aria-hidden="true" tabindex="-1"></a>| <span class="in">`allow_substring_split_file`</span> | Allow partial filename matching | <span class="in">`True`</span> |</span>
+<span id="cb27-587"><a href="#cb27-587" aria-hidden="true" tabindex="-1"></a>| <span class="in">`drop_last`</span> | Drop incomplete final batch | <span class="in">`True`</span> |</span>
+<span id="cb27-588"><a href="#cb27-588" aria-hidden="true" tabindex="-1"></a>| <span class="in">`check_stackability`</span> | Verify all images same size | <span class="in">`True`</span> |</span>
+<span id="cb27-589"><a href="#cb27-589" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-590"><a href="#cb27-590" aria-hidden="true" tabindex="-1"></a><span class="fu">### Common Dataset Patterns</span></span>
+<span id="cb27-591"><a href="#cb27-591" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-592"><a href="#cb27-592" aria-hidden="true" tabindex="-1"></a>| Task | Structure | DataModule Class |</span>
+<span id="cb27-593"><a href="#cb27-593" aria-hidden="true" tabindex="-1"></a>|------|-----------|------------------|</span>
+<span id="cb27-594"><a href="#cb27-594" aria-hidden="true" tabindex="-1"></a>| Classification | <span class="in">`class_name/image.tif`</span> | <span class="in">`GenericNonGeoClassificationDataModule`</span> |</span>
+<span id="cb27-595"><a href="#cb27-595" aria-hidden="true" tabindex="-1"></a>| Segmentation | <span class="in">`images/`</span> + <span class="in">`labels/`</span> | <span class="in">`GenericNonGeoSegmentationDataModule`</span> |</span>
+<span id="cb27-596"><a href="#cb27-596" aria-hidden="true" tabindex="-1"></a>| Regression | <span class="in">`images/`</span> + <span class="in">`labels.csv`</span> | <span class="in">`GenericNonGeoRegressionDataModule`</span> |</span>
+<span id="cb27-597"><a href="#cb27-597" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-598"><a href="#cb27-598" aria-hidden="true" tabindex="-1"></a><span class="fu">### Workflow Summary</span></span>
+<span id="cb27-599"><a href="#cb27-599" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-600"><a href="#cb27-600" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Organize data** according to task pattern</span>
+<span id="cb27-601"><a href="#cb27-601" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Create split files** or separate directories</span>
+<span id="cb27-602"><a href="#cb27-602" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Compute or obtain** normalization statistics</span>
+<span id="cb27-603"><a href="#cb27-603" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Define transforms** for train/val/test</span>
+<span id="cb27-604"><a href="#cb27-604" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Initialize DataModule** with all parameters</span>
+<span id="cb27-605"><a href="#cb27-605" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Setup and validate** with <span class="in">`datamodule.setup("fit")`</span></span>
+<span id="cb27-606"><a href="#cb27-606" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Use with Trainer** for fine-tuning</span>
+<span id="cb27-607"><a href="#cb27-607" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-608"><a href="#cb27-608" aria-hidden="true" tabindex="-1"></a><span class="fu">## Next Steps</span></span>
+<span id="cb27-609"><a href="#cb27-609" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-610"><a href="#cb27-610" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>See <span class="co">[</span><span class="ot">TerraMind EuroSAT Example</span><span class="co">](../examples/Terramind_EuroSAT.ipynb)</span> for complete classification workflow</span>
+<span id="cb27-611"><a href="#cb27-611" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>See <span class="co">[</span><span class="ot">Segmentation Tutorial</span><span class="co">](../examples/segmentation_tutorial.qmd)</span> for segmentation workflow</span>
+<span id="cb27-612"><a href="#cb27-612" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Check <span class="co">[</span><span class="ot">TorchGeo Basics</span><span class="co">](torchgeo_basics.qmd)</span> for additional dataset utilities</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../images/geog-logo.png" class="img-fluid figure-img" width="250"></p>
+<figcaption>Department of Geography logo</figcaption>
+</figure>
+</div>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>This website is built with <a href="https://github.com/kcaylor/GEOG-288KC-geospatial-foundation-models"><i class="fa-brands fa-github" title="the github octocat logo" aria-label="github"></i></a> and <a href="https://quarto.org/">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

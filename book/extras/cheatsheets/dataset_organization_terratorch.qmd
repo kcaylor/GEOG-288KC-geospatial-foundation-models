@@ -1,0 +1,612 @@
+---
+title: "Dataset Organization for GeoAI Fine-Tuning"
+subtitle: "From raw data to TerraTorch DataModules"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+    toc-depth: 3
+---
+
+## Overview
+
+This guide explains how to organize geospatial datasets for fine-tuning foundation models, with a focus on TerraTorch's DataModule system. You'll learn:
+
+- Standard dataset organization patterns for different tasks
+- How to structure files for TerraTorch DataModules
+- Integration with HuggingFace datasets
+- Train/validation/test split strategies
+- Band selection and normalization
+
+## Task-Specific Organization Patterns
+
+### Classification Tasks
+
+**Directory Structure:**
+```
+dataset_root/
+├── class_1/
+│   ├── image_001.tif
+│   ├── image_002.tif
+│   └── ...
+├── class_2/
+│   ├── image_001.tif
+│   └── ...
+└── class_n/
+    └── ...
+```
+
+**Key Points:**
+- One folder per class, named with the class label
+- All images for that class inside the folder
+- Works with `GenericNonGeoClassificationDataModule`
+
+**Example: EuroSAT Dataset**
+```
+EuroSAT_MS/
+├── AnnualCrop/
+│   ├── AnnualCrop_1.tif
+│   └── ...
+├── Forest/
+│   └── ...
+└── Residential/
+    └── ...
+```
+
+### Segmentation Tasks
+
+**Directory Structure (Separate Folders):**
+```
+dataset_root/
+├── images/
+│   ├── scene_001_image.tif
+│   ├── scene_002_image.tif
+│   └── ...
+└── labels/
+    ├── scene_001_mask.tif
+    ├── scene_002_mask.tif
+    └── ...
+```
+
+**Directory Structure (Matching Names):**
+```
+dataset_root/
+├── train_images/
+│   ├── scene_001.tif
+│   └── ...
+├── train_labels/
+│   ├── scene_001.tif
+│   └── ...
+├── val_images/
+│   └── ...
+└── val_labels/
+    └── ...
+```
+
+**Key Points:**
+- Image and label files must have matching names (or matching patterns)
+- Common patterns: `*_image.tif` paired with `*_mask.tif`
+- Or identical names in separate `images/` and `labels/` folders
+- Labels are typically single-band rasters with integer class values
+
+### Object Detection Tasks
+
+**Directory Structure:**
+```
+dataset_root/
+├── images/
+│   ├── scene_001.tif
+│   └── ...
+└── annotations/
+    ├── scene_001.json  # or .xml
+    └── ...
+```
+
+**Annotation Format (COCO-style JSON):**
+```json
+{
+  "images": [{"id": 1, "file_name": "scene_001.tif"}],
+  "annotations": [
+    {
+      "id": 1,
+      "image_id": 1,
+      "category_id": 1,
+      "bbox": [x, y, width, height],
+      "area": 1000
+    }
+  ],
+  "categories": [{"id": 1, "name": "building"}]
+}
+```
+
+## Train/Val/Test Split Strategies
+
+### Strategy 1: Separate Directories
+
+**Structure:**
+```
+dataset_root/
+├── train/
+│   ├── class_1/
+│   └── class_2/
+├── val/
+│   ├── class_1/
+│   └── class_2/
+└── test/
+    ├── class_1/
+    └── class_2/
+```
+
+**TerraTorch Usage:**
+```python
+from terratorch.datamodules import GenericNonGeoClassificationDataModule
+
+datamodule = GenericNonGeoClassificationDataModule(
+    batch_size=16,
+    num_workers=4,
+    train_data_root="dataset_root/train",
+    val_data_root="dataset_root/val",
+    test_data_root="dataset_root/test",
+    means=[...],
+    stds=[...],
+    num_classes=10
+)
+```
+
+### Strategy 2: Split Files (Recommended for Benchmarks)
+
+**Structure:**
+```
+dataset_root/
+├── class_1/
+├── class_2/
+└── splits/
+    ├── train.txt
+    ├── val.txt
+    └── test.txt
+```
+
+**Split File Format (train.txt):**
+```
+class_1/image_001.tif
+class_1/image_005.tif
+class_2/image_003.tif
+...
+```
+
+**TerraTorch Usage:**
+```python
+datamodule = GenericNonGeoClassificationDataModule(
+    batch_size=16,
+    num_workers=4,
+    # All splits use same root
+    train_data_root="dataset_root",
+    val_data_root="dataset_root",
+    test_data_root="dataset_root",
+    # But different split files
+    train_split="dataset_root/splits/train.txt",
+    val_split="dataset_root/splits/val.txt",
+    test_split="dataset_root/splits/test.txt",
+    means=[...],
+    stds=[...],
+    num_classes=10,
+    # Important options for split files
+    ignore_split_file_extensions=True,  # Match "image.tif" with "image.jpg" in split
+    allow_substring_split_file=True      # Split file can contain substrings
+)
+```
+
+**Key Parameters:**
+- `ignore_split_file_extensions`: Set to `True` if split files list different extensions than actual files
+- `allow_substring_split_file`: Set to `True` for partial filename matching (mmsegmentation style)
+
+## Band Selection and Ordering
+
+### Specifying Input Bands
+
+```python
+# Your dataset has all Sentinel-2 bands
+dataset_bands = [
+    "B1", "B2", "B3", "B4", "B5", "B6",
+    "B7", "B8", "B8A", "B9", "B10", "B11", "B12"
+]
+
+# But your model only needs these 6
+output_bands = ["B2", "B3", "B4", "B8A", "B11", "B12"]
+
+datamodule = GenericNonGeoClassificationDataModule(
+    # ... other params ...
+    dataset_bands=dataset_bands,  # What your files contain
+    output_bands=output_bands,     # What the model receives
+)
+```
+
+**Using HLSBands Enums:**
+```python
+from terratorch.datasets import HLSBands
+
+output_bands = [
+    HLSBands.BLUE,
+    HLSBands.GREEN,
+    HLSBands.RED,
+    HLSBands.NIR_NARROW,
+    HLSBands.SWIR_1,
+    HLSBands.SWIR_2
+]
+```
+
+## Normalization Statistics
+
+### Computing Dataset Statistics
+
+```python
+import rasterio
+import numpy as np
+from pathlib import Path
+
+def compute_band_statistics(data_root, band_indices):
+    """Compute mean and std for each band across dataset"""
+    means = []
+    stds = []
+
+    for band_idx in band_indices:
+        band_values = []
+        for img_path in Path(data_root).rglob("*.tif"):
+            with rasterio.open(img_path) as src:
+                band_data = src.read(band_idx + 1)
+                band_values.append(band_data.flatten())
+
+        all_values = np.concatenate(band_values)
+        means.append(float(np.mean(all_values)))
+        stds.append(float(np.std(all_values)))
+
+    return means, stds
+
+# Example usage
+means, stds = compute_band_statistics("dataset_root", range(6))
+```
+
+### Using Pre-computed Statistics
+
+Common datasets have published statistics:
+
+```python
+# Sentinel-2 L1C statistics (from TerraMesh)
+S2L1C_STATS = {
+    "mean": [2357.090, 2137.398, 2018.799, 2082.998, 2295.663,
+             2854.548, 3122.860, 3040.571, 3306.491, 1473.849,
+             506.072, 2472.840, 1838.943],
+    "std": [1673.639, 1722.641, 1602.205, 1873.138, 1866.055,
+            1779.839, 1776.496, 1724.114, 1771.041, 1079.786,
+            512.404, 1340.879, 1172.435]
+}
+
+# Sentinel-2 L2A statistics
+S2L2A_STATS = {
+    "mean": [1390.461, 1503.332, 1718.211, 1853.926, 2199.116,
+             2779.989, 2987.025, 3083.248, 3132.235, 3162.989,
+             2424.902, 1857.665],
+    "std": [2131.157, 2163.666, 2059.311, 2152.477, 2105.179,
+            1912.773, 1842.326, 1893.568, 1775.656, 1814.907,
+            1436.282, 1336.155]
+}
+
+datamodule = GenericNonGeoClassificationDataModule(
+    # ... other params ...
+    means=S2L1C_STATS["mean"],
+    stds=S2L1C_STATS["std"]
+)
+```
+
+## Data Transforms
+
+### Basic Transform Pipeline
+
+```python
+import albumentations as A
+
+# Training transforms with augmentation
+train_transform = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomRotate90(p=0.5),
+    A.pytorch.transforms.ToTensorV2()
+])
+
+# Validation/test transforms (no augmentation)
+val_transform = A.Compose([
+    A.pytorch.transforms.ToTensorV2()
+])
+
+datamodule = GenericNonGeoClassificationDataModule(
+    # ... other params ...
+    train_transform=train_transform,
+    val_transform=val_transform,
+    test_transform=val_transform
+)
+```
+
+### Cropping for Model Input Size
+
+```python
+# If your images are larger than model input
+train_transform = A.Compose([
+    A.RandomCrop(height=224, width=224),  # Random crops for training
+    A.HorizontalFlip(p=0.5),
+    A.pytorch.transforms.ToTensorV2()
+])
+
+val_transform = A.Compose([
+    A.CenterCrop(height=224, width=224),  # Center crop for validation
+    A.pytorch.transforms.ToTensorV2()
+])
+```
+
+## Integration with HuggingFace Datasets
+
+### Loading from HuggingFace Hub
+
+```python
+from datasets import load_dataset
+
+# Load dataset
+dataset = load_dataset("torchgeo/eurosat", "sentinel2-all")
+
+# Save to disk in TerraTorch-compatible format
+def save_classification_dataset(dataset, output_root):
+    """Convert HF dataset to folder-per-class structure"""
+    from pathlib import Path
+    import shutil
+
+    for split_name in ["train", "validation", "test"]:
+        split = dataset[split_name]
+
+        for idx, example in enumerate(split):
+            class_name = example["label"]
+            class_dir = Path(output_root) / split_name / class_name
+            class_dir.mkdir(parents=True, exist_ok=True)
+
+            # Save image
+            img_path = class_dir / f"image_{idx:05d}.tif"
+            # ... save logic ...
+
+# Use the saved dataset
+datamodule = GenericNonGeoClassificationDataModule(
+    train_data_root="output_root/train",
+    val_data_root="output_root/validation",
+    test_data_root="output_root/test",
+    # ... other params ...
+)
+```
+
+### Using HuggingFace Split Files
+
+Many HuggingFace datasets provide split files:
+
+```python
+import urllib.request
+
+# Download split files from HF
+base_url = "https://huggingface.co/datasets/torchgeo/eurosat/resolve/main"
+for split in ["train", "val", "test"]:
+    url = f"{base_url}/eurosat-{split}.txt"
+    urllib.request.urlretrieve(url, f"splits/eurosat-{split}.txt")
+
+# Use with TerraTorch
+datamodule = GenericNonGeoClassificationDataModule(
+    train_data_root="dataset_root",
+    val_data_root="dataset_root",
+    test_data_root="dataset_root",
+    train_split="splits/eurosat-train.txt",
+    val_split="splits/eurosat-val.txt",
+    test_split="splits/eurosat-test.txt",
+    # ... other params ...
+)
+```
+
+## Complete DataModule Example
+
+### Classification with EuroSAT
+
+```python
+from terratorch.datamodules import GenericNonGeoClassificationDataModule
+import albumentations as A
+
+# Dataset paths
+EUROSAT_ROOT = "/data/EuroSAT_MS"
+SPLIT_DIR = "/data/EuroSAT/splits"
+
+# Sentinel-2 bands
+S2_BANDS = ["B1", "B2", "B3", "B4", "B5", "B6", "B7",
+            "B8", "B8A", "B9", "B10", "B11", "B12"]
+MODEL_BANDS = ["B2", "B3", "B4", "B8A", "B11", "B12"]
+
+# Statistics
+S2L1C_MEAN = [2357.090, 2137.398, 2018.799, 2082.998,
+              2295.663, 2854.548, 3122.860, 3040.571,
+              3306.491, 1473.849, 506.072, 2472.840, 1838.943]
+S2L1C_STD = [1673.639, 1722.641, 1602.205, 1873.138,
+             1866.055, 1779.839, 1776.496, 1724.114,
+             1771.041, 1079.786, 512.404, 1340.879, 1172.435]
+
+# Transforms
+train_transform = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.pytorch.transforms.ToTensorV2()
+])
+val_transform = A.pytorch.transforms.ToTensorV2()
+
+# Create DataModule
+datamodule = GenericNonGeoClassificationDataModule(
+    batch_size=32,
+    num_workers=4,
+    train_data_root=EUROSAT_ROOT,
+    val_data_root=EUROSAT_ROOT,
+    test_data_root=EUROSAT_ROOT,
+    train_split=f"{SPLIT_DIR}/eurosat-train.txt",
+    val_split=f"{SPLIT_DIR}/eurosat-val.txt",
+    test_split=f"{SPLIT_DIR}/eurosat-test.txt",
+    means=S2L1C_MEAN,
+    stds=S2L1C_STD,
+    num_classes=10,
+    dataset_bands=S2_BANDS,
+    output_bands=MODEL_BANDS,
+    train_transform=train_transform,
+    val_transform=val_transform,
+    test_transform=val_transform,
+    ignore_split_file_extensions=True,
+    allow_substring_split_file=True,
+)
+
+# Setup for training
+datamodule.setup("fit")
+
+# Get a batch
+train_loader = datamodule.train_dataloader()
+batch = next(iter(train_loader))
+
+print(f"Batch image shape: {batch['image'].shape}")
+print(f"Batch label shape: {batch['label'].shape}")
+```
+
+### Segmentation with Custom Dataset
+
+```python
+from terratorch.datamodules import GenericNonGeoSegmentationDataModule
+
+# Segmentation dataset structure:
+# dataset_root/
+#   train_images/
+#   train_labels/
+#   val_images/
+#   val_labels/
+
+datamodule = GenericNonGeoSegmentationDataModule(
+    batch_size=16,
+    num_workers=4,
+    train_data_root="dataset_root/train_images",
+    train_label_data_root="dataset_root/train_labels",
+    val_data_root="dataset_root/val_images",
+    val_label_data_root="dataset_root/val_labels",
+    test_data_root="dataset_root/test_images",
+    test_label_data_root="dataset_root/test_labels",
+    means=S2L2A_MEAN,
+    stds=S2L2A_STD,
+    num_classes=5,  # Number of segmentation classes
+    dataset_bands=S2_BANDS,
+    output_bands=MODEL_BANDS,
+    train_transform=train_transform,
+    val_transform=val_transform,
+    test_transform=val_transform,
+    ignore_index=255,  # Ignore value in labels
+)
+```
+
+## Common Issues and Solutions
+
+### Issue: Split file paths don't match actual files
+
+**Problem:** Split file lists `image.jpg` but files are `image.tif`
+
+**Solution:**
+```python
+datamodule = GenericNonGeoClassificationDataModule(
+    # ... other params ...
+    ignore_split_file_extensions=True  # Ignore extension when matching
+)
+```
+
+### Issue: Band mismatch errors
+
+**Problem:** Model expects 6 bands but receives 13
+
+**Solution:** Specify both `dataset_bands` and `output_bands`
+```python
+datamodule = GenericNonGeoClassificationDataModule(
+    # ... other params ...
+    dataset_bands=ALL_13_BANDS,  # What files contain
+    output_bands=MODEL_6_BANDS   # What model needs
+)
+```
+
+### Issue: Normalization from wrong sensor
+
+**Problem:** Using L2A statistics on L1C data
+
+**Solution:** Match statistics to your data product
+```python
+# Check your data source
+# L1C = Top of Atmosphere reflectance (e.g., EuroSAT)
+# L2A = Bottom of Atmosphere reflectance (e.g., Sentinel-2 L2A)
+
+datamodule = GenericNonGeoClassificationDataModule(
+    # ... other params ...
+    means=S2L1C_MEAN if is_l1c else S2L2A_MEAN,
+    stds=S2L1C_STD if is_l1c else S2L2A_STD
+)
+```
+
+### Issue: Images can't be stacked into batches
+
+**Problem:** Images have different dimensions
+
+**Solution:** Use transforms to ensure consistent sizes
+```python
+train_transform = A.Compose([
+    A.RandomCrop(height=224, width=224),  # Ensures all same size
+    A.pytorch.transforms.ToTensorV2()
+])
+```
+
+Or disable stackability checking (if intentional):
+```python
+datamodule = GenericNonGeoClassificationDataModule(
+    # ... other params ...
+    check_stackability=False
+)
+```
+
+## Quick Reference
+
+### DataModule Parameters
+
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| `batch_size` | Samples per batch | `32` |
+| `num_workers` | Parallel data loading threads | `4` |
+| `train_data_root` | Path to training images | `"data/train"` |
+| `train_split` | File listing training samples | `"splits/train.txt"` |
+| `means` | Per-band normalization means | `[2357.09, ...]` |
+| `stds` | Per-band normalization stds | `[1673.64, ...]` |
+| `num_classes` | Number of output classes | `10` |
+| `dataset_bands` | Bands in your files | `["B2", "B3", ...]` |
+| `output_bands` | Bands model receives | `["B2", "B3", "B4"]` |
+| `train_transform` | Training augmentations | `A.Compose([...])` |
+| `ignore_split_file_extensions` | Match files ignoring extension | `True` |
+| `allow_substring_split_file` | Allow partial filename matching | `True` |
+| `drop_last` | Drop incomplete final batch | `True` |
+| `check_stackability` | Verify all images same size | `True` |
+
+### Common Dataset Patterns
+
+| Task | Structure | DataModule Class |
+|------|-----------|------------------|
+| Classification | `class_name/image.tif` | `GenericNonGeoClassificationDataModule` |
+| Segmentation | `images/` + `labels/` | `GenericNonGeoSegmentationDataModule` |
+| Regression | `images/` + `labels.csv` | `GenericNonGeoRegressionDataModule` |
+
+### Workflow Summary
+
+1. **Organize data** according to task pattern
+2. **Create split files** or separate directories
+3. **Compute or obtain** normalization statistics
+4. **Define transforms** for train/val/test
+5. **Initialize DataModule** with all parameters
+6. **Setup and validate** with `datamodule.setup("fit")`
+7. **Use with Trainer** for fine-tuning
+
+## Next Steps
+
+- See [TerraMind EuroSAT Example](../examples/Terramind_EuroSAT.ipynb) for complete classification workflow
+- See [Segmentation Tutorial](../examples/segmentation_tutorial.qmd) for segmentation workflow
+- Check [TorchGeo Basics](torchgeo_basics.qmd) for additional dataset utilities

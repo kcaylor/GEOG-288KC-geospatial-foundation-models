@@ -7,9 +7,22 @@ LLMS-from-scratch/
 
 # Chapter data
 book/chapters/data
-
-data/train
+data/hfhome/
+data/hub/
+data/ds/
+data/train/
+data/*.zip
+data/*.txt
 book/extras/examples/data
+book/extras/wandb/
+book/extras/lightning_logs/
+book/extras/examples/wandb/
+book/extras/examples/lightning_logs/
+docs/extras/.claude/
+docs/.DS_Store
+docs/extras/.DS_Store
+
+
 
 # Python
 __pycache__/

@@ -114,7 +114,7 @@
   </url>
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/cheatsheets.html</loc>
-    <lastmod>2025-10-24T18:26:38.036Z</lastmod>
+    <lastmod>2025-11-07T17:16:44.491Z</lastmod>
   </url>
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/segmentation_finetuning.html</loc>
@@ -239,5 +239,33 @@
   <url>
     <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/chapters/c01-geospatial-data-foundations-OLD.html</loc>
     <lastmod>2025-10-09T17:41:47.790Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/Terramind_EuroSAT.html</loc>
+    <lastmod>2025-11-07T16:57:32.561Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/object_detection.html</loc>
+    <lastmod>2025-10-31T23:56:21.757Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/cheatsheets/dataset_organization_terratorch.html</loc>
+    <lastmod>2025-11-07T17:15:58.976Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/TerraTorch_demo (2).html</loc>
+    <lastmod>2025-11-14T17:09:00.670Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/optimizers_explainer.html</loc>
+    <lastmod>2025-11-14T19:23:43.909Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/examples/terratorch_finetuning_workflow.html</loc>
+    <lastmod>2025-11-21T05:33:26.873Z</lastmod>
+  </url>
+  <url>
+    <loc>https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models/extras/TerraTorch_training_demo.html</loc>
+    <lastmod>2025-11-20T19:19:14.275Z</lastmod>
   </url>
 </urlset>

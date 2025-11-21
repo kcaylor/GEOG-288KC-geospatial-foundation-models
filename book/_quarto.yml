@@ -37,6 +37,8 @@ website:
             href: chapters/c05-training-loop-optimization.qmd
           - text: Week 6 - ⏰ Spatiotemporal Modeling & Projects
             href: chapters/c06-model-evaluation-analysis.qmd
+          - text: Week 7 - ⚡ TerraTorch + Lightning Fine-Tuning Workflows
+            href: extras/examples/terratorch_finetuning_workflow.qmd
       - text: 👀 cheatsheets
         menu:
           - text: "📋 All Cheatsheets"
@@ -45,6 +47,8 @@ website:
           - text: "⚡ Quick Starts"
           - text: "Week 01: Import Guide"
             href: extras/cheatsheets/week01_imports.qmd
+          - text: "Dataset Organization for Fine-Tuning"
+            href: extras/cheatsheets/dataset_organization_terratorch.qmd
       - text: 🧩 explainers
         menu:
           - text: "1️⃣ Week 1"
@@ -70,6 +74,10 @@ website:
             href: extras/examples/resnet.qmd
           - text: Segmentation Fine-Tuning
             href: extras/examples/segmentation_finetuning.ipynb
+          - text: TerraMind EuroSAT Classification
+            href: extras/examples/Terramind_EuroSAT.ipynb
+          - text: TerraTorch Fine-Tuning Workflow
+            href: extras/examples/terratorch_finetuning_workflow.qmd
           - text: Text Encoder
             href: extras/examples/text_encoder.qmd
           - text: Tiling and Patches

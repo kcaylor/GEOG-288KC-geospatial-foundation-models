@@ -181,6 +181,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="./extras/cheatsheets/week01_imports.html">
  <span class="dropdown-text">Week 01: Import Guide</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./extras/cheatsheets/dataset_organization_terratorch.html">
+ <span class="dropdown-text">Dataset Organization for Fine-Tuning</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -233,6 +237,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="./extras/examples/segmentation_finetuning.html">
  <span class="dropdown-text">Segmentation Fine-Tuning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./extras/examples/Terramind_EuroSAT.html">
+ <span class="dropdown-text">TerraMind EuroSAT Classification</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./extras/examples/text_encoder.html">
@@ -348,6 +356,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="terratorch-for-geospatial-ai" class="level2">
 <h2 class="anchored" data-anchor-id="terratorch-for-geospatial-ai">🌎 TerraTorch for Geospatial AI</h2>
 <ul>
+<li><a href="./extras/cheatsheets/dataset_organization_terratorch.html">Dataset Organization for Fine-Tuning</a></li>
 <li><a href="./extras/cheatsheets/modular_gfm_architecture.html">Modular GFM Architecture in TerraTorch</a></li>
 <li><a href="./extras/examples/terratorch_workflows.html">TerraTorch Workflows</a></li>
 <li><a href="./extras/cheatsheets/terratorch_model_zoo.html">TerraTorch Model Zoo</a></li>
@@ -880,22 +889,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## 🌎 TerraTorch for Geospatial AI</span></span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Modular GFM Architecture in TerraTorch</span><span class="co">](extras/cheatsheets/modular_gfm_architecture.qmd)</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">TerraTorch Workflows</span><span class="co">](extras/examples/terratorch_workflows.qmd)</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">TerraTorch Model Zoo</span><span class="co">](extras/cheatsheets/terratorch_model_zoo.qmd)</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## 🤗 Foundation Models &amp; HuggingFace</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Loading Pre-trained Models</span><span class="co">](extras/cheatsheets/loading_models.qmd)</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Model Inference &amp; Feature Extraction</span><span class="co">](extras/cheatsheets/model_inference.qmd)</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Fine-tuning Strategies</span><span class="co">](extras/cheatsheets/finetuning_basics.qmd)</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">HuggingFace Cache on Shared Servers</span><span class="co">](extras/cheatsheets/huggingface_cache_server.qmd)</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="fu">## 📊 Visualization &amp; Analysis</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Plotting Satellite Imagery</span><span class="co">](extras/cheatsheets/plotting_satellite.qmd)</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Interactive Maps with Folium</span><span class="co">](extras/cheatsheets/folium_basics.qmd)</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Geospatial Plotting with Matplotlib</span><span class="co">](extras/cheatsheets/matplotlib_geospatial.qmd)</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Dataset Organization for Fine-Tuning</span><span class="co">](extras/cheatsheets/dataset_organization_terratorch.qmd)</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Modular GFM Architecture in TerraTorch</span><span class="co">](extras/cheatsheets/modular_gfm_architecture.qmd)</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">TerraTorch Workflows</span><span class="co">](extras/examples/terratorch_workflows.qmd)</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">TerraTorch Model Zoo</span><span class="co">](extras/cheatsheets/terratorch_model_zoo.qmd)</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## 🤗 Foundation Models &amp; HuggingFace</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Loading Pre-trained Models</span><span class="co">](extras/cheatsheets/loading_models.qmd)</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Model Inference &amp; Feature Extraction</span><span class="co">](extras/cheatsheets/model_inference.qmd)</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Fine-tuning Strategies</span><span class="co">](extras/cheatsheets/finetuning_basics.qmd)</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">HuggingFace Cache on Shared Servers</span><span class="co">](extras/cheatsheets/huggingface_cache_server.qmd)</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## 📊 Visualization &amp; Analysis</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Plotting Satellite Imagery</span><span class="co">](extras/cheatsheets/plotting_satellite.qmd)</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Interactive Maps with Folium</span><span class="co">](extras/cheatsheets/folium_basics.qmd)</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Geospatial Plotting with Matplotlib</span><span class="co">](extras/cheatsheets/matplotlib_geospatial.qmd)</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
