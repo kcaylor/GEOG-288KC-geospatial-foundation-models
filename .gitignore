@@ -160,3 +160,4 @@ run_test.sh
 # Temporary Quarto configs
 *_quarto_test.yml
 
+data/

@@ -68,6 +68,8 @@ website:
       - text: 📖 extras
         menu:
           - text: "🎯 Practical Examples"
+          - text: NDVI Timeseries Forecasting
+            href: extras/examples/ndvi_timeseries_forecasting.qmd
           - text: Normalization Comparison
             href: extras/examples/normalization_comparison.qmd
           - text: ResNet Implementation
