@@ -124,6 +124,8 @@ Before reorganization, the current course materials are preserved in a separate 
 - NDVI time series forecasting
 - Seasonal pattern prediction
 
+**Deliverable**: Project Proposal Due
+
 ---
 
 #### Week 5: Classification
@@ -144,8 +146,6 @@ Before reorganization, the current course materials are preserved in a separate 
 **Practical Application**:
 - Land cover classification (EuroSAT)
 - Multi-label scene tagging
-
-**Deliverable**: Project Proposal Due
 
 ---
 
@@ -329,17 +329,75 @@ New chapter files will follow the pattern:
 
 ---
 
-## Open Questions for Discussion
+## Research Findings & Decisions
 
-1. **Week 6 (Object Detection)**: Should we use TorchGeo's detection datasets or create custom examples? Need to verify TerraTorch detection support.
+### TerraTorch Capability Assessment (2025-12-19)
 
-2. **Mask/Gap Filling (Week 3)**: Is there existing TerraTorch support for MAE reconstruction, or do we need a minimal custom implementation?
+| Workflow | TerraTorch Support | Status | Notes |
+|----------|-------------------|--------|-------|
+| Embedding Analysis | Supported | Ready | Feature extraction works well |
+| Mask/Gap Filling | Partial | Needs wrapper | Prithvi has `inference.py` for reconstruction; custom mask requires forward function modification |
+| Next Image Prediction | Supported | Ready | `PixelWiseRegressionTask` + `expand_temporal_dimension` |
+| Classification | Fully Supported | Ready | `ClassificationTask` |
+| Object Detection | Under Development | **FLAG** | In development branch with known issues; existing course material requires extensive custom code |
+| Segmentation | Fully Supported | Ready | `SemanticSegmentationTask` |
 
-3. **Project Milestones**: Current structure has proposals due Week 5 and MVPs due Week 7. Should these shift given the new workflow order?
+### Key Sources
+- [TerraTorch Documentation](https://ibm.github.io/terratorch/stable/)
+- [TerraTorch Examples (Blumenstiel)](https://github.com/blumenstiel/TerraTorch-Examples)
+- [Prithvi-EO-2.0 Paper](https://arxiv.org/html/2412.02732v1)
+- [Cloud Gap Imputation Paper](https://arxiv.org/abs/2404.19609)
+- [TorchGeo ObjectDetectionTask](https://github.com/microsoft/torchgeo/blob/main/torchgeo/trainers/detection.py)
 
-4. **Cheatsheet Organization**: Should cheatsheets be reorganized by workflow (embedding, classification, etc.) or keep current topic-based organization?
+---
 
-5. **geogfm Package**: Should we keep a minimal version for utilities, or fully deprecate in favor of TorchGeo/TerraTorch utilities?
+## Resolved Questions
+
+1. **Project Milestones**: ✅ **RESOLVED** - Proposals move to Week 4 (was Week 5)
+
+2. **geogfm Package**: ✅ **RESOLVED** - Fully deprecate; preserve in `geogfm-course-materials` branch for future "from-scratch" course
+
+3. **Mask/Gap Filling (Week 3)**: ✅ **RESOLVED** - Use Prithvi's native reconstruction via `inference.py` with minimal wrapper. Acceptable for teaching since it demonstrates a real workflow.
+
+4. **Next Image Prediction (Week 4)**: ✅ **RESOLVED** - Well-supported via `PixelWiseRegressionTask` with `expand_temporal_dimension`. Existing `ndvi_timeseries_forecasting.qmd` is a good starting point.
+
+---
+
+## Items Requiring Follow-Up
+
+### HIGH PRIORITY: Week 6 Object Detection
+
+**Issue**: TerraTorch's `ObjectDetectionTask` is under development (in `obj_det_geobench` branch) with [known issues](https://github.com/IBM/terratorch/issues/362). The current course material (`object_detection.qmd`) requires extensive custom code that contradicts our "minimal custom code" principle.
+
+**Options to Discuss**:
+
+1. **Wait for TerraTorch**: Monitor TerraTorch development and use once stable
+   - Pro: Aligns with course philosophy
+   - Con: May not be ready in time
+
+2. **Use TorchGeo Directly**: TorchGeo's `ObjectDetectionTask` supports faster-rcnn, fcos, retinanet
+   - Pro: Works now, still Lightning-based
+   - Con: Not TerraTorch, less integrated
+
+3. **Reduce Scope**: Make Week 6 conceptual/demo only with pre-trained detection models
+   - Pro: Avoids custom code
+   - Con: Less hands-on
+
+4. **Move to Advanced Topics**: Replace Week 6 with another workflow; make detection optional
+   - Pro: Maintains course quality
+   - Con: Reduces coverage
+
+**Recommendation**: Use TorchGeo's `ObjectDetectionTask` directly for now, with a note that TerraTorch integration is coming. This maintains Lightning-based workflow while providing working detection capability.
+
+---
+
+## Updated Deliverables Timeline
+
+| Week | Deliverable |
+|------|-------------|
+| Week 4 | **Project Proposal Due** (moved from Week 5) |
+| Week 7 | Initial MVP Due |
+| Week 10 | Final Project Presentations |
 
 ---
 

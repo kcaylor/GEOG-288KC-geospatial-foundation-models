@@ -33,12 +33,14 @@ Materials that need to be created from scratch or significantly expanded.
 
 ### Week 3: Mask/Gap Filling
 
+**NOTE**: Use Prithvi's native reconstruction via `inference.py`. Reference: [Cloud Gap Imputation Paper](https://arxiv.org/abs/2404.19609)
+
 | Material | Description | Priority | Status | Notes |
 |----------|-------------|----------|--------|-------|
-| `w03-mask-gap-filling.qmd` | MAE reconstruction workflows | HIGH | TODO | Core new workflow |
-| Cloud gap filling tutorial | Using MAE for cloud removal | HIGH | TODO | High practical value |
+| `w03-mask-gap-filling.qmd` | MAE reconstruction workflows | HIGH | TODO | Use Prithvi `inference.py` with minimal wrapper |
+| Cloud gap filling tutorial | Using MAE for cloud removal | HIGH | TODO | Based on arxiv paper methodology |
 | Missing data reconstruction | Filling temporal gaps | MEDIUM | TODO | Build on temporal content |
-| TerraTorch MAE usage guide | Document TerraTorch MAE interface | HIGH | TODO | Need to verify TerraTorch MAE support |
+| MAE concepts explainer | Brief intro to masked autoencoders | MEDIUM | TODO | Theory component |
 
 ### Week 4: Next Image Prediction
 
@@ -50,11 +52,14 @@ Materials that need to be created from scratch or significantly expanded.
 
 ### Week 6: Object Detection
 
+**NOTE**: TerraTorch detection is under development with known issues. Use **TorchGeo's `ObjectDetectionTask`** instead.
+
 | Material | Description | Priority | Status | Notes |
 |----------|-------------|----------|--------|-------|
-| `w06-object-detection.qmd` | Detection workflows | HIGH | TODO | Significant refactor of existing |
-| TerraTorch detection tutorial | Step-by-step detection workflow | HIGH | TODO | Need to verify TerraTorch detection support |
+| `w06-object-detection.qmd` | Detection workflows using TorchGeo | HIGH | TODO | Use `ObjectDetectionTask` (faster-rcnn, fcos, retinanet) |
+| TorchGeo detection tutorial | Step-by-step detection with Lightning | HIGH | TODO | DIOR or VHR10 dataset |
 | Annotation workflow guide | How to prepare detection datasets | MEDIUM | TODO | Practical need |
+| Detection concepts explainer | Anchors, NMS, mAP (brief) | MEDIUM | TODO | Theory component |
 
 ### Week 8: Integration & Scaling
 
@@ -206,15 +211,23 @@ Materials that should be moved to the preservation branch or removed from main c
 
 ## 5. DEPENDENCY VERIFICATION
 
-Before implementation, verify these technical dependencies:
+Research completed 2025-12-19. Updated status:
 
 | Dependency | Need | Status | Notes |
 |------------|------|--------|-------|
-| TerraTorch MAE reconstruction | Week 3 | BLOCKED | Need to verify API support |
-| TerraTorch detection heads | Week 6 | BLOCKED | Need to verify API support |
-| TerraTorch temporal models | Week 4 | BLOCKED | Need to verify API support |
-| TorchGeo detection datasets | Week 6 | TODO | Verify available datasets |
+| TerraTorch MAE reconstruction | Week 3 | **PARTIAL** | Prithvi has `inference.py` for reconstruction; custom mask needs forward function mod. Use Prithvi native reconstruction with minimal wrapper. |
+| TerraTorch detection heads | Week 6 | **BLOCKED** | Under development in `obj_det_geobench` branch with known issues. Use TorchGeo `ObjectDetectionTask` instead. |
+| TerraTorch temporal models | Week 4 | **READY** | `PixelWiseRegressionTask` + `expand_temporal_dimension` works. Prithvi has 3D temporal encodings. |
+| TorchGeo detection datasets | Week 6 | **READY** | DIOR, VHR10 available. `ObjectDetectionTask` supports faster-rcnn, fcos, retinanet. |
 | Lightning 2.x compatibility | All | TODO | Ensure examples work |
+| TerraTorch ClassificationTask | Week 5 | **READY** | Fully supported |
+| TerraTorch SegmentationTask | Week 7 | **READY** | Fully supported |
+
+### Key Research Sources
+- [TerraTorch Examples](https://github.com/blumenstiel/TerraTorch-Examples) - Sen1Floods11, Burn Scars, Multi-temporal Crop tutorials
+- [Cloud Gap Imputation Paper](https://arxiv.org/abs/2404.19609) - Prithvi for gap filling
+- [Prithvi-EO-2.0](https://arxiv.org/html/2412.02732v1) - 3D temporal/spatial embeddings
+- [TerraTorch Issue #362](https://github.com/IBM/terratorch/issues/362) - Object detection data mismatch issues
 
 ---
 
@@ -261,21 +274,35 @@ Before implementation, verify these technical dependencies:
 
 ---
 
-## 8. OPEN QUESTIONS
+## 8. RESOLVED QUESTIONS
 
-### Content Questions
-1. **TerraTorch MAE**: Does TerraTorch support MAE reconstruction out of the box, or do we need minimal custom code?
-2. **Detection Support**: What detection architectures are available in TerraTorch? Do we need to fall back to raw TorchGeo?
-3. **Temporal Models**: Are there TerraTorch-native temporal models, or do we use TorchGeo temporal datasets with custom heads?
+### Content Questions (Resolved via Research 2025-12-19)
+1. **TerraTorch MAE**: ✅ Use Prithvi's native `inference.py` reconstruction with minimal wrapper. Custom mask support needs forward function modification but is acceptable for teaching.
+2. **Detection Support**: ✅ TerraTorch detection is under development with issues. **Use TorchGeo's `ObjectDetectionTask`** (faster-rcnn, fcos, retinanet) for now.
+3. **Temporal Models**: ✅ `PixelWiseRegressionTask` + `expand_temporal_dimension` works. Prithvi-EO-2.0 has 3D temporal embeddings.
 
-### Structural Questions
-4. **Week Pacing**: Is embedding analysis substantial enough for a full week, or should it be combined with Week 1?
-5. **Project Timeline**: Should proposals move from Week 5 to Week 4 given new content ordering?
-6. **geogfm Package**: Should we keep a minimal `utils/` directory for helper functions, or fully deprecate?
+### Structural Questions (Resolved via User Decision)
+4. **Week Pacing**: ✅ Embedding analysis is substantial enough for a full week.
+5. **Project Timeline**: ✅ **Proposals move to Week 4** (from Week 5).
+6. **geogfm Package**: ✅ **Fully deprecate**. Preserve in `geogfm-course-materials` branch for future "from-scratch" course. Any needed utilities go in local .py files.
 
-### Resource Questions
-7. **Datasets**: Are there standard datasets for mask/gap filling workflows that work with TerraTorch?
-8. **Compute Requirements**: Do any of the new workflows require significantly more compute than current content?
+---
+
+## 9. REMAINING ITEMS FOR FOLLOW-UP
+
+### HIGH PRIORITY: Object Detection Approach
+
+**Decision Needed**: How to handle Week 6 given TerraTorch detection limitations?
+
+**Options**:
+1. Use TorchGeo's `ObjectDetectionTask` directly (recommended - maintains Lightning workflow)
+2. Wait for TerraTorch detection to stabilize
+3. Make Week 6 conceptual with demo only
+4. Replace with different workflow
+
+### MEDIUM PRIORITY: Resource Questions
+- **Datasets for Gap Filling**: Need to identify standard cloud-masked datasets for Week 3
+- **Compute Requirements**: Verify that all workflows run on UCSB AI Sandbox
 
 ---
 
