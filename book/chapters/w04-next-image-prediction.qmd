@@ -1,0 +1,336 @@
+---
+title: "Week 4: Next Image Prediction"
+subtitle: "Temporal modeling and forecasting with foundation models"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Many Earth observation applications require predicting future states: vegetation forecasts, urban expansion, seasonal patterns. This week, we use foundation models with temporal awareness to predict the next image in a satellite time series.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Handle temporal satellite data in TorchGeo/TerraTorch
+- Understand temporal encodings in foundation models
+- Train models for next-image prediction
+- Forecast NDVI and vegetation indices
+:::
+
+**Deliverable**: Project Proposal Due
+
+## Theory: Temporal Modeling
+
+### Why Temporal Matters
+
+Earth observation is inherently temporal:
+- **Seasonality**: Vegetation cycles, snow cover, agriculture
+- **Trends**: Urban expansion, deforestation, climate change
+- **Events**: Floods, fires, storms
+
+### Temporal Encodings
+
+Foundation models like Prithvi-EO-2.0 include temporal encodings:
+
+```
+Input: Image + Date → Temporal Encoding → Model
+```
+
+These encodings capture:
+- Day of year (seasonality)
+- Year (long-term trends)
+- Relative position in sequence
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+from datetime import datetime, timedelta
+
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+os.environ["HF_HOME"] = os.path.join(DATA_PATH, "hfhome")
+```
+
+## Preparing Temporal Data
+
+### Downloading NDVI Time Series
+
+```{python}
+#| eval: false
+from pystac_client import Client
+import planetary_computer as pc
+import rasterio
+
+# Connect to Planetary Computer
+catalog = Client.open(
+    "https://planetarycomputer.microsoft.com/api/stac/v1",
+    modifier=pc.sign_inplace
+)
+
+# Search for multi-year time series
+bbox = [-119.9, 34.4, -119.6, 34.5]  # Santa Barbara
+
+search = catalog.search(
+    collections=["sentinel-2-l2a"],
+    bbox=bbox,
+    datetime="2022-01-01/2024-12-31",
+    query={"eo:cloud_cover": {"lt": 10}}
+)
+
+items = sorted(search.items(), key=lambda x: x.datetime)
+print(f"Found {len(items)} cloud-free scenes over 3 years")
+```
+
+### Computing NDVI
+
+```{python}
+def compute_ndvi(nir, red):
+    """Compute Normalized Difference Vegetation Index."""
+    ndvi = (nir - red) / (nir + red + 1e-8)
+    return np.clip(ndvi, -1, 1)
+```
+
+### Creating Temporal Dataset
+
+```{python}
+#| eval: false
+class NDVITimeSeriesDataset(torch.utils.data.Dataset):
+    """Dataset for NDVI time series prediction."""
+
+    def __init__(self, ndvi_stack, dates, sequence_length=4):
+        """
+        Args:
+            ndvi_stack: (T, H, W) array of NDVI images
+            dates: List of datetime objects
+            sequence_length: Number of input images
+        """
+        self.ndvi_stack = ndvi_stack
+        self.dates = dates
+        self.sequence_length = sequence_length
+
+    def __len__(self):
+        return len(self.ndvi_stack) - self.sequence_length
+
+    def __getitem__(self, idx):
+        # Input: sequence of images
+        input_images = self.ndvi_stack[idx:idx + self.sequence_length]
+        input_dates = self.dates[idx:idx + self.sequence_length]
+
+        # Target: next image
+        target_image = self.ndvi_stack[idx + self.sequence_length]
+        target_date = self.dates[idx + self.sequence_length]
+
+        # Compute temporal encodings
+        input_doys = [d.timetuple().tm_yday / 365.0 for d in input_dates]
+        target_doy = target_date.timetuple().tm_yday / 365.0
+
+        return {
+            'input': torch.tensor(input_images, dtype=torch.float32),
+            'input_doy': torch.tensor(input_doys, dtype=torch.float32),
+            'target': torch.tensor(target_image, dtype=torch.float32),
+            'target_doy': torch.tensor(target_doy, dtype=torch.float32)
+        }
+```
+
+## Temporal Encodings
+
+### Sinusoidal Encoding
+
+```{python}
+def create_temporal_encoding(day_of_year, dim=64):
+    """Create sinusoidal temporal encoding.
+
+    Args:
+        day_of_year: Normalized day of year (0-1)
+        dim: Encoding dimension
+
+    Returns:
+        Encoding vector of shape (dim,)
+    """
+    encoding = np.zeros(dim)
+    for i in range(dim // 2):
+        freq = 2 * np.pi * (i + 1)
+        encoding[2*i] = np.sin(freq * day_of_year)
+        encoding[2*i + 1] = np.cos(freq * day_of_year)
+    return encoding
+
+# Visualize encoding across year
+days = np.linspace(0, 1, 365)
+encodings = np.array([create_temporal_encoding(d, dim=8) for d in days])
+
+plt.figure(figsize=(12, 4))
+for i in range(8):
+    plt.plot(days * 365, encodings[:, i], label=f'dim {i}')
+plt.xlabel('Day of Year')
+plt.ylabel('Encoding Value')
+plt.title('Sinusoidal Temporal Encoding')
+plt.legend(bbox_to_anchor=(1.05, 1))
+plt.tight_layout()
+plt.show()
+```
+
+## TerraTorch Temporal Data Module
+
+TerraTorch supports temporal data via the `expand_temporal_dimension` parameter:
+
+```{python}
+#| eval: false
+from terratorch.datamodules import GenericPixelWiseRegressionDataModule
+
+# Configure temporal data module
+datamodule = GenericPixelWiseRegressionDataModule(
+    train_data_root="path/to/train",
+    val_data_root="path/to/val",
+    batch_size=8,
+    num_workers=4,
+    expand_temporal_dimension=True,  # Enable temporal handling
+    # Data stacked as (time*channels, H, W) -> (channels, time, H, W)
+)
+```
+
+## Training for Prediction
+
+### Using PixelWiseRegressionTask
+
+```{python}
+#| eval: false
+from terratorch.tasks import PixelWiseRegressionTask
+import lightning as L
+
+# Create task for regression (predicting continuous values)
+task = PixelWiseRegressionTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "regression",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_frames": 4,  # Input sequence length
+    },
+    loss="mse",
+    lr=1e-4
+)
+
+# Train with Lightning
+trainer = L.Trainer(
+    max_epochs=50,
+    accelerator="auto",
+    devices=1,
+    precision="16-mixed"
+)
+
+trainer.fit(task, datamodule)
+```
+
+## NDVI Forecasting Example
+
+```{python}
+#| eval: false
+# TODO: Complete end-to-end NDVI forecasting workflow
+# 1. Load multi-year Sentinel-2 time series
+# 2. Compute NDVI for each date
+# 3. Create train/val split (chronological)
+# 4. Train prediction model
+# 5. Evaluate on held-out future dates
+# 6. Visualize predictions vs. actuals
+```
+
+## Evaluation Metrics
+
+```{python}
+def compute_forecast_metrics(predictions, targets):
+    """Compute forecasting quality metrics."""
+    # Flatten for metric computation
+    pred_flat = predictions.flatten()
+    target_flat = targets.flatten()
+
+    # Mean Absolute Error
+    mae = np.mean(np.abs(pred_flat - target_flat))
+
+    # Root Mean Square Error
+    rmse = np.sqrt(np.mean((pred_flat - target_flat) ** 2))
+
+    # Correlation
+    correlation = np.corrcoef(pred_flat, target_flat)[0, 1]
+
+    # Coefficient of determination (R²)
+    ss_res = np.sum((target_flat - pred_flat) ** 2)
+    ss_tot = np.sum((target_flat - np.mean(target_flat)) ** 2)
+    r2 = 1 - (ss_res / ss_tot)
+
+    return {'mae': mae, 'rmse': rmse, 'r2': r2, 'correlation': correlation}
+```
+
+## Visualization
+
+```{python}
+#| eval: false
+def plot_forecast_comparison(dates, actual, predicted):
+    """Plot actual vs predicted time series."""
+    fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+
+    # Time series
+    axes[0].plot(dates, actual, 'b-', label='Actual', linewidth=2)
+    axes[0].plot(dates, predicted, 'r--', label='Predicted', linewidth=2)
+    axes[0].set_xlabel('Date')
+    axes[0].set_ylabel('NDVI')
+    axes[0].set_title('NDVI Forecast vs Actual')
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+
+    # Scatter plot
+    axes[1].scatter(actual, predicted, alpha=0.5)
+    axes[1].plot([0, 1], [0, 1], 'k--', label='Perfect prediction')
+    axes[1].set_xlabel('Actual NDVI')
+    axes[1].set_ylabel('Predicted NDVI')
+    axes[1].set_title('Prediction Accuracy')
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+```
+
+## Applications
+
+### Vegetation Monitoring
+
+- **Crop yield prediction**: Forecast end-of-season vegetation state
+- **Drought early warning**: Detect vegetation stress before visible
+- **Phenology tracking**: Predict green-up and senescence timing
+
+### Change Detection
+
+- **Urban expansion**: Predict future development patterns
+- **Deforestation**: Forecast forest loss trajectories
+
+## Summary
+
+This week you learned to:
+
+1. **Prepare temporal data** for foundation models
+2. **Implement temporal encodings** (sinusoidal, learned)
+3. **Configure TerraTorch** for temporal regression
+4. **Train prediction models** using PixelWiseRegressionTask
+5. **Evaluate forecasts** with appropriate metrics
+
+## Project Proposal Reminder
+
+Your project proposal is due this week! Include:
+- Problem statement and motivation
+- Data sources and availability
+- Proposed methodology (which workflow: classification, segmentation, etc.)
+- Evaluation plan
+- Timeline
+
+## Next Week
+
+In Week 5, we'll focus on **classification** - training models to categorize scenes and patches into discrete land cover classes.

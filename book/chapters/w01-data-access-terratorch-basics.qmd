@@ -1,0 +1,262 @@
+---
+title: "Week 1: Data Access & TerraTorch Basics"
+subtitle: "Working with geospatial data through TorchGeo and TerraTorch"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+This week covers the fundamentals of accessing and working with geospatial data in the TerraTorch/TorchGeo ecosystem. You'll learn to discover satellite imagery via STAC APIs, load data using TorchGeo, and configure TerraTorch data modules for training workflows.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Discover satellite imagery using STAC APIs (Planetary Computer)
+- Load and visualize Sentinel-2/Landsat data
+- Use TorchGeo datasets and data loaders
+- Configure TerraTorch data modules
+- Load pretrained foundation models
+:::
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+# Configure paths
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+os.makedirs(DATA_PATH, exist_ok=True)
+
+# HuggingFace cache configuration
+os.environ["HF_HOME"] = os.path.join(DATA_PATH, "hfhome")
+os.environ["HF_HUB_CACHE"] = os.path.join(DATA_PATH, "hub")
+```
+
+## STAC API Data Discovery
+
+The SpatioTemporal Asset Catalog (STAC) provides a standardized way to discover and access geospatial data. We'll use Microsoft's Planetary Computer as our primary data source.
+
+```{python}
+from pystac_client import Client
+import planetary_computer as pc
+
+# Connect to Planetary Computer
+catalog = Client.open(
+    "https://planetarycomputer.microsoft.com/api/stac/v1",
+    modifier=pc.sign_inplace
+)
+
+# Define area of interest (Santa Barbara region)
+bbox = [-119.9, 34.4, -119.6, 34.5]
+
+# Search for Sentinel-2 imagery
+search = catalog.search(
+    collections=["sentinel-2-l2a"],
+    bbox=bbox,
+    datetime="2024-01-01/2024-03-01",
+    query={"eo:cloud_cover": {"lt": 20}}
+)
+
+items = list(search.items())
+print(f"Found {len(items)} scenes with <20% cloud cover")
+```
+
+### Examining STAC Items
+
+```{python}
+if items:
+    item = items[0]
+    print(f"Scene ID: {item.id}")
+    print(f"Date: {item.datetime}")
+    print(f"Cloud cover: {item.properties.get('eo:cloud_cover', 'N/A')}%")
+    print(f"\nAvailable bands:")
+    for asset_key in ['B02', 'B03', 'B04', 'B08', 'SCL']:
+        if asset_key in item.assets:
+            print(f"  - {asset_key}: {item.assets[asset_key].title}")
+```
+
+## Loading Satellite Imagery
+
+### Using Rasterio Directly
+
+```{python}
+import rasterio
+import numpy as np
+import matplotlib.pyplot as plt
+
+def load_sentinel2_rgb(item, bbox):
+    """Load RGB bands from a Sentinel-2 STAC item."""
+    bands = []
+    for band_name in ['B04', 'B03', 'B02']:  # R, G, B
+        href = pc.sign(item.assets[band_name].href)
+        with rasterio.open(href) as src:
+            window = src.window(*bbox)
+            band = src.read(1, window=window)
+            bands.append(band)
+
+    # Stack and normalize
+    rgb = np.stack(bands, axis=-1)
+    rgb = np.clip(rgb / 3000, 0, 1)  # Simple normalization
+    return rgb
+
+if items:
+    rgb = load_sentinel2_rgb(items[0], bbox)
+
+    plt.figure(figsize=(10, 8))
+    plt.imshow(rgb)
+    plt.title(f"Sentinel-2 RGB: {items[0].datetime.strftime('%Y-%m-%d')}")
+    plt.axis('off')
+    plt.show()
+```
+
+## TorchGeo Datasets
+
+TorchGeo provides standardized datasets for geospatial machine learning. These handle the complexities of coordinate systems, resampling, and data loading.
+
+### Built-in Benchmark Datasets
+
+```{python}
+from torchgeo.datasets import EuroSAT
+
+# Download EuroSAT dataset
+eurosat = EuroSAT(root=DATA_PATH, download=True)
+print(f"EuroSAT: {len(eurosat)} samples")
+print(f"Classes: {eurosat.classes}")
+```
+
+### Visualizing Dataset Samples
+
+```{python}
+import torch
+
+# Get a sample
+sample = eurosat[0]
+image = sample['image']
+label = sample['label']
+
+# EuroSAT images are 13-band, use RGB (bands 4, 3, 2 = indices 3, 2, 1)
+rgb_indices = [3, 2, 1]
+rgb = image[rgb_indices].numpy().transpose(1, 2, 0)
+rgb = np.clip(rgb / 3000, 0, 1)
+
+plt.figure(figsize=(6, 6))
+plt.imshow(rgb)
+plt.title(f"Class: {eurosat.classes[label]}")
+plt.axis('off')
+plt.show()
+```
+
+## TorchGeo DataLoaders
+
+```{python}
+from torch.utils.data import DataLoader
+from torchgeo.datasets import EuroSAT
+
+# Create train/val split
+dataset = EuroSAT(root=DATA_PATH, split='train', download=True)
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = torch.utils.data.random_split(
+    dataset, [train_size, val_size]
+)
+
+# Create data loaders
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=0)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=0)
+
+print(f"Training batches: {len(train_loader)}")
+print(f"Validation batches: {len(val_loader)}")
+```
+
+## TerraTorch Data Modules
+
+TerraTorch provides high-level data modules that integrate with PyTorch Lightning.
+
+```{python}
+#| eval: false
+from terratorch.datamodules import EuroSATDataModule
+
+# TerraTorch data module handles everything
+datamodule = EuroSATDataModule(
+    root=DATA_PATH,
+    batch_size=32,
+    num_workers=4
+)
+
+# Prepare data
+datamodule.setup()
+print(f"Train samples: {len(datamodule.train_dataset)}")
+print(f"Val samples: {len(datamodule.val_dataset)}")
+```
+
+## Loading Pretrained Models
+
+### Using TerraTorch Model Factory
+
+```{python}
+#| eval: false
+from terratorch.models import PrithviModelFactory
+
+# Create model factory
+factory = PrithviModelFactory()
+
+# Load pretrained Prithvi encoder
+model = factory.build_model(
+    task="classification",
+    backbone="prithvi_eo_v2_300",
+    num_classes=10,
+    pretrained=True
+)
+
+print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
+```
+
+### Direct HuggingFace Loading
+
+```{python}
+#| eval: false
+from transformers import AutoModel
+
+# Load Prithvi directly from HuggingFace
+model = AutoModel.from_pretrained(
+    "ibm-nasa-geospatial/Prithvi-EO-2.0-300M",
+    trust_remote_code=True
+)
+```
+
+## Data Normalization
+
+Foundation models expect specific input normalization. TerraTorch handles this automatically, but understanding the process is important.
+
+```{python}
+# Sentinel-2 band statistics (approximate)
+SENTINEL2_MEAN = [1370, 1180, 1070, 1000, 1280, 2180, 2510, 2640, 2520, 820, 20, 2190, 1540]
+SENTINEL2_STD = [530, 450, 420, 390, 420, 680, 770, 800, 770, 380, 20, 680, 550]
+
+def normalize_sentinel2(image, mean=SENTINEL2_MEAN, std=SENTINEL2_STD):
+    """Normalize Sentinel-2 image for model input."""
+    image = image.float()
+    for i, (m, s) in enumerate(zip(mean, std)):
+        if i < image.shape[0]:
+            image[i] = (image[i] - m) / s
+    return image
+```
+
+## Summary
+
+This week you learned to:
+
+1. **Discover data** using STAC APIs and Planetary Computer
+2. **Load imagery** with rasterio and TorchGeo
+3. **Use datasets** like EuroSAT from TorchGeo
+4. **Configure data modules** for TerraTorch workflows
+5. **Load models** from TerraTorch and HuggingFace
+
+## Next Week
+
+In Week 2, we'll explore **embedding analysis** - extracting and visualizing features from pretrained foundation models to understand what they've learned.

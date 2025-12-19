@@ -1,0 +1,414 @@
+---
+title: "Week 7: Semantic Segmentation"
+subtitle: "Pixel-wise classification with TerraTorch"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Semantic segmentation assigns a class label to every pixel in an image, enabling precise delineation of land cover, flood extent, burn scars, and other features. This week, we use TerraTorch's `SemanticSegmentationTask` to fine-tune foundation models for segmentation.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Configure TerraTorch for semantic segmentation
+- Fine-tune encoder-decoder architectures
+- Handle large images with tiling
+- Evaluate segmentation with IoU and F1 metrics
+:::
+
+**Deliverable**: Initial MVP Due
+
+## Theory: Semantic Segmentation
+
+### Segmentation vs. Detection
+
+| Task | Output | Granularity |
+|------|--------|-------------|
+| Detection | Bounding boxes | Object-level |
+| Segmentation | Pixel masks | Pixel-level |
+
+### Encoder-Decoder Architecture
+
+```
+Input Image → Encoder (Foundation Model) → Decoder (Upsampling) → Pixel Labels
+  (H×W×C)        Feature extraction         Spatial recovery      (H×W×Classes)
+```
+
+The encoder (Prithvi, etc.) extracts features; the decoder (UNet, FPN) restores spatial resolution.
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+import lightning as L
+
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+os.environ["HF_HOME"] = os.path.join(DATA_PATH, "hfhome")
+```
+
+## Sen1Floods11 Dataset
+
+Sen1Floods11 contains Sentinel-1 SAR data for flood mapping across 11 global flood events.
+
+```{python}
+#| eval: false
+from terratorch.datamodules import Sen1Floods11DataModule
+
+datamodule = Sen1Floods11DataModule(
+    root=DATA_PATH,
+    batch_size=8,
+    num_workers=4,
+)
+
+datamodule.setup()
+print(f"Training samples: {len(datamodule.train_dataset)}")
+print(f"Classes: ['Not Flooded', 'Flooded']")
+```
+
+### Visualizing Samples
+
+```{python}
+#| eval: false
+def visualize_segmentation_sample(image, mask, classes=['Background', 'Flooded']):
+    """Visualize image and segmentation mask side by side."""
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    # Image (assume single band SAR)
+    if image.shape[0] == 1:
+        axes[0].imshow(image[0], cmap='gray')
+    else:
+        # RGB composite
+        rgb = image[[2, 1, 0]].numpy().transpose(1, 2, 0)
+        rgb = np.clip(rgb / rgb.max(), 0, 1)
+        axes[0].imshow(rgb)
+    axes[0].set_title('Input Image')
+    axes[0].axis('off')
+
+    # Mask
+    im = axes[1].imshow(mask, cmap='Blues', vmin=0, vmax=len(classes)-1)
+    axes[1].set_title('Segmentation Mask')
+    axes[1].axis('off')
+    plt.colorbar(im, ax=axes[1], ticks=range(len(classes)))
+
+    plt.tight_layout()
+    plt.show()
+```
+
+## TerraTorch Segmentation Task
+
+### Basic Configuration
+
+```{python}
+#| eval: false
+from terratorch.tasks import SemanticSegmentationTask
+
+task = SemanticSegmentationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "segmentation",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_classes": 2,  # Binary: flooded/not flooded
+        "decoder": "unet",  # UNet decoder
+    },
+    loss="cross_entropy",
+    lr=1e-4,
+)
+```
+
+### Training
+
+```{python}
+#| eval: false
+trainer = L.Trainer(
+    max_epochs=30,
+    accelerator="auto",
+    devices=1,
+    precision="16-mixed",
+)
+
+trainer.fit(task, datamodule)
+```
+
+## YAML Configuration
+
+```yaml
+# config/flood_segmentation.yaml
+model:
+  factory: PrithviModelFactory
+  task: segmentation
+  backbone: prithvi_eo_v2_300
+  pretrained: true
+  num_classes: 2
+  decoder: unet
+
+data:
+  class: Sen1Floods11DataModule
+  root: /path/to/data
+  batch_size: 8
+  num_workers: 4
+
+training:
+  max_epochs: 30
+  lr: 1e-4
+
+trainer:
+  accelerator: auto
+  precision: 16-mixed
+```
+
+```bash
+terratorch fit --config config/flood_segmentation.yaml
+```
+
+## HLS Burn Scars Dataset
+
+Another common segmentation task is burn scar mapping:
+
+```{python}
+#| eval: false
+from terratorch.datamodules import HLSBurnScarsDataModule
+
+datamodule = HLSBurnScarsDataModule(
+    root=DATA_PATH,
+    batch_size=8,
+    num_workers=4,
+)
+
+task = SemanticSegmentationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "segmentation",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_classes": 2,
+        "decoder": "unet",
+    },
+    loss="cross_entropy",
+    lr=1e-4,
+)
+```
+
+## Evaluation Metrics
+
+### Intersection over Union (IoU)
+
+```{python}
+def compute_iou(pred, target, num_classes):
+    """Compute per-class IoU."""
+    ious = []
+    for cls in range(num_classes):
+        pred_mask = (pred == cls)
+        target_mask = (target == cls)
+
+        intersection = (pred_mask & target_mask).sum()
+        union = (pred_mask | target_mask).sum()
+
+        if union > 0:
+            ious.append(intersection / union)
+        else:
+            ious.append(float('nan'))
+
+    return ious
+
+def mean_iou(ious):
+    """Compute mean IoU, ignoring NaN."""
+    valid_ious = [iou for iou in ious if not np.isnan(iou)]
+    return np.mean(valid_ious) if valid_ious else 0.0
+```
+
+### Full Evaluation
+
+```{python}
+#| eval: false
+from torchmetrics import JaccardIndex, F1Score
+
+# Per-class IoU
+iou_metric = JaccardIndex(task='multiclass', num_classes=2, average=None)
+
+# Macro F1
+f1_metric = F1Score(task='multiclass', num_classes=2, average='macro')
+
+task.eval()
+for batch in datamodule.test_dataloader():
+    images = batch['image']
+    masks = batch['mask']
+
+    with torch.no_grad():
+        preds = task(images).argmax(dim=1)
+
+    iou_metric.update(preds, masks)
+    f1_metric.update(preds, masks)
+
+print(f"Per-class IoU: {iou_metric.compute()}")
+print(f"Mean IoU: {iou_metric.compute().mean():.3f}")
+print(f"Macro F1: {f1_metric.compute():.3f}")
+```
+
+## Handling Large Images
+
+Satellite images are often much larger than model input sizes. We use tiling with overlap.
+
+### Tiling Strategy
+
+```{python}
+def create_tiles(image, tile_size=512, overlap=64):
+    """Create overlapping tiles from large image."""
+    c, h, w = image.shape
+    stride = tile_size - overlap
+
+    tiles = []
+    positions = []
+
+    for y in range(0, max(1, h - tile_size + 1), stride):
+        for x in range(0, max(1, w - tile_size + 1), stride):
+            # Handle edge cases
+            y_end = min(y + tile_size, h)
+            x_end = min(x + tile_size, w)
+            y_start = y_end - tile_size
+            x_start = x_end - tile_size
+
+            tile = image[:, y_start:y_end, x_start:x_end]
+            tiles.append(tile)
+            positions.append((x_start, y_start))
+
+    return tiles, positions
+```
+
+### Merging Predictions
+
+```{python}
+def merge_tile_predictions(predictions, positions, image_size, tile_size=512):
+    """Merge tile predictions with averaging in overlap regions."""
+    h, w = image_size
+    num_classes = predictions[0].shape[0]
+
+    # Accumulator for summing predictions
+    output = torch.zeros(num_classes, h, w)
+    counts = torch.zeros(h, w)
+
+    for pred, (x, y) in zip(predictions, positions):
+        output[:, y:y+tile_size, x:x+tile_size] += pred
+        counts[y:y+tile_size, x:x+tile_size] += 1
+
+    # Average overlapping regions
+    output /= counts.unsqueeze(0).clamp(min=1)
+
+    return output.argmax(dim=0)
+```
+
+### Full Inference Pipeline
+
+```{python}
+#| eval: false
+def segment_large_image(model, image, tile_size=512, overlap=64, device='cuda'):
+    """Segment large image using tiled inference."""
+    model.eval()
+
+    # Create tiles
+    tiles, positions = create_tiles(image, tile_size, overlap)
+
+    # Run inference on each tile
+    predictions = []
+    for tile in tiles:
+        tile_batch = tile.unsqueeze(0).to(device)
+        with torch.no_grad():
+            pred = model(tile_batch)
+        predictions.append(pred.squeeze(0).cpu())
+
+    # Merge predictions
+    h, w = image.shape[1:]
+    result = merge_tile_predictions(predictions, positions, (h, w), tile_size)
+
+    return result
+```
+
+## Visualization
+
+```{python}
+#| eval: false
+def visualize_segmentation_result(image, prediction, ground_truth=None):
+    """Visualize segmentation prediction."""
+    num_plots = 3 if ground_truth is not None else 2
+    fig, axes = plt.subplots(1, num_plots, figsize=(5*num_plots, 5))
+
+    # Image
+    if image.shape[0] <= 3:
+        rgb = image[:3].numpy().transpose(1, 2, 0)
+        rgb = np.clip(rgb / np.percentile(rgb, 98), 0, 1)
+    else:
+        rgb = image[[3, 2, 1]].numpy().transpose(1, 2, 0)
+        rgb = np.clip(rgb / 3000, 0, 1)
+
+    axes[0].imshow(rgb)
+    axes[0].set_title('Input Image')
+    axes[0].axis('off')
+
+    # Prediction
+    axes[1].imshow(prediction, cmap='tab10')
+    axes[1].set_title('Prediction')
+    axes[1].axis('off')
+
+    # Ground truth
+    if ground_truth is not None:
+        axes[2].imshow(ground_truth, cmap='tab10')
+        axes[2].set_title('Ground Truth')
+        axes[2].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+```
+
+## Multi-class Segmentation
+
+For land cover mapping with multiple classes:
+
+```{python}
+#| eval: false
+# Example: 5-class land cover
+task = SemanticSegmentationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "segmentation",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_classes": 5,  # Water, Forest, Urban, Agriculture, Other
+        "decoder": "unet",
+    },
+    loss="cross_entropy",
+    class_weights=[1.0, 1.0, 2.0, 1.5, 1.0],  # Handle class imbalance
+    lr=1e-4,
+)
+```
+
+## Summary
+
+This week you learned to:
+
+1. **Configure TerraTorch** for semantic segmentation
+2. **Fine-tune encoder-decoder** architectures
+3. **Handle large images** with tiling
+4. **Evaluate segmentation** with IoU and F1
+5. **Visualize results** for interpretation
+
+## MVP Reminder
+
+Your Initial MVP is due! Include:
+- Working code for your chosen workflow
+- Preliminary results on your dataset
+- Identified challenges and next steps
+- Updated timeline
+
+## Next Week
+
+In Week 8, we'll focus on **integration and scaling** - combining multiple workflows and optimizing for production use.

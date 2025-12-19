@@ -1,0 +1,395 @@
+---
+title: "Week 6: Object Detection"
+subtitle: "Detecting and localizing objects in satellite imagery"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Object detection goes beyond classification to locate and identify individual objects within an image. This week, we use TorchGeo's `ObjectDetectionTask` to detect objects like buildings, vehicles, and infrastructure in aerial imagery.
+
+:::{.callout-note}
+## Framework Note
+
+We use **TorchGeo's ObjectDetectionTask** for this workflow, which provides a Lightning-based detection pipeline. TerraTorch's detection support is under active development.
+:::
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Understand object detection architectures (Faster R-CNN, RetinaNet)
+- Use TorchGeo's ObjectDetectionTask with Lightning
+- Train detectors on aerial imagery datasets
+- Evaluate detection performance (mAP, IoU)
+:::
+
+## Theory: Object Detection
+
+### Detection vs. Classification
+
+| Task | Output | Example |
+|------|--------|---------|
+| Classification | Single label per image | "This is an airport" |
+| Detection | Bounding boxes + labels | "Building at (100,200,150,280)" |
+
+### Key Concepts
+
+- **Bounding Box**: Rectangle defined by (x_min, y_min, x_max, y_max)
+- **Confidence Score**: Model's certainty about detection (0-1)
+- **IoU (Intersection over Union)**: Overlap between predicted and ground truth boxes
+- **NMS (Non-Maximum Suppression)**: Removes duplicate detections
+
+### Detection Architectures
+
+TorchGeo supports three architectures:
+
+| Architecture | Speed | Accuracy | Best For |
+|--------------|-------|----------|----------|
+| **Faster R-CNN** | Medium | High | General use |
+| **RetinaNet** | Fast | High | Dense objects |
+| **FCOS** | Fast | Medium | Anchor-free detection |
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import torch
+import lightning as L
+
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+```
+
+## DIOR Dataset
+
+DIOR (Dataset for Object Detection in Aerial Images) contains 23,463 images with 20 object classes.
+
+### Loading with TorchGeo
+
+```{python}
+#| eval: false
+from torchgeo.datasets import DIOR
+from torchgeo.datamodules import NonGeoDataModule
+
+# Download DIOR dataset
+dataset = DIOR(root=DATA_PATH, split='train', download=True)
+
+print(f"Training samples: {len(dataset)}")
+print(f"Classes: {dataset.classes}")
+```
+
+### Visualizing Annotations
+
+```{python}
+#| eval: false
+def visualize_detection_sample(sample, classes):
+    """Visualize image with bounding box annotations."""
+    image = sample['image'].numpy().transpose(1, 2, 0)
+    boxes = sample['boxes']
+    labels = sample['labels']
+
+    # Normalize for display
+    image = np.clip(image / 255.0, 0, 1)
+
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    ax.imshow(image)
+
+    for box, label in zip(boxes, labels):
+        x_min, y_min, x_max, y_max = box.numpy()
+        width = x_max - x_min
+        height = y_max - y_min
+
+        rect = patches.Rectangle(
+            (x_min, y_min), width, height,
+            linewidth=2, edgecolor='red', facecolor='none'
+        )
+        ax.add_patch(rect)
+
+        class_name = classes[label.item()]
+        ax.text(x_min, y_min - 5, class_name,
+                color='white', fontsize=10, weight='bold',
+                bbox=dict(boxstyle='round', facecolor='red', alpha=0.8))
+
+    ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+# Visualize a sample
+sample = dataset[0]
+visualize_detection_sample(sample, dataset.classes)
+```
+
+## TorchGeo ObjectDetectionTask
+
+### Creating the Task
+
+```{python}
+#| eval: false
+from torchgeo.trainers import ObjectDetectionTask
+
+task = ObjectDetectionTask(
+    model="faster-rcnn",  # or "retinanet", "fcos"
+    backbone="resnet50",
+    weights=True,  # Use pretrained backbone
+    num_classes=len(dataset.classes),
+    lr=1e-4,
+)
+```
+
+### Data Module Setup
+
+```{python}
+#| eval: false
+from torchgeo.datamodules import NonGeoDataModule
+from torch.utils.data import DataLoader
+
+def detection_collate_fn(batch):
+    """Custom collate for variable-size annotations."""
+    images = [sample['image'] for sample in batch]
+    targets = [{
+        'boxes': sample['boxes'],
+        'labels': sample['labels']
+    } for sample in batch]
+    return images, targets
+
+# Create data module
+train_dataset = DIOR(root=DATA_PATH, split='train', download=True)
+val_dataset = DIOR(root=DATA_PATH, split='val', download=True)
+
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=4,
+    shuffle=True,
+    num_workers=4,
+    collate_fn=detection_collate_fn
+)
+
+val_loader = DataLoader(
+    val_dataset,
+    batch_size=4,
+    shuffle=False,
+    num_workers=4,
+    collate_fn=detection_collate_fn
+)
+```
+
+### Training
+
+```{python}
+#| eval: false
+trainer = L.Trainer(
+    max_epochs=20,
+    accelerator="auto",
+    devices=1,
+    precision="16-mixed",
+)
+
+trainer.fit(task, train_loader, val_loader)
+```
+
+## Evaluation Metrics
+
+### Mean Average Precision (mAP)
+
+mAP is the standard detection metric:
+
+```{python}
+#| eval: false
+from torchmetrics.detection import MeanAveragePrecision
+
+metric = MeanAveragePrecision(iou_thresholds=[0.5])
+
+# Compute mAP
+task.eval()
+for batch in val_loader:
+    images, targets = batch
+    with torch.no_grad():
+        predictions = task.model(images)
+    metric.update(predictions, targets)
+
+results = metric.compute()
+print(f"mAP@0.5: {results['map_50']:.3f}")
+print(f"mAP@[.5:.95]: {results['map']:.3f}")
+```
+
+### Per-class AP
+
+```{python}
+#| eval: false
+# Per-class average precision
+for i, ap in enumerate(results['map_per_class']):
+    if not torch.isnan(ap):
+        print(f"  {dataset.classes[i]}: {ap:.3f}")
+```
+
+## Inference and Visualization
+
+```{python}
+#| eval: false
+def run_detection(model, image, score_threshold=0.5):
+    """Run detection on a single image."""
+    model.eval()
+    with torch.no_grad():
+        predictions = model([image])[0]
+
+    # Filter by score
+    keep = predictions['scores'] > score_threshold
+    boxes = predictions['boxes'][keep]
+    labels = predictions['labels'][keep]
+    scores = predictions['scores'][keep]
+
+    return boxes, labels, scores
+
+def visualize_predictions(image, boxes, labels, scores, classes):
+    """Visualize detection predictions."""
+    image_np = image.numpy().transpose(1, 2, 0)
+    image_np = np.clip(image_np / 255.0, 0, 1)
+
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    ax.imshow(image_np)
+
+    for box, label, score in zip(boxes, labels, scores):
+        x_min, y_min, x_max, y_max = box.numpy()
+        width = x_max - x_min
+        height = y_max - y_min
+
+        rect = patches.Rectangle(
+            (x_min, y_min), width, height,
+            linewidth=2, edgecolor='lime', facecolor='none'
+        )
+        ax.add_patch(rect)
+
+        class_name = classes[label.item()]
+        ax.text(x_min, y_min - 5, f"{class_name}: {score:.2f}",
+                color='white', fontsize=10, weight='bold',
+                bbox=dict(boxstyle='round', facecolor='lime', alpha=0.8))
+
+    ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+```
+
+## Alternative Architectures
+
+### RetinaNet (Faster, Dense Objects)
+
+```{python}
+#| eval: false
+task = ObjectDetectionTask(
+    model="retinanet",
+    backbone="resnet50",
+    weights=True,
+    num_classes=len(dataset.classes),
+    lr=1e-4,
+)
+```
+
+### FCOS (Anchor-free)
+
+```{python}
+#| eval: false
+task = ObjectDetectionTask(
+    model="fcos",
+    backbone="resnet50",
+    weights=True,
+    num_classes=len(dataset.classes),
+    lr=1e-4,
+)
+```
+
+## VHR-10 Dataset Alternative
+
+For smaller-scale experiments, VHR-10 provides 650 images with 10 classes:
+
+```{python}
+#| eval: false
+from torchgeo.datasets import VHR10
+
+dataset = VHR10(root=DATA_PATH, split='positive', download=True)
+print(f"VHR-10 samples: {len(dataset)}")
+print(f"Classes: {dataset.classes}")
+```
+
+## Practical Considerations
+
+### Image Tiling
+
+Satellite images are often too large for direct detection:
+
+```{python}
+def tile_image(image, tile_size=512, overlap=64):
+    """Tile large image for detection."""
+    _, h, w = image.shape
+    tiles = []
+    positions = []
+
+    for y in range(0, h - tile_size + 1, tile_size - overlap):
+        for x in range(0, w - tile_size + 1, tile_size - overlap):
+            tile = image[:, y:y+tile_size, x:x+tile_size]
+            tiles.append(tile)
+            positions.append((x, y))
+
+    return tiles, positions
+
+def merge_detections(all_boxes, all_labels, all_scores, positions, tile_size):
+    """Merge detections from tiles back to full image coordinates."""
+    merged_boxes = []
+    merged_labels = []
+    merged_scores = []
+
+    for boxes, labels, scores, (x_off, y_off) in zip(
+        all_boxes, all_labels, all_scores, positions
+    ):
+        for box, label, score in zip(boxes, labels, scores):
+            # Offset to full image coordinates
+            box_global = box.clone()
+            box_global[[0, 2]] += x_off
+            box_global[[1, 3]] += y_off
+
+            merged_boxes.append(box_global)
+            merged_labels.append(label)
+            merged_scores.append(score)
+
+    # Apply NMS to remove duplicates at tile boundaries
+    # TODO: Implement cross-tile NMS
+
+    return merged_boxes, merged_labels, merged_scores
+```
+
+### Data Augmentation
+
+```{python}
+#| eval: false
+import albumentations as A
+
+train_transforms = A.Compose([
+    A.RandomRotate90(p=0.5),
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomBrightnessContrast(p=0.2),
+], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['labels']))
+```
+
+## Summary
+
+This week you learned to:
+
+1. **Understand detection architectures** (Faster R-CNN, RetinaNet, FCOS)
+2. **Use TorchGeo's ObjectDetectionTask** for training
+3. **Evaluate detection performance** with mAP
+4. **Handle large images** with tiling
+5. **Visualize predictions** with bounding boxes
+
+## Next Week
+
+In Week 7, we'll focus on **semantic segmentation** - pixel-wise classification that assigns a class to every pixel in the image.
+
+**Reminder**: Initial MVP due next week!

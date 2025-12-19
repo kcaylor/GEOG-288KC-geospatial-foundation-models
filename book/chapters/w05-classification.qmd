@@ -1,0 +1,368 @@
+---
+title: "Week 5: Classification"
+subtitle: "Scene and image classification workflows with TerraTorch"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Classification is one of the most common tasks in remote sensing: determining what type of land cover or scene is present in an image. This week, we use TerraTorch's `ClassificationTask` to fine-tune foundation models for classification.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Configure TerraTorch for classification tasks
+- Implement linear probing vs. full fine-tuning
+- Train and evaluate classification models
+- Handle multi-label classification scenarios
+:::
+
+## Theory: Transfer Learning Strategies
+
+### Linear Probing vs. Full Fine-tuning
+
+| Strategy | What Changes | When to Use |
+|----------|--------------|-------------|
+| **Linear Probe** | Only classification head | Small datasets, quick experiments |
+| **Fine-tune Head** | Head + last few layers | Medium datasets |
+| **Full Fine-tune** | Entire model | Large datasets, domain shift |
+
+### Why Foundation Models Help
+
+Pretrained models already understand:
+- Spectral patterns (vegetation, water, urban)
+- Spatial textures (forests, fields, buildings)
+- Multi-scale features
+
+We only need to teach them our specific classification scheme.
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+import lightning as L
+
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+os.environ["HF_HOME"] = os.path.join(DATA_PATH, "hfhome")
+```
+
+## EuroSAT Classification
+
+EuroSAT is a standard benchmark with 27,000 Sentinel-2 patches across 10 land cover classes.
+
+### Loading Data with TerraTorch
+
+```{python}
+#| eval: false
+from terratorch.datamodules import EuroSATDataModule
+
+datamodule = EuroSATDataModule(
+    root=DATA_PATH,
+    batch_size=32,
+    num_workers=4,
+    bands=["B02", "B03", "B04", "B08"],  # RGB + NIR
+)
+
+datamodule.setup()
+print(f"Training samples: {len(datamodule.train_dataset)}")
+print(f"Validation samples: {len(datamodule.val_dataset)}")
+print(f"Classes: {datamodule.train_dataset.classes}")
+```
+
+### Visualizing Samples
+
+```{python}
+#| eval: false
+from torchgeo.datasets import EuroSAT
+
+dataset = EuroSAT(root=DATA_PATH, split='train', download=True)
+
+fig, axes = plt.subplots(2, 5, figsize=(15, 6))
+for i, ax in enumerate(axes.flat):
+    sample = dataset[i * 100]
+    # Use bands 4, 3, 2 (R, G, B in 0-indexed: 3, 2, 1)
+    rgb = sample['image'][[3, 2, 1]].numpy().transpose(1, 2, 0)
+    rgb = np.clip(rgb / 3000, 0, 1)
+    ax.imshow(rgb)
+    ax.set_title(dataset.classes[sample['label']])
+    ax.axis('off')
+plt.tight_layout()
+plt.show()
+```
+
+## Linear Probing
+
+Train only the classification head while keeping the backbone frozen.
+
+```{python}
+#| eval: false
+from terratorch.tasks import ClassificationTask
+
+# Linear probe: freeze backbone
+task = ClassificationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "classification",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_classes": 10,
+        "in_channels": 4,
+    },
+    loss="cross_entropy",
+    lr=1e-3,
+    freeze_backbone=True,  # Only train the head
+)
+
+trainer = L.Trainer(
+    max_epochs=10,
+    accelerator="auto",
+    devices=1,
+)
+
+trainer.fit(task, datamodule)
+```
+
+## Full Fine-tuning
+
+Train the entire model with a lower learning rate for the backbone.
+
+```{python}
+#| eval: false
+from terratorch.tasks import ClassificationTask
+
+# Full fine-tuning
+task = ClassificationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "classification",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_classes": 10,
+        "in_channels": 4,
+    },
+    loss="cross_entropy",
+    lr=1e-4,  # Lower learning rate
+    freeze_backbone=False,  # Train everything
+)
+
+trainer = L.Trainer(
+    max_epochs=20,
+    accelerator="auto",
+    devices=1,
+    precision="16-mixed",  # Mixed precision for speed
+)
+
+trainer.fit(task, datamodule)
+```
+
+## Using YAML Configuration
+
+TerraTorch supports config-driven training:
+
+```yaml
+# config/eurosat_classification.yaml
+model:
+  factory: PrithviModelFactory
+  task: classification
+  backbone: prithvi_eo_v2_300
+  pretrained: true
+  num_classes: 10
+  in_channels: 4
+
+data:
+  class: EuroSATDataModule
+  root: /path/to/data
+  batch_size: 32
+  num_workers: 4
+
+training:
+  max_epochs: 20
+  lr: 1e-4
+  freeze_backbone: false
+
+trainer:
+  accelerator: auto
+  precision: 16-mixed
+```
+
+```bash
+# Train from command line
+terratorch fit --config config/eurosat_classification.yaml
+```
+
+## Evaluation
+
+### Accuracy Metrics
+
+```{python}
+#| eval: false
+# Evaluate on test set
+trainer.test(task, datamodule)
+
+# Results include:
+# - Overall accuracy
+# - Per-class precision, recall, F1
+# - Confusion matrix
+```
+
+### Confusion Matrix
+
+```{python}
+#| eval: false
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+# Get predictions
+task.eval()
+all_preds = []
+all_labels = []
+
+with torch.no_grad():
+    for batch in datamodule.test_dataloader():
+        images = batch['image']
+        labels = batch['label']
+        preds = task(images).argmax(dim=1)
+        all_preds.extend(preds.cpu().numpy())
+        all_labels.extend(labels.cpu().numpy())
+
+# Plot confusion matrix
+cm = confusion_matrix(all_labels, all_preds)
+disp = ConfusionMatrixDisplay(cm, display_labels=datamodule.classes)
+fig, ax = plt.subplots(figsize=(12, 10))
+disp.plot(ax=ax, cmap='Blues', xticks_rotation=45)
+plt.title('Classification Confusion Matrix')
+plt.tight_layout()
+plt.show()
+```
+
+## Multi-label Classification
+
+Some scenes may belong to multiple categories (e.g., "urban" AND "water").
+
+```{python}
+#| eval: false
+from terratorch.tasks import ClassificationTask
+
+# Multi-label configuration
+task = ClassificationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "classification",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_classes": 10,
+    },
+    loss="binary_cross_entropy",  # Multi-label loss
+    lr=1e-4,
+)
+```
+
+## BigEarthNet Example
+
+BigEarthNet is a larger, multi-label dataset with 590,326 Sentinel-2 patches.
+
+```{python}
+#| eval: false
+from terratorch.datamodules import BigEarthNetDataModule
+
+datamodule = BigEarthNetDataModule(
+    root=DATA_PATH,
+    batch_size=32,
+    num_workers=4,
+    bands=["B02", "B03", "B04", "B08", "B11", "B12"],
+)
+
+# Train multi-label classifier
+task = ClassificationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={
+        "task": "classification",
+        "backbone": "prithvi_eo_v2_300",
+        "pretrained": True,
+        "num_classes": 19,  # BigEarthNet classes
+    },
+    loss="binary_cross_entropy",
+    lr=1e-4,
+)
+```
+
+## Practical Tips
+
+### Data Augmentation
+
+```{python}
+#| eval: false
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+train_transforms = A.Compose([
+    A.RandomRotate90(p=0.5),
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomBrightnessContrast(p=0.2),
+    ToTensorV2(),
+])
+```
+
+### Learning Rate Scheduling
+
+```{python}
+#| eval: false
+from lightning.pytorch.callbacks import LearningRateMonitor
+
+trainer = L.Trainer(
+    max_epochs=20,
+    callbacks=[
+        LearningRateMonitor(logging_interval='epoch'),
+    ],
+)
+
+# Configure scheduler in task
+task = ClassificationTask(
+    ...,
+    lr_scheduler="cosine",
+    lr_scheduler_kwargs={"T_max": 20},
+)
+```
+
+### Early Stopping
+
+```{python}
+#| eval: false
+from lightning.pytorch.callbacks import EarlyStopping
+
+trainer = L.Trainer(
+    callbacks=[
+        EarlyStopping(monitor="val_loss", patience=5, mode="min"),
+    ],
+)
+```
+
+## Summary
+
+This week you learned to:
+
+1. **Configure TerraTorch** for classification tasks
+2. **Implement linear probing** for quick experiments
+3. **Fine-tune models** for better performance
+4. **Evaluate classifiers** with appropriate metrics
+5. **Handle multi-label** scenarios
+
+## Key Takeaways
+
+- Linear probing is fast and works well with pretrained features
+- Full fine-tuning requires more data but achieves better results
+- Foundation models significantly reduce data requirements
+- TerraTorch's config-driven approach simplifies experimentation
+
+## Next Week
+
+In Week 6, we'll tackle **object detection** - finding and localizing objects like buildings, vehicles, and infrastructure in satellite imagery.
