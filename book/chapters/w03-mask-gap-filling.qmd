@@ -1,0 +1,309 @@
+---
+title: "Week 3: Mask/Gap Filling"
+subtitle: "Using masked autoencoders for reconstruction tasks"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Satellite imagery often has missing data due to clouds, sensor issues, or acquisition gaps. This week, we explore how masked autoencoder (MAE) foundation models can reconstruct missing pixels, enabling applications like cloud removal and temporal gap filling.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Understand masked autoencoder (MAE) architecture and training
+- Use Prithvi for image reconstruction
+- Implement cloud gap filling workflows
+- Fill temporal gaps in satellite time series
+:::
+
+## Theory: Masked Autoencoders
+
+### How MAE Pretraining Works
+
+Masked autoencoders learn by reconstructing randomly masked portions of images:
+
+```
+Original Image → Mask 75% of patches → Encode visible patches → Decode all patches → Reconstruct
+```
+
+This forces the model to learn:
+- Spatial patterns and textures
+- Spectral relationships between bands
+- Semantic understanding of scene content
+
+### Why MAE for Gap Filling?
+
+The reconstruction capability from pretraining directly applies to gap filling:
+- **Cloud removal**: Treat clouds as masked regions
+- **Temporal gaps**: Use multi-temporal context to fill missing dates
+- **Sensor artifacts**: Reconstruct corrupted pixels
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+os.environ["HF_HOME"] = os.path.join(DATA_PATH, "hfhome")
+```
+
+## Loading Prithvi for Reconstruction
+
+Prithvi-EO-2.0 is pretrained with MAE and includes reconstruction capabilities.
+
+```{python}
+#| eval: false
+from transformers import AutoModel, AutoConfig
+
+# Load Prithvi with reconstruction head
+model = AutoModel.from_pretrained(
+    "ibm-nasa-geospatial/Prithvi-EO-2.0-300M",
+    trust_remote_code=True
+)
+model.eval()
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
+```
+
+## Creating Masked Inputs
+
+### Random Masking
+
+```{python}
+#| eval: false
+def create_random_mask(height, width, patch_size=16, mask_ratio=0.75):
+    """Create random patch mask for MAE-style reconstruction."""
+    num_patches_h = height // patch_size
+    num_patches_w = width // patch_size
+    num_patches = num_patches_h * num_patches_w
+
+    num_masked = int(num_patches * mask_ratio)
+    mask_indices = np.random.choice(num_patches, num_masked, replace=False)
+
+    mask = np.ones((num_patches_h, num_patches_w), dtype=bool)
+    for idx in mask_indices:
+        i, j = idx // num_patches_w, idx % num_patches_w
+        mask[i, j] = False
+
+    # Upsample to pixel resolution
+    mask_pixels = np.repeat(np.repeat(mask, patch_size, axis=0), patch_size, axis=1)
+    return mask_pixels
+```
+
+### Cloud-based Masking
+
+For real cloud removal, we use the Scene Classification Layer (SCL) from Sentinel-2:
+
+```{python}
+#| eval: false
+def create_cloud_mask_from_scl(scl_band):
+    """Create mask from Sentinel-2 Scene Classification Layer.
+
+    SCL classes to mask:
+    - 3: Cloud shadows
+    - 8: Cloud medium probability
+    - 9: Cloud high probability
+    - 10: Thin cirrus
+    """
+    cloud_classes = [3, 8, 9, 10]
+    mask = ~np.isin(scl_band, cloud_classes)
+    return mask
+```
+
+## Reconstruction Workflow
+
+### Step 1: Apply Mask to Image
+
+```{python}
+#| eval: false
+def apply_mask_to_image(image, mask):
+    """Apply mask to image, setting masked pixels to zero."""
+    masked_image = image.clone()
+    mask_tensor = torch.from_numpy(mask).to(image.device)
+
+    # Expand mask to match image dimensions (C, H, W)
+    mask_expanded = mask_tensor.unsqueeze(0).expand_as(image)
+    masked_image[~mask_expanded] = 0
+
+    return masked_image, mask_tensor
+```
+
+### Step 2: Run Reconstruction
+
+```{python}
+#| eval: false
+def reconstruct_image(model, masked_image, mask, device):
+    """Reconstruct masked regions using Prithvi."""
+    with torch.no_grad():
+        # Prepare input (add batch dimension)
+        x = masked_image.unsqueeze(0).to(device)
+
+        # TODO: Prithvi reconstruction forward pass
+        # This requires the reconstruction head, not just the encoder
+        # The exact API depends on the model version
+
+        reconstructed = model.reconstruct(x, mask)
+
+    return reconstructed.squeeze(0).cpu()
+```
+
+### Step 3: Blend Original and Reconstructed
+
+```{python}
+#| eval: false
+def blend_reconstruction(original, reconstructed, mask):
+    """Blend original (visible) with reconstructed (masked) pixels."""
+    result = original.clone()
+    mask_tensor = torch.from_numpy(mask)
+    mask_expanded = mask_tensor.unsqueeze(0).expand_as(original)
+
+    # Replace masked pixels with reconstructed
+    result[~mask_expanded] = reconstructed[~mask_expanded]
+
+    return result
+```
+
+## Cloud Gap Filling Example
+
+```{python}
+#| eval: false
+# TODO: Complete example with real Sentinel-2 data
+# 1. Load multi-temporal Sentinel-2 stack
+# 2. Identify cloudy pixels from SCL
+# 3. Reconstruct using temporal context
+# 4. Validate against cloud-free reference
+
+# Reference: https://arxiv.org/abs/2404.19609
+# "Seeing Through the Clouds: Cloud Gap Imputation with Prithvi Foundation Model"
+```
+
+## Temporal Gap Filling
+
+For temporal gaps (missing acquisition dates), we use multi-temporal input:
+
+```{python}
+#| eval: false
+def prepare_temporal_stack(images, dates, target_date):
+    """Prepare temporal stack for gap filling.
+
+    Args:
+        images: List of (C, H, W) tensors
+        dates: List of datetime objects
+        target_date: Date to reconstruct
+
+    Returns:
+        Stacked tensor with temporal dimension
+    """
+    # Sort by date
+    sorted_pairs = sorted(zip(dates, images), key=lambda x: x[0])
+    dates, images = zip(*sorted_pairs)
+
+    # Stack along temporal dimension
+    temporal_stack = torch.stack(images, dim=0)  # (T, C, H, W)
+
+    # Create mask for target date (if missing)
+    target_idx = dates.index(target_date) if target_date in dates else None
+
+    return temporal_stack, target_idx
+```
+
+## Evaluation Metrics
+
+### Reconstruction Quality
+
+```{python}
+def compute_reconstruction_metrics(original, reconstructed, mask):
+    """Compute quality metrics for reconstruction."""
+    # Only evaluate on masked regions
+    mask_flat = mask.flatten()
+    orig_masked = original.numpy().reshape(-1)[~mask_flat]
+    recon_masked = reconstructed.numpy().reshape(-1)[~mask_flat]
+
+    # Mean Absolute Error
+    mae = np.mean(np.abs(orig_masked - recon_masked))
+
+    # Root Mean Square Error
+    rmse = np.sqrt(np.mean((orig_masked - recon_masked) ** 2))
+
+    # Structural Similarity (simplified)
+    correlation = np.corrcoef(orig_masked, recon_masked)[0, 1]
+
+    return {'mae': mae, 'rmse': rmse, 'correlation': correlation}
+```
+
+## Visualization
+
+```{python}
+#| eval: false
+def visualize_reconstruction(original, masked, reconstructed, mask):
+    """Visualize reconstruction results."""
+    fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+
+    # Helper to show RGB
+    def show_rgb(ax, img, title):
+        rgb = img[[3, 2, 1]].numpy().transpose(1, 2, 0)
+        rgb = np.clip(rgb / 3000, 0, 1)
+        ax.imshow(rgb)
+        ax.set_title(title)
+        ax.axis('off')
+
+    show_rgb(axes[0], original, 'Original')
+    show_rgb(axes[1], masked, 'Masked Input')
+    show_rgb(axes[2], reconstructed, 'Reconstructed')
+
+    # Difference map
+    diff = torch.abs(original - reconstructed).mean(dim=0).numpy()
+    im = axes[3].imshow(diff, cmap='hot')
+    axes[3].set_title('Reconstruction Error')
+    axes[3].axis('off')
+    plt.colorbar(im, ax=axes[3])
+
+    plt.tight_layout()
+    plt.show()
+```
+
+## Practical Considerations
+
+### Limitations
+
+- Reconstruction quality depends on context availability
+- Large contiguous gaps are harder to fill
+- Spectral consistency may not be perfect
+
+### Best Practices
+
+1. **Use temporal context** when available
+2. **Validate against cloud-free references**
+3. **Consider uncertainty** in downstream analysis
+4. **Document reconstruction** in data provenance
+
+## Summary
+
+This week you learned to:
+
+1. **Understand MAE** architecture and pretraining
+2. **Create masks** from clouds or random sampling
+3. **Reconstruct images** using Prithvi's MAE capabilities
+4. **Fill temporal gaps** using multi-temporal context
+5. **Evaluate reconstruction** quality
+
+## Next Week
+
+In Week 4, we'll build on temporal modeling to predict **future images** in a time series - enabling forecasting of vegetation indices and other phenomena.
+
+## References
+
+- [Seeing Through the Clouds: Cloud Gap Imputation with Prithvi](https://arxiv.org/abs/2404.19609)
+- [Prithvi-EO-2.0 Paper](https://arxiv.org/html/2412.02732v1)
+- [Masked Autoencoders Are Scalable Vision Learners](https://arxiv.org/abs/2111.06377)

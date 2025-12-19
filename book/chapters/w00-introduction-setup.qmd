@@ -1,0 +1,144 @@
+---
+title: "Week 0: Introduction & Environment Setup"
+subtitle: "Getting started with geospatial foundation models and the TerraTorch ecosystem"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Welcome to GEOG 288KC: Geospatial Foundation Models and Applications. This week introduces the course objectives, the TerraTorch/TorchGeo ecosystem, and ensures your computing environment is properly configured.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Course objectives and structure
+- What geospatial foundation models are and why they matter
+- The TerraTorch + TorchGeo + PyTorch Lightning stack
+- Environment setup on UCSB AI Sandbox
+:::
+
+## Course Overview
+
+<!-- TODO: Condense from Syllabus.md -->
+
+### Course Philosophy
+
+This course focuses on **application workflows** using high-level libraries. We use:
+
+- **TerraTorch**: Fine-tuning toolkit for geospatial foundation models
+- **TorchGeo**: PyTorch domain library for geospatial data
+- **PyTorch Lightning**: Structured training framework
+
+Our goal is to help you build practical applications, not implement models from scratch.
+
+### Weekly Structure
+
+| Week | Topic | Deliverable |
+|------|-------|-------------|
+| 0 | Introduction & Setup | - |
+| 1 | Data Access & TerraTorch Basics | - |
+| 2 | Embedding Analysis | - |
+| 3 | Mask/Gap Filling | - |
+| 4 | Next Image Prediction | **Project Proposal** |
+| 5 | Classification | - |
+| 6 | Object Detection | - |
+| 7 | Segmentation | **Initial MVP** |
+| 8 | Integration & Scaling | - |
+| 9 | Deployment & APIs | - |
+| 10 | Presentations | **Final Project** |
+
+## What Are Geospatial Foundation Models?
+
+<!-- TODO: Condense key concepts from c00a-foundation_model_architectures.qmd -->
+
+Foundation models are large neural networks pretrained on massive datasets that can be adapted to many downstream tasks. **Geospatial foundation models** (GFMs) are specifically designed for Earth observation data:
+
+- Pretrained on satellite imagery (Sentinel-2, Landsat, etc.)
+- Understand spatial patterns and spectral information
+- Can be fine-tuned for classification, segmentation, detection, and more
+
+### Key Models We'll Use
+
+| Model | Source | Pretraining Data | Key Capability |
+|-------|--------|------------------|----------------|
+| Prithvi-EO-2.0 | IBM/NASA | HLS (4.2M samples) | Multi-temporal, reconstruction |
+| SatMAE | | Sentinel-2 | Masked autoencoder |
+| Clay | | Multi-source | Flexible embeddings |
+
+## The TerraTorch Ecosystem
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Your Application                      │
+├─────────────────────────────────────────────────────────┤
+│                      TerraTorch                          │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────┐   │
+│  │   Tasks     │ │Model Factory│ │  Data Modules   │   │
+│  │Classification│ │  Backbones  │ │ Generic Loaders │   │
+│  │Segmentation │ │  Decoders   │ │  Transforms     │   │
+│  │ Regression  │ │   Heads     │ │                 │   │
+│  └─────────────┘ └─────────────┘ └─────────────────┘   │
+├─────────────────────────────────────────────────────────┤
+│                   PyTorch Lightning                      │
+│           (Training loops, callbacks, logging)           │
+├─────────────────────────────────────────────────────────┤
+│                       TorchGeo                           │
+│        (Geospatial datasets, samplers, transforms)       │
+├─────────────────────────────────────────────────────────┤
+│                        PyTorch                           │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Environment Setup
+
+### UCSB AI Sandbox
+
+The primary computing environment for this course is the UCSB AI Sandbox, which provides:
+
+- GPU-enabled JupyterLab instances
+- Pre-configured deep learning environments
+- Shared storage for datasets and model weights
+
+### Verifying Your Environment
+
+```{python}
+#| eval: false
+import torch
+import terratorch
+import torchgeo
+import lightning
+
+print(f"PyTorch: {torch.__version__}")
+print(f"TerraTorch: {terratorch.__version__}")
+print(f"TorchGeo: {torchgeo.__version__}")
+print(f"Lightning: {lightning.__version__}")
+print(f"CUDA available: {torch.cuda.is_available()}")
+```
+
+### Key Package Versions
+
+For compatibility, we recommend:
+
+- `terratorch >= 1.0`
+- `torchgeo >= 0.6`
+- `lightning >= 2.0`
+- `torch >= 2.0`
+
+## Next Steps
+
+In Week 1, we'll start working with real geospatial data:
+
+- Discovering data via STAC APIs
+- Loading satellite imagery with TorchGeo
+- Configuring TerraTorch data modules
+- Loading your first pretrained foundation model
+
+## Resources
+
+- [TerraTorch Documentation](https://ibm.github.io/terratorch/stable/)
+- [TorchGeo Documentation](https://torchgeo.readthedocs.io/)
+- [PyTorch Lightning Documentation](https://lightning.ai/docs/pytorch/stable/)
+- [Prithvi-EO-2.0 on HuggingFace](https://huggingface.co/ibm-nasa-geospatial/Prithvi-EO-2.0-300M)

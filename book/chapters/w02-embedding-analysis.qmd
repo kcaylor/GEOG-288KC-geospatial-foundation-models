@@ -1,0 +1,303 @@
+---
+title: "Week 2: Embedding Analysis"
+subtitle: "Understanding what foundation models learn through feature extraction"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Foundation models learn rich representations of geospatial data during pretraining. This week, we extract and analyze these embeddings to understand what the models have learned and how they can be applied to downstream tasks.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Extract embeddings from pretrained foundation models
+- Visualize high-dimensional features with UMAP/t-SNE
+- Perform similarity search using embeddings
+- Compare representations across different models
+- Apply embeddings for anomaly detection
+:::
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+from torch.utils.data import DataLoader
+
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+os.environ["HF_HOME"] = os.path.join(DATA_PATH, "hfhome")
+```
+
+## Theory: Latent Representations
+
+### What Are Embeddings?
+
+When a foundation model processes an image, it transforms the raw pixels into a **latent representation** - a compressed vector that captures the essential features of the input.
+
+```
+Input Image (224×224×13)  →  Foundation Model  →  Embedding (768,)
+   ~650,000 values              Prithvi           768 values
+```
+
+These embeddings encode:
+- Spatial patterns (textures, structures)
+- Spectral signatures (vegetation, water, urban)
+- Semantic content (land cover type, features)
+
+### Why Analyze Embeddings?
+
+1. **Understand model behavior** - What does the model consider similar?
+2. **Zero-shot classification** - Classify without training by comparing embeddings
+3. **Anomaly detection** - Find unusual patterns as outliers in embedding space
+4. **Retrieval** - Find similar scenes in large archives
+
+## Loading a Pretrained Model
+
+```{python}
+#| eval: false
+from terratorch.models import PrithviModelFactory
+
+factory = PrithviModelFactory()
+
+# Build model for feature extraction (no classification head)
+model = factory.build_model(
+    task="embedding",  # Feature extraction mode
+    backbone="prithvi_eo_v2_300",
+    pretrained=True
+)
+model.eval()
+
+# Move to GPU if available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
+```
+
+## Extracting Embeddings
+
+### From EuroSAT Dataset
+
+```{python}
+#| eval: false
+from torchgeo.datasets import EuroSAT
+
+dataset = EuroSAT(root=DATA_PATH, split='test', download=True)
+loader = DataLoader(dataset, batch_size=32, shuffle=False, num_workers=4)
+
+embeddings = []
+labels = []
+
+with torch.no_grad():
+    for batch in loader:
+        images = batch['image'].to(device)
+
+        # Extract embeddings
+        features = model(images)
+
+        # Pool spatial dimensions if needed (B, C, H, W) -> (B, C)
+        if features.dim() == 4:
+            features = features.mean(dim=[2, 3])
+
+        embeddings.append(features.cpu().numpy())
+        labels.append(batch['label'].numpy())
+
+embeddings = np.concatenate(embeddings, axis=0)
+labels = np.concatenate(labels, axis=0)
+
+print(f"Extracted {len(embeddings)} embeddings of dimension {embeddings.shape[1]}")
+```
+
+## Visualizing Embeddings with UMAP
+
+UMAP (Uniform Manifold Approximation and Projection) reduces high-dimensional embeddings to 2D for visualization while preserving local structure.
+
+```{python}
+#| eval: false
+from umap import UMAP
+
+# Reduce to 2D
+reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
+embeddings_2d = reducer.fit_transform(embeddings)
+
+# Plot with class colors
+plt.figure(figsize=(12, 10))
+scatter = plt.scatter(
+    embeddings_2d[:, 0],
+    embeddings_2d[:, 1],
+    c=labels,
+    cmap='tab10',
+    alpha=0.6,
+    s=10
+)
+plt.colorbar(scatter, label='Class')
+plt.title('EuroSAT Embeddings (UMAP)')
+plt.xlabel('UMAP 1')
+plt.ylabel('UMAP 2')
+plt.tight_layout()
+plt.show()
+```
+
+### Interpreting the Visualization
+
+- **Clusters** indicate the model groups similar land cover types
+- **Separation** between clusters shows discriminative power
+- **Overlap** suggests classes the model finds similar
+
+## Similarity Search
+
+Find the most similar scenes to a query image using cosine similarity.
+
+```{python}
+#| eval: false
+from sklearn.metrics.pairwise import cosine_similarity
+
+def find_similar(query_idx, embeddings, k=5):
+    """Find k most similar embeddings to query."""
+    query = embeddings[query_idx:query_idx+1]
+    similarities = cosine_similarity(query, embeddings)[0]
+
+    # Get top-k (excluding query itself)
+    top_indices = np.argsort(similarities)[::-1][1:k+1]
+    top_scores = similarities[top_indices]
+
+    return top_indices, top_scores
+
+# Find similar scenes
+query_idx = 0
+similar_indices, scores = find_similar(query_idx, embeddings, k=5)
+
+print(f"Query class: {dataset.classes[labels[query_idx]]}")
+print("\nMost similar scenes:")
+for idx, score in zip(similar_indices, scores):
+    print(f"  Index {idx}: {dataset.classes[labels[idx]]} (similarity: {score:.3f})")
+```
+
+### Visualizing Similar Scenes
+
+```{python}
+#| eval: false
+fig, axes = plt.subplots(1, 6, figsize=(18, 3))
+
+# Show query
+sample = dataset[query_idx]
+rgb = sample['image'][[3, 2, 1]].numpy().transpose(1, 2, 0)
+rgb = np.clip(rgb / 3000, 0, 1)
+axes[0].imshow(rgb)
+axes[0].set_title(f"Query\n{dataset.classes[labels[query_idx]]}")
+axes[0].axis('off')
+
+# Show similar scenes
+for i, (idx, score) in enumerate(zip(similar_indices, scores)):
+    sample = dataset[idx]
+    rgb = sample['image'][[3, 2, 1]].numpy().transpose(1, 2, 0)
+    rgb = np.clip(rgb / 3000, 0, 1)
+    axes[i+1].imshow(rgb)
+    axes[i+1].set_title(f"Sim: {score:.3f}\n{dataset.classes[labels[idx]]}")
+    axes[i+1].axis('off')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Comparing Models
+
+Different foundation models learn different representations. Let's compare embeddings from multiple models.
+
+```{python}
+#| eval: false
+# TODO: Load multiple models and compare embeddings
+# - Prithvi-EO-2.0
+# - SatMAE
+# - Clay
+
+# Compare:
+# 1. Cluster quality (silhouette score)
+# 2. Classification accuracy (linear probe)
+# 3. Retrieval performance (recall@k)
+```
+
+## Anomaly Detection
+
+Embeddings can identify unusual scenes as outliers in the feature space.
+
+```{python}
+#| eval: false
+from sklearn.ensemble import IsolationForest
+
+# Train anomaly detector on embeddings
+detector = IsolationForest(contamination=0.05, random_state=42)
+anomaly_scores = detector.fit_predict(embeddings)
+
+# Find anomalies
+anomaly_indices = np.where(anomaly_scores == -1)[0]
+print(f"Found {len(anomaly_indices)} potential anomalies")
+
+# Visualize anomalies in UMAP space
+plt.figure(figsize=(12, 10))
+plt.scatter(embeddings_2d[:, 0], embeddings_2d[:, 1], c='lightgray', alpha=0.5, s=10)
+plt.scatter(
+    embeddings_2d[anomaly_indices, 0],
+    embeddings_2d[anomaly_indices, 1],
+    c='red', s=30, label='Anomalies'
+)
+plt.legend()
+plt.title('Detected Anomalies in Embedding Space')
+plt.show()
+```
+
+## Linear Probing
+
+Test embedding quality by training a simple linear classifier on frozen features.
+
+```{python}
+#| eval: false
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    embeddings, labels, test_size=0.2, random_state=42, stratify=labels
+)
+
+# Train linear classifier
+clf = LogisticRegression(max_iter=1000, random_state=42)
+clf.fit(X_train, y_train)
+
+# Evaluate
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"Linear probe accuracy: {accuracy:.1%}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=dataset.classes))
+```
+
+## Summary
+
+This week you learned to:
+
+1. **Extract embeddings** from pretrained foundation models
+2. **Visualize features** using UMAP dimensionality reduction
+3. **Perform similarity search** to find related scenes
+4. **Detect anomalies** as outliers in embedding space
+5. **Evaluate embeddings** with linear probing
+
+## Key Takeaways
+
+- Foundation models learn meaningful representations without task-specific training
+- Embeddings cluster by semantic content (land cover, features)
+- Simple classifiers on frozen embeddings often perform surprisingly well
+- Embedding analysis helps understand and debug model behavior
+
+## Next Week
+
+In Week 3, we'll explore **mask/gap filling** - using masked autoencoders to reconstruct missing data in satellite imagery, with applications to cloud removal.

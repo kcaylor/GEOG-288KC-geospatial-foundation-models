@@ -1,0 +1,235 @@
+---
+title: "Week 10: Presentations & Synthesis"
+subtitle: "Final project presentations and course synthesis"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+This final week is dedicated to project presentations and synthesizing the concepts learned throughout the course.
+
+**Deliverable**: Final Project Presentations
+
+## Presentation Guidelines
+
+### Format
+
+- **Duration**: 15-20 minutes per presentation
+- **Q&A**: 5 minutes
+- **Format**: Slides + live demo (optional)
+
+### Required Content
+
+1. **Problem Statement**
+   - What problem are you solving?
+   - Why does it matter?
+   - What's the application domain?
+
+2. **Data**
+   - What data sources did you use?
+   - How much data? What preprocessing?
+   - Any data challenges encountered?
+
+3. **Methodology**
+   - Which workflow(s) did you use?
+   - What foundation model(s)?
+   - Training configuration and choices
+
+4. **Results**
+   - Quantitative metrics (accuracy, IoU, mAP, etc.)
+   - Qualitative examples
+   - Comparison to baselines (if applicable)
+
+5. **Lessons Learned**
+   - What worked well?
+   - What didn't work?
+   - What would you do differently?
+
+6. **Future Work**
+   - How could this be extended?
+   - What's needed for production?
+
+## Course Synthesis
+
+### Workflows Covered
+
+| Week | Workflow | Key Task | TerraTorch/TorchGeo Component |
+|------|----------|----------|------------------------------|
+| 2 | Embeddings | Feature extraction | Model forward pass |
+| 3 | Gap Filling | Reconstruction | Prithvi MAE |
+| 4 | Prediction | Temporal forecasting | PixelWiseRegressionTask |
+| 5 | Classification | Scene labeling | ClassificationTask |
+| 6 | Detection | Object localization | ObjectDetectionTask (TorchGeo) |
+| 7 | Segmentation | Pixel labeling | SemanticSegmentationTask |
+
+### The TerraTorch Stack
+
+```
+Your Application
+      ↓
+TerraTorch (Tasks, Model Factory, Data Modules)
+      ↓
+PyTorch Lightning (Training, Callbacks, Logging)
+      ↓
+TorchGeo (Datasets, Samplers, Transforms)
+      ↓
+PyTorch
+```
+
+### Key Concepts
+
+#### Foundation Models
+
+- **Pretraining**: Self-supervised learning on massive unlabeled data
+- **Transfer Learning**: Adapting pretrained models to new tasks
+- **Fine-tuning Strategies**:
+  - Linear probing (freeze backbone)
+  - Full fine-tuning (update everything)
+  - LoRA/adapters (efficient partial updates)
+
+#### Data Handling
+
+- **STAC APIs**: Standardized data discovery
+- **TorchGeo Datasets**: Geospatial-aware data loading
+- **Tiling**: Handling large images
+- **Normalization**: Per-band statistics for remote sensing
+
+#### Training
+
+- **PyTorch Lightning**: Structured training loops
+- **Callbacks**: Checkpointing, early stopping, LR scheduling
+- **Mixed Precision**: Faster training with 16-bit
+- **Reproducibility**: Seed setting, deterministic algorithms
+
+## Best Practices Summary
+
+### Data Preparation
+
+```python
+# 1. Use established datasets when possible
+from torchgeo.datasets import EuroSAT
+
+# 2. Apply appropriate normalization
+transform = Normalize(mean=SENTINEL2_MEAN, std=SENTINEL2_STD)
+
+# 3. Handle large images with tiling
+tiles = create_tiles(image, tile_size=512, overlap=64)
+
+# 4. Split data appropriately (spatial/temporal awareness)
+train, val, test = spatial_split(dataset, ratio=[0.7, 0.15, 0.15])
+```
+
+### Model Selection
+
+```python
+# 1. Start with linear probing
+task = ClassificationTask(..., freeze_backbone=True)
+
+# 2. Move to full fine-tuning if needed
+task = ClassificationTask(..., freeze_backbone=False, lr=1e-4)
+
+# 3. Use appropriate architecture for task
+# - Classification: backbone + head
+# - Segmentation: encoder + decoder (UNet, FPN)
+# - Detection: backbone + RPN + heads
+```
+
+### Training
+
+```python
+# 1. Use Lightning for structured training
+trainer = L.Trainer(
+    max_epochs=50,
+    callbacks=[checkpoint, early_stop],
+    precision="16-mixed",
+)
+
+# 2. Monitor appropriate metrics
+# - Classification: accuracy, F1
+# - Segmentation: IoU, F1
+# - Detection: mAP@0.5
+
+# 3. Save checkpoints regularly
+checkpoint = ModelCheckpoint(save_top_k=3, monitor='val_loss')
+```
+
+### Evaluation
+
+```python
+# 1. Use held-out test set
+trainer.test(task, datamodule)
+
+# 2. Visualize predictions
+visualize_predictions(images, predictions, ground_truth)
+
+# 3. Analyze errors
+confusion_matrix(y_true, y_pred)
+error_analysis(failures)
+```
+
+### Deployment
+
+```python
+# 1. Export model
+torch.onnx.export(model, dummy_input, "model.onnx")
+
+# 2. Create demo
+demo = gr.Interface(fn=predict, inputs="image", outputs="label")
+
+# 3. Document thoroughly
+# - Model card
+# - API documentation
+# - Usage examples
+```
+
+## Resources for Continued Learning
+
+### Documentation
+
+- [TerraTorch Documentation](https://ibm.github.io/terratorch/stable/)
+- [TorchGeo Documentation](https://torchgeo.readthedocs.io/)
+- [PyTorch Lightning Documentation](https://lightning.ai/docs/)
+- [HuggingFace Transformers](https://huggingface.co/docs/transformers/)
+
+### Papers
+
+- [Prithvi-EO-2.0](https://arxiv.org/html/2412.02732v1)
+- [SatMAE](https://arxiv.org/abs/2207.08051)
+- [MAE](https://arxiv.org/abs/2111.06377)
+- [ViT](https://arxiv.org/abs/2010.11929)
+
+### Datasets
+
+- [GEO-Bench](https://github.com/ServiceNow/geo-bench)
+- [TorchGeo Datasets](https://torchgeo.readthedocs.io/en/stable/api/datasets.html)
+- [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com/)
+
+### Communities
+
+- [TorchGeo Discord](https://discord.gg/torchgeo)
+- [HuggingFace Community](https://huggingface.co/join)
+- [IBM TerraTorch GitHub](https://github.com/IBM/terratorch)
+
+## Thank You!
+
+This course covered:
+
+1. **Week 0-1**: Environment setup and data access
+2. **Week 2**: Embedding analysis and feature understanding
+3. **Week 3**: MAE reconstruction and gap filling
+4. **Week 4**: Temporal prediction and forecasting
+5. **Week 5**: Scene and image classification
+6. **Week 6**: Object detection and localization
+7. **Week 7**: Semantic segmentation
+8. **Week 8**: Integration and scaling
+9. **Week 9**: Deployment and APIs
+10. **Week 10**: Presentations and synthesis
+
+### Key Takeaway
+
+Foundation models significantly reduce the data and compute requirements for geospatial AI applications. Combined with high-level tools like TerraTorch and TorchGeo, you can now build production-quality geospatial ML systems without implementing everything from scratch.
+
+Good luck with your continued work in geospatial AI!

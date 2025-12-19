@@ -11,96 +11,111 @@ project:
     - "!LLMs-from-scratch/**"
     - "!COURSE_*.md"
     - "!*_PLAN.md"
+    - "!*_TRACKING.md"
+    - "!chapters/c*.qmd"  # Exclude old chapter files
 
 website:
   site-url: https://kcaylor.github.io/GEOG-288KC-geospatial-foundation-models
   navbar:
     title: "GEOG 288KC"
     right:
-      - text: 🏠 home
+      - text: Home
         href: index.qmd
-      - text: 📋 syllabus
+      - text: Syllabus
         href: Syllabus.html
-      - text: 💻 weekly sessions
+      - text: Weekly Sessions
         menu:
-          - text: Week 1 - 🚀 Core Tools and Data Access
-            href: chapters/c01-geospatial-data-foundations.qmd
-          - text: Week 2 - ⚡ Rapid Remote Sensing Preprocessing
-            href: chapters/c02-spatial-temporal-attention-mechanisms.qmd
-          - text: Week 3a - 🌍 TerraTorch Foundations
-            href: chapters/c03a-terratorch-foundations.qmd
-          - text: Week 3b - 🤖 Machine Learning on Remote Sensing
-            href: chapters/c03-complete-gfm-architecture.qmd
-          - text: Week 4 - 🏗️ Foundation Models in Practice
-            href: chapters/c04-pretraining-implementation.qmd
-          - text: Week 5 - 🔧 Fine-Tuning & Transfer Learning
-            href: chapters/c05-training-loop-optimization.qmd
-          - text: Week 6 - ⏰ Spatiotemporal Modeling & Projects
-            href: chapters/c06-model-evaluation-analysis.qmd
-          - text: Week 7 - ⚡ TerraTorch + Lightning Fine-Tuning Workflows
-            href: extras/examples/terratorch_finetuning_workflow.qmd
-      - text: 👀 cheatsheets
+          - text: "Phase 1: Foundations"
+          - text: Week 0 - Introduction & Setup
+            href: chapters/w00-introduction-setup.qmd
+          - text: Week 1 - Data Access & TerraTorch Basics
+            href: chapters/w01-data-access-terratorch-basics.qmd
+          - text: "---"
+          - text: "Phase 2: Core Workflows"
+          - text: Week 2 - Embedding Analysis
+            href: chapters/w02-embedding-analysis.qmd
+          - text: Week 3 - Mask/Gap Filling
+            href: chapters/w03-mask-gap-filling.qmd
+          - text: Week 4 - Next Image Prediction
+            href: chapters/w04-next-image-prediction.qmd
+          - text: Week 5 - Classification
+            href: chapters/w05-classification.qmd
+          - text: Week 6 - Object Detection
+            href: chapters/w06-object-detection.qmd
+          - text: Week 7 - Segmentation
+            href: chapters/w07-segmentation.qmd
+          - text: "---"
+          - text: "Phase 3: Production"
+          - text: Week 8 - Integration & Scaling
+            href: chapters/w08-integration-scaling.qmd
+          - text: Week 9 - Deployment & APIs
+            href: chapters/w09-deployment-apis.qmd
+          - text: Week 10 - Presentations & Synthesis
+            href: chapters/w10-presentations-synthesis.qmd
+      - text: Cheatsheets
         menu:
-          - text: "📋 All Cheatsheets"
+          - text: "All Cheatsheets"
             href: cheatsheets.qmd
           - text: "---"
-          - text: "⚡ Quick Starts"
-          - text: "Week 01: Import Guide"
+          - text: "Quick Starts"
+          - text: "Import Guide"
             href: extras/cheatsheets/week01_imports.qmd
-          - text: "Dataset Organization for Fine-Tuning"
+          - text: "Dataset Organization"
             href: extras/cheatsheets/dataset_organization_terratorch.qmd
-      - text: 🧩 explainers
+          - text: "TorchGeo Basics"
+            href: extras/cheatsheets/torchgeo_basics.qmd
+          - text: "TerraTorch Model Zoo"
+            href: extras/cheatsheets/terratorch_model_zoo.qmd
+      - text: Conceptual Guides
         menu:
-          - text: "1️⃣ Week 1"
-          - text: "🤖 AI/ML/DL/FM Hierarchy"
+          - text: "Foundations"
+          - text: "AI/ML/DL/FM Hierarchy"
             href: extras/ai-ml-dl-fm-hierarchy.qmd
-          - text: "🎯 GFM Predictions (Standalone)"
-            href: extras/geospatial-foundation-model-predictions-standalone.qmd
-          - text: "✅ Geospatial Task/Prediction Types"
+          - text: "Geospatial Task Types"
             href: extras/geospatial-prediction-hierarchy.qmd
-          - text: "🧠 Neural Networks: Neurons to Transformers"
+          - text: "Neural Networks Explainer"
             href: extras/neural_networks_explainer.qmd
-          - text: "2️⃣ Week 2"
-          - text: "🏗️ Foundation Model Architectures"
+          - text: "---"
+          - text: "Architecture Deep Dives"
+          - text: "Foundation Model Architectures"
             href: chapters/c00a-foundation_model_architectures.qmd
-          - text: "🎓 Introduction to Deep Learning Architecture"
+          - text: "Deep Learning Architecture"
             href: chapters/c00b-introduction-to-deeplearning-architecture.qmd
-      - text: 📖 extras
+      - text: Examples
         menu:
-          - text: "🎯 Practical Examples"
+          - text: "Tutorials"
           - text: NDVI Timeseries Forecasting
             href: extras/examples/ndvi_timeseries_forecasting.qmd
-          - text: Normalization Comparison
-            href: extras/examples/normalization_comparison.qmd
-          - text: ResNet Implementation
-            href: extras/examples/resnet.qmd
           - text: Segmentation Fine-Tuning
-            href: extras/examples/segmentation_finetuning.ipynb
-          - text: TerraMind EuroSAT Classification
-            href: extras/examples/Terramind_EuroSAT.ipynb
-          - text: TerraTorch Fine-Tuning Workflow
-            href: extras/examples/terratorch_finetuning_workflow.qmd
-          - text: Text Encoder
-            href: extras/examples/text_encoder.qmd
+            href: extras/examples/segmentation_tutorial.qmd
+          - text: Object Detection
+            href: extras/examples/object_detection.qmd
           - text: Tiling and Patches
             href: extras/examples/tiling-and-patches.qmd
+          - text: "---"
+          - text: "Reference"
+          - text: Normalization Comparison
+            href: extras/examples/normalization_comparison.qmd
           - text: TerraTorch Workflows
             href: extras/examples/terratorch_workflows.qmd
-          - text: "📚 Reference Materials"
-            href: extras/resources/course_resources.qmd
-          - text: "📁 Project Templates"
+          - text: "---"
+          - text: "Project Templates"
           - text: Project Proposal Template
             href: extras/projects/project-proposal-template.qmd
-          - text: Project Results Template
+          - text: MVP Template
             href: extras/projects/mvp-template.qmd
+          - text: "---"
+          - text: "Resources"
+            href: extras/resources/course_resources.qmd
       - icon: github
-        href: https://github.com/gfms-from-scratch/gfms-from-scratch.github.io
+        href: https://github.com/kcaylor/GEOG-288KC-geospatial-foundation-models
         target: _blank
   page-footer:
     background: dark
     right: This website is built with [{{< fa brands github title="the github octocat logo" >}}](https://github.com/kcaylor/GEOG-288KC-geospatial-foundation-models) and [Quarto](https://quarto.org/)
     left: |
       ![Department of Geography logo](/images/geog-logo.png){.img-fluid width=250px}
+
 format:
   html:
     theme: meds-website-styles.scss
@@ -110,14 +125,10 @@ format:
     code-fold: false
     code-tools: true
     jupyter: geoai
-    # note: keep filters at project level for reliability across engines
 
 filters:
   - fontawesome
-  - tools/filters/tangle.py   # run your Python filter
-  - tools/filters/path_shortcode.py   # handle {{< path >}} shortcodes
-
-tangle-root: ..
+  - tools/filters/path_shortcode.py
 
 execute:
   freeze: true

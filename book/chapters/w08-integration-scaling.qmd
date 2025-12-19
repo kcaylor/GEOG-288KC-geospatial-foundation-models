@@ -1,0 +1,396 @@
+---
+title: "Week 8: Integration & Scaling"
+subtitle: "Combining workflows and optimizing for production"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Real-world applications often require combining multiple workflows and scaling to handle large datasets. This week, we integrate the techniques learned so far and optimize for production use.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Combine multiple workflows in a pipeline
+- Optimize training with Lightning callbacks
+- Scale inference for large datasets
+- Manage checkpoints and reproducibility
+:::
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import numpy as np
+import torch
+import lightning as L
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
+
+DATA_PATH = os.environ.get('DATA_PATH', '/tmp/geoai_data')
+```
+
+## Multi-Workflow Pipelines
+
+### Example: Detection + Segmentation
+
+```{python}
+#| eval: false
+class CombinedPipeline:
+    """Pipeline combining detection and segmentation."""
+
+    def __init__(self, detector, segmenter, device='cuda'):
+        self.detector = detector.to(device).eval()
+        self.segmenter = segmenter.to(device).eval()
+        self.device = device
+
+    def __call__(self, image):
+        """Run combined analysis."""
+        image_tensor = image.unsqueeze(0).to(self.device)
+
+        with torch.no_grad():
+            # Step 1: Detect objects
+            detections = self.detector(image_tensor)
+
+            # Step 2: Segment full image
+            segmentation = self.segmenter(image_tensor).argmax(dim=1)
+
+        return {
+            'detections': detections[0],
+            'segmentation': segmentation[0],
+        }
+```
+
+### Example: Classification → Segmentation
+
+```{python}
+#| eval: false
+class ConditionalPipeline:
+    """Run segmentation only on interesting scenes."""
+
+    def __init__(self, classifier, segmenter, target_classes, device='cuda'):
+        self.classifier = classifier.to(device).eval()
+        self.segmenter = segmenter.to(device).eval()
+        self.target_classes = target_classes
+        self.device = device
+
+    def __call__(self, image):
+        image_tensor = image.unsqueeze(0).to(self.device)
+
+        with torch.no_grad():
+            # Step 1: Classify scene
+            class_probs = self.classifier(image_tensor).softmax(dim=1)
+            predicted_class = class_probs.argmax(dim=1).item()
+
+            # Step 2: Only segment if relevant class
+            if predicted_class in self.target_classes:
+                segmentation = self.segmenter(image_tensor).argmax(dim=1)
+                return {
+                    'class': predicted_class,
+                    'segmentation': segmentation[0],
+                    'skipped': False
+                }
+
+        return {'class': predicted_class, 'segmentation': None, 'skipped': True}
+```
+
+## Lightning Optimization
+
+### Callback Configuration
+
+```{python}
+#| eval: false
+from lightning.pytorch.callbacks import (
+    ModelCheckpoint,
+    EarlyStopping,
+    LearningRateMonitor,
+    RichProgressBar,
+)
+
+callbacks = [
+    # Save best model
+    ModelCheckpoint(
+        monitor='val_loss',
+        mode='min',
+        save_top_k=3,
+        filename='epoch={epoch}-val_loss={val_loss:.3f}',
+        save_last=True,
+    ),
+
+    # Early stopping
+    EarlyStopping(
+        monitor='val_loss',
+        patience=10,
+        mode='min',
+        verbose=True,
+    ),
+
+    # Learning rate monitoring
+    LearningRateMonitor(logging_interval='epoch'),
+
+    # Rich progress bar
+    RichProgressBar(),
+]
+
+trainer = L.Trainer(
+    max_epochs=100,
+    callbacks=callbacks,
+    accelerator="auto",
+    devices=1,
+)
+```
+
+### Learning Rate Scheduling
+
+```{python}
+#| eval: false
+from terratorch.tasks import SemanticSegmentationTask
+
+task = SemanticSegmentationTask(
+    model_factory="PrithviModelFactory",
+    model_factory_kwargs={...},
+    lr=1e-4,
+    lr_scheduler="cosine",
+    lr_scheduler_kwargs={"T_max": 100},
+)
+```
+
+### Mixed Precision Training
+
+```{python}
+#| eval: false
+trainer = L.Trainer(
+    precision="16-mixed",  # FP16 training
+    # or "bf16-mixed" for bfloat16
+)
+```
+
+## Scaling Inference
+
+### Batch Processing
+
+```{python}
+#| eval: false
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
+def batch_inference(model, dataset, batch_size=32, device='cuda'):
+    """Run inference on entire dataset."""
+    model = model.to(device).eval()
+    loader = DataLoader(dataset, batch_size=batch_size, num_workers=4)
+
+    all_predictions = []
+
+    with torch.no_grad():
+        for batch in tqdm(loader, desc="Processing"):
+            images = batch['image'].to(device)
+            preds = model(images)
+            all_predictions.append(preds.cpu())
+
+    return torch.cat(all_predictions, dim=0)
+```
+
+### Parallel Tile Processing
+
+```{python}
+#| eval: false
+from concurrent.futures import ThreadPoolExecutor
+import torch.multiprocessing as mp
+
+def parallel_tile_inference(model, tiles, num_workers=4, device='cuda'):
+    """Process tiles in parallel."""
+    model = model.to(device).eval()
+
+    def process_tile(tile):
+        with torch.no_grad():
+            tile_gpu = tile.unsqueeze(0).to(device)
+            pred = model(tile_gpu)
+        return pred.cpu().squeeze(0)
+
+    # Process tiles with thread pool
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        predictions = list(executor.map(process_tile, tiles))
+
+    return predictions
+```
+
+### Memory-Efficient Inference
+
+```{python}
+#| eval: false
+@torch.inference_mode()
+def memory_efficient_inference(model, dataloader, device='cuda'):
+    """Inference with minimal memory footprint."""
+    model = model.to(device).eval()
+
+    for batch in dataloader:
+        images = batch['image'].to(device, non_blocking=True)
+
+        # Forward pass
+        predictions = model(images)
+
+        # Process predictions immediately
+        yield predictions.cpu()
+
+        # Clear GPU memory
+        del images, predictions
+        torch.cuda.empty_cache()
+```
+
+## Checkpoint Management
+
+### Saving Checkpoints
+
+```{python}
+#| eval: false
+# Automatic via Lightning
+checkpoint_callback = ModelCheckpoint(
+    dirpath='checkpoints/',
+    filename='model-{epoch:02d}-{val_loss:.3f}',
+    save_top_k=3,
+    monitor='val_loss',
+    mode='min',
+)
+
+# Manual save
+trainer.save_checkpoint('checkpoints/final_model.ckpt')
+```
+
+### Loading Checkpoints
+
+```{python}
+#| eval: false
+from terratorch.tasks import SemanticSegmentationTask
+
+# Load from checkpoint
+task = SemanticSegmentationTask.load_from_checkpoint(
+    'checkpoints/model-epoch=10-val_loss=0.123.ckpt'
+)
+
+# Or for inference only
+model = task.model
+```
+
+### Exporting for Deployment
+
+```{python}
+#| eval: false
+# Export to ONNX
+dummy_input = torch.randn(1, 4, 512, 512)
+torch.onnx.export(
+    model,
+    dummy_input,
+    'model.onnx',
+    input_names=['image'],
+    output_names=['prediction'],
+    dynamic_axes={'image': {0: 'batch'}, 'prediction': {0: 'batch'}},
+)
+
+# Export to TorchScript
+scripted_model = torch.jit.script(model)
+scripted_model.save('model.pt')
+```
+
+## Reproducibility
+
+### Setting Seeds
+
+```{python}
+#| eval: false
+import lightning as L
+
+# Set all seeds
+L.seed_everything(42, workers=True)
+
+# Deterministic algorithms
+trainer = L.Trainer(
+    deterministic=True,
+)
+```
+
+### Logging Experiments
+
+```{python}
+#| eval: false
+from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
+
+# TensorBoard
+logger = TensorBoardLogger('logs/', name='my_experiment')
+
+# Weights & Biases
+logger = WandbLogger(project='geoai', name='experiment_1')
+
+trainer = L.Trainer(logger=logger)
+```
+
+## Performance Profiling
+
+```{python}
+#| eval: false
+from lightning.pytorch.profilers import PyTorchProfiler
+
+profiler = PyTorchProfiler(
+    on_trace_ready=torch.profiler.tensorboard_trace_handler('./logs/profiler'),
+    schedule=torch.profiler.schedule(
+        wait=1,
+        warmup=1,
+        active=3,
+    ),
+)
+
+trainer = L.Trainer(profiler=profiler)
+```
+
+## Practical Optimization Tips
+
+### Data Loading
+
+```{python}
+#| eval: false
+# Optimize DataLoader
+loader = DataLoader(
+    dataset,
+    batch_size=32,
+    num_workers=8,
+    pin_memory=True,
+    persistent_workers=True,
+    prefetch_factor=2,
+)
+```
+
+### Model Compilation (PyTorch 2.0+)
+
+```{python}
+#| eval: false
+# Compile model for faster inference
+model = torch.compile(model, mode='reduce-overhead')
+```
+
+### Gradient Accumulation
+
+```{python}
+#| eval: false
+# Simulate larger batch sizes
+trainer = L.Trainer(
+    accumulate_grad_batches=4,  # Effective batch = 4 * batch_size
+)
+```
+
+## Summary
+
+This week you learned to:
+
+1. **Combine workflows** in multi-step pipelines
+2. **Optimize training** with Lightning callbacks
+3. **Scale inference** for large datasets
+4. **Manage checkpoints** for reproducibility
+5. **Profile performance** for optimization
+
+## Next Week
+
+In Week 9, we'll focus on **deployment and APIs** - making your models accessible through web interfaces and APIs.

@@ -1,0 +1,430 @@
+---
+title: "Week 9: Deployment & APIs"
+subtitle: "Making models accessible through web interfaces"
+jupyter: geoai
+format:
+  html:
+    code-fold: false
+---
+
+## Overview
+
+Trained models are only useful if they can be accessed by users. This week, we learn to deploy models through web APIs and interactive interfaces using Gradio, FastAPI, and HuggingFace Hub.
+
+:::{.callout-tip}
+## What You'll Learn
+
+- Create interactive demos with Gradio
+- Build REST APIs with FastAPI
+- Deploy to HuggingFace Spaces
+- Containerize with Docker
+:::
+
+## Setup
+
+```{python}
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+import torch
+import numpy as np
+from PIL import Image
+```
+
+## Gradio Demos
+
+Gradio makes it easy to create interactive web interfaces for ML models.
+
+### Basic Classification Demo
+
+```{python}
+#| eval: false
+import gradio as gr
+
+def classify_image(image):
+    """Classify uploaded satellite image."""
+    # Preprocess
+    image_tensor = preprocess(image)
+
+    # Inference
+    with torch.no_grad():
+        logits = model(image_tensor.unsqueeze(0))
+        probs = torch.softmax(logits, dim=1)[0]
+
+    # Return class probabilities
+    return {classes[i]: float(probs[i]) for i in range(len(classes))}
+
+# Create interface
+demo = gr.Interface(
+    fn=classify_image,
+    inputs=gr.Image(type="pil", label="Satellite Image"),
+    outputs=gr.Label(num_top_classes=5, label="Predictions"),
+    title="Land Cover Classification",
+    description="Upload a satellite image to classify its land cover type.",
+    examples=["examples/forest.png", "examples/urban.png"],
+)
+
+demo.launch()
+```
+
+### Segmentation Demo
+
+```{python}
+#| eval: false
+import gradio as gr
+import numpy as np
+
+def segment_image(image):
+    """Segment uploaded satellite image."""
+    # Preprocess
+    image_tensor = preprocess(image)
+
+    # Inference
+    with torch.no_grad():
+        logits = model(image_tensor.unsqueeze(0))
+        prediction = logits.argmax(dim=1)[0].cpu().numpy()
+
+    # Create colored mask
+    colored_mask = colorize_mask(prediction, class_colors)
+
+    return Image.fromarray(colored_mask)
+
+demo = gr.Interface(
+    fn=segment_image,
+    inputs=gr.Image(type="pil", label="Satellite Image"),
+    outputs=gr.Image(type="pil", label="Segmentation"),
+    title="Land Cover Segmentation",
+    description="Upload a satellite image to segment land cover types.",
+)
+
+demo.launch()
+```
+
+### Multi-tab Demo
+
+```{python}
+#| eval: false
+import gradio as gr
+
+with gr.Blocks() as demo:
+    gr.Markdown("# Geospatial Foundation Model Demo")
+
+    with gr.Tabs():
+        with gr.TabItem("Classification"):
+            with gr.Row():
+                class_input = gr.Image(type="pil", label="Input")
+                class_output = gr.Label(num_top_classes=5)
+            class_btn = gr.Button("Classify")
+            class_btn.click(classify_image, inputs=class_input, outputs=class_output)
+
+        with gr.TabItem("Segmentation"):
+            with gr.Row():
+                seg_input = gr.Image(type="pil", label="Input")
+                seg_output = gr.Image(type="pil", label="Segmentation")
+            seg_btn = gr.Button("Segment")
+            seg_btn.click(segment_image, inputs=seg_input, outputs=seg_output)
+
+        with gr.TabItem("Detection"):
+            with gr.Row():
+                det_input = gr.Image(type="pil", label="Input")
+                det_output = gr.Image(type="pil", label="Detections")
+            det_btn = gr.Button("Detect")
+            det_btn.click(detect_objects, inputs=det_input, outputs=det_output)
+
+demo.launch()
+```
+
+## FastAPI REST API
+
+For production deployments, FastAPI provides high-performance REST APIs.
+
+### Basic API Structure
+
+```{python}
+#| eval: false
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse
+import io
+
+app = FastAPI(title="GeoAI API", version="1.0")
+
+@app.on_event("startup")
+async def load_model():
+    global model
+    model = load_pretrained_model()
+    model.eval()
+
+@app.post("/classify")
+async def classify(file: UploadFile = File(...)):
+    # Read image
+    contents = await file.read()
+    image = Image.open(io.BytesIO(contents))
+
+    # Preprocess and inference
+    tensor = preprocess(image)
+    with torch.no_grad():
+        logits = model(tensor.unsqueeze(0))
+        probs = torch.softmax(logits, dim=1)[0]
+
+    # Return results
+    predictions = {
+        classes[i]: float(probs[i])
+        for i in range(len(classes))
+    }
+    return JSONResponse(predictions)
+
+@app.post("/segment")
+async def segment(file: UploadFile = File(...)):
+    contents = await file.read()
+    image = Image.open(io.BytesIO(contents))
+
+    tensor = preprocess(image)
+    with torch.no_grad():
+        logits = model(tensor.unsqueeze(0))
+        mask = logits.argmax(dim=1)[0].cpu().numpy()
+
+    # Encode mask as base64 or return as image
+    return {"mask": mask.tolist()}
+
+# Run with: uvicorn app:app --reload
+```
+
+### API with Batching
+
+```{python}
+#| eval: false
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
+import asyncio
+
+class BatchRequest(BaseModel):
+    images: List[str]  # Base64 encoded images
+
+class BatchResponse(BaseModel):
+    predictions: List[dict]
+
+@app.post("/batch_classify", response_model=BatchResponse)
+async def batch_classify(request: BatchRequest):
+    # Decode images
+    tensors = [decode_and_preprocess(img) for img in request.images]
+    batch = torch.stack(tensors)
+
+    # Batch inference
+    with torch.no_grad():
+        logits = model(batch)
+        probs = torch.softmax(logits, dim=1)
+
+    # Format results
+    predictions = []
+    for i, prob in enumerate(probs):
+        predictions.append({
+            classes[j]: float(prob[j])
+            for j in range(len(classes))
+        })
+
+    return BatchResponse(predictions=predictions)
+```
+
+## HuggingFace Hub
+
+### Uploading Models
+
+```{python}
+#| eval: false
+from huggingface_hub import HfApi, create_repo
+
+# Create repository
+repo_id = "username/geoai-segmentation"
+create_repo(repo_id, private=False)
+
+# Upload model
+api = HfApi()
+api.upload_folder(
+    folder_path="./model_checkpoint",
+    repo_id=repo_id,
+    repo_type="model",
+)
+```
+
+### Model Card
+
+```markdown
+---
+tags:
+- geospatial
+- segmentation
+- satellite-imagery
+- terratorch
+license: apache-2.0
+datasets:
+- sen1floods11
+metrics:
+- iou
+---
+
+# Flood Segmentation Model
+
+This model performs semantic segmentation for flood mapping using Sentinel-1 SAR imagery.
+
+## Model Details
+
+- **Base Model**: Prithvi-EO-2.0-300M
+- **Task**: Binary segmentation (flooded/not flooded)
+- **Dataset**: Sen1Floods11
+- **Performance**: mIoU 0.78
+
+## Usage
+
+```python
+from terratorch.tasks import SemanticSegmentationTask
+
+model = SemanticSegmentationTask.load_from_checkpoint("model.ckpt")
+```
+```
+
+### HuggingFace Spaces
+
+Create a Gradio app and deploy to Spaces:
+
+```{python}
+#| eval: false
+# app.py for HuggingFace Spaces
+import gradio as gr
+from huggingface_hub import hf_hub_download
+import torch
+
+# Download model from Hub
+model_path = hf_hub_download(
+    repo_id="username/geoai-segmentation",
+    filename="model.ckpt"
+)
+model = load_model(model_path)
+
+def predict(image):
+    # ... inference code ...
+    return result
+
+demo = gr.Interface(fn=predict, inputs="image", outputs="image")
+demo.launch()
+```
+
+## Docker Deployment
+
+### Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY . .
+
+# Expose port
+EXPOSE 8000
+
+# Run API
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+    environment:
+      - MODEL_PATH=/app/models/segmentation.ckpt
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+```
+
+## API Client Example
+
+```{python}
+#| eval: false
+import requests
+import base64
+
+def classify_remote(image_path, api_url="http://localhost:8000"):
+    """Send image to API for classification."""
+    with open(image_path, "rb") as f:
+        files = {"file": f}
+        response = requests.post(f"{api_url}/classify", files=files)
+
+    return response.json()
+
+# Usage
+result = classify_remote("satellite_image.tif")
+print(f"Top prediction: {max(result, key=result.get)}")
+```
+
+## Performance Optimization
+
+### Model Optimization
+
+```{python}
+#| eval: false
+# Quantization for faster inference
+model_int8 = torch.quantization.quantize_dynamic(
+    model, {torch.nn.Linear}, dtype=torch.qint8
+)
+
+# TorchScript for production
+scripted = torch.jit.script(model)
+scripted.save("model_scripted.pt")
+
+# ONNX export
+torch.onnx.export(model, dummy_input, "model.onnx")
+```
+
+### Caching
+
+```{python}
+#| eval: false
+from functools import lru_cache
+import hashlib
+
+@lru_cache(maxsize=100)
+def cached_inference(image_hash):
+    """Cache inference results by image hash."""
+    return model(images[image_hash])
+
+def predict_with_cache(image):
+    # Create hash of image
+    image_bytes = image.tobytes()
+    image_hash = hashlib.md5(image_bytes).hexdigest()
+
+    return cached_inference(image_hash)
+```
+
+## Summary
+
+This week you learned to:
+
+1. **Create Gradio demos** for interactive model exploration
+2. **Build FastAPI endpoints** for production APIs
+3. **Deploy to HuggingFace** Spaces and Hub
+4. **Containerize with Docker** for reproducible deployment
+5. **Optimize performance** for production use
+
+## Next Week
+
+In Week 10, we'll wrap up with **project presentations and synthesis** - presenting your projects and reviewing key concepts from the course.

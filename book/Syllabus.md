@@ -7,7 +7,7 @@
 
 ### **Course Overview**
 
-This accelerated, hands-on seminar provides practical skills for working with state-of-the-art geospatial foundation models. Students learn to access, process, and analyze satellite imagery using modern tools, apply foundation models to real-world problems, and implement independent projects in environmental monitoring and analysis. The course emphasizes immediately applicable skills rather than theoretical foundations.
+This accelerated, hands-on seminar provides practical skills for working with state-of-the-art geospatial foundation models. Students learn to apply pretrained models to real-world problems using TerraTorch and PyTorch Lightning workflows, covering embedding analysis, image reconstruction, temporal prediction, classification, object detection, and semantic segmentation. The course emphasizes immediately applicable skills and production-ready workflows rather than building models from scratch.
 
 ---
 
@@ -25,44 +25,53 @@ To apply, students should submit a paragraph at the [form link](https://forms.gl
 
 [https://forms.gle/Q1iDp2kuZuX1avMPA](https://forms.gle/Q1iDp2kuZuX1avMPA)
 
-### ---
+---
 
 ### **Course Structure: 10-Week Format**
 
-#### **📚 Phase 1: Structured Learning (Weeks 1-5)**
+#### **📚 Phase 1: Foundations (Weeks 0-1)**
 
-* **Week 1**: Core Tools and Data Access *(STAC APIs, satellite data visualization)*
-* **Week 2**: Remote Sensing Preprocessing *(Cloud masking, reprojection, compositing)*
-* **Week 3**: Machine Learning on Remote Sensing *(CNN training, land cover classification)*
-* **Week 4**: Foundation Models in Practice *(Loading pretrained models, feature extraction)*
-* **Week 5**: Fine-Tuning & Transfer Learning *(Linear probing vs. full fine-tuning, adaptation strategies)*
+* **Week 0**: Introduction & Environment Setup *(Course overview, TerraTorch ecosystem, UCSB AI Sandbox setup)*
+* **Week 1**: Data Access & TerraTorch Basics *(STAC APIs, TorchGeo datasets, pretrained model loading)*
 
-#### **🎯 Phase 2: Independent Project Development (Weeks 6-10)**
+#### **🔧 Phase 2: Core Workflows (Weeks 2-7)**
 
-* **Week 6**: Project Proposals & Planning *(Define scope, methodology, expected outcomes)*
-* **Week 7**: Initial Implementation *(Develop minimum viable product, early results)*
-* **Week 8**: Development & Refinement *(Expand functionality, optimize performance)*
-* **Week 9**: Analysis & Results *(Generate final results, prepare visualizations)*
-* **Week 10**: Final Presentations *(Present completed projects, peer review, submission)*
+* **Week 2**: Embedding Analysis *(Feature extraction, UMAP visualization, similarity search, linear probing)*
+* **Week 3**: Mask/Gap Filling *(MAE reconstruction, cloud gap filling, temporal gap filling)*
+* **Week 4**: Next Image Prediction *(Temporal encodings, PixelWiseRegressionTask, NDVI forecasting)* — **Project Proposals Due**
+* **Week 5**: Classification *(ClassificationTask, linear probing vs. fine-tuning, EuroSAT/BigEarthNet)*
+* **Week 6**: Object Detection *(TorchGeo ObjectDetectionTask, Faster R-CNN, detection metrics)*
+* **Week 7**: Semantic Segmentation *(SemanticSegmentationTask, UNet decoders, tiling strategies)* — **Initial MVP Due**
+
+#### **🚀 Phase 3: Production (Weeks 8-10)**
+
+* **Week 8**: Integration & Scaling *(Multi-workflow pipelines, Lightning optimization, batch processing)*
+* **Week 9**: Deployment & APIs *(Gradio demos, FastAPI, HuggingFace Spaces, Docker)*
+* **Week 10**: Presentations & Synthesis *(Final project presentations, course synthesis)*
 
 ---
 
 ### **Deliverables**
 
-**Phase 1: Structured Learning (Weeks 1-5)**
+**Phase 1: Foundations (Weeks 0-1)**
 
-* **Week 1**: Working data access pipeline using STAC APIs
-* **Week 2**: Complete preprocessing workflow for satellite imagery
-* **Week 3**: Trained CNN model for land cover classification
-* **Week 4**: Working foundation model integration and feature extraction
-* **Week 5**: Fine-tuning implementation and project proposal
+* **Week 0**: Working development environment in UCSB AI Sandbox
+* **Week 1**: Working data access pipeline using STAC APIs and TorchGeo datasets
 
-**Phase 2: Independent Project Development (Weeks 6-10)**
+**Phase 2: Core Workflows (Weeks 2-7)**
 
-* **Week 6**: Detailed project proposal with methodology and timeline
-* **Week 7**: Minimum viable product (MVP) with initial results
-* **Week 8-9**: Iterative development, analysis, and documentation
-* **Week 10**: Final presentation, complete project code, and written report
+* **Week 2**: Embedding extraction and visualization workflow
+* **Week 3**: Working mask/gap filling pipeline
+* **Week 4**: Temporal prediction implementation + **Project Proposal**
+* **Week 5**: Classification fine-tuning workflow
+* **Week 6**: Object detection pipeline
+* **Week 7**: Semantic segmentation implementation + **Initial MVP**
+
+**Phase 3: Production (Weeks 8-10)**
+
+* **Week 8**: Integrated multi-workflow pipeline
+* **Week 9**: Deployed demo or API
+* **Week 10**: **Final Presentation** and complete project submission
 
 **Optional**: Submit project results to GitHub, Hugging Face, or present at student showcase
 
@@ -72,8 +81,8 @@ To apply, students should submit a paragraph at the [form link](https://forms.gl
 
 This course will be assessed on a pass/fail basis. Passing requires:
 
-* Consistent attendance and participation (Weeks 1-5)
-* Submission of all structured learning deliverables (Weeks 1-5)
-* Project proposal submission (Week 6)
+* Consistent attendance and participation
+* Submission of weekly workflow deliverables
+* Project proposal submission (Week 4)
 * MVP demonstration (Week 7)
 * Final project presentation and submission (Week 10)
