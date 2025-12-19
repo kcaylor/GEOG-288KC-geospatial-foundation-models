@@ -20,9 +20,9 @@ This document outlines the plan to reorganize GEOG 288KC from its current struct
 
 Before reorganization, the current course materials are preserved in a separate branch:
 
-- **Branch**: `geogfm-course-materials` (local)
+- **Branch**: `claude/geogfm-course-materials-GNJEA` ✅ Pushed to origin
 - **Purpose**: Future "from-scratch" course development
-- **Action Required**: Push branch to origin when ready: `git push origin geogfm-course-materials`
+- **Contains**: Full geogfm package, DIY implementations, current chapter structure
 
 ---
 
