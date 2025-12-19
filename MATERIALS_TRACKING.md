@@ -290,15 +290,8 @@ Research completed 2025-12-19. Updated status:
 
 ## 9. REMAINING ITEMS FOR FOLLOW-UP
 
-### HIGH PRIORITY: Object Detection Approach
-
-**Decision Needed**: How to handle Week 6 given TerraTorch detection limitations?
-
-**Options**:
-1. Use TorchGeo's `ObjectDetectionTask` directly (recommended - maintains Lightning workflow)
-2. Wait for TerraTorch detection to stabilize
-3. Make Week 6 conceptual with demo only
-4. Replace with different workflow
+### Object Detection Approach - RESOLVED
+✅ **Decision**: Use TorchGeo's `ObjectDetectionTask` directly (faster-rcnn, fcos, retinanet with DIOR/VHR10 datasets)
 
 ### MEDIUM PRIORITY: Resource Questions
 - **Datasets for Gap Filling**: Need to identify standard cloud-masked datasets for Week 3
